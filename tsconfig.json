@@ -1,0 +1,34 @@
+{
+    "compilerOptions": {
+        // Project Options
+        "module": "CommonJS",
+        "outDir": "Classes/JavaScript",
+        "removeComments": true,
+        "rootDir": "Classes/TypeScript",
+        "target": "esNext",
+        // Strict Checks
+        "alwaysStrict": true,
+        "noImplicitAny": true,
+        "noImplicitThis": true,
+        "strict": true,
+        "strictBindCallApply": true,
+        "strictFunctionTypes": true,
+        "strictNullChecks": true,
+        "strictPropertyInitialization": true,
+        // Module Resolution
+        "esModuleInterop": true,
+        "allowSyntheticDefaultImports": true,
+        // Linter Checks
+        "noFallthroughCasesInSwitch": true,
+        "noImplicitReturns": true,
+        "noUnusedLocals": true,
+        "noUnusedParameters": true,
+        // Advanced
+        "forceConsistentCasingInFileNames": true,
+        "resolveJsonModule": true,
+        "useDefineForClassFields": true
+    },
+    "include": [
+        "Classes/TypeScript/**/*.ts"
+    ]
+}
