@@ -29,6 +29,6 @@
         "useDefineForClassFields": true
     },
     "include": [
-        "Classes/TypeScript/**/*.ts"
+        "Classes/TypeScript"
     ]
 }

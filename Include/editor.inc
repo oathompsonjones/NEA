@@ -88,7 +88,7 @@ echo <<<HTML
         const tooltipList = tooltipTriggerList.map((tooltipTriggerEl) => new bootstrap.Tooltip(tooltipTriggerEl));
     </script>
     <script src="Classes/JavaScript/Matrix.js"></script>
-    <script src="Classes/JavaScript/Animation.js"></script>
+    <script src="Classes/JavaScript/AnimationEditor.js"></script>
     <script>
         const TYPE = $type;
         const WIDTH = $width;
@@ -98,30 +98,27 @@ echo <<<HTML
 HTML;
 
 echo <<<HTML
-    <div id="playback">
-        <img>
-    </div>
+    <div id="playback"><img></div>
     <div class="grid">
 HTML;
 
 for ($i = 0; $i < $width * $height; ++$i) {
     echo <<<HTML
-        <button class="cell" id="grid-cell-$i" onclick="ledClicked($i);updateLEDs();">
-        <script>allButtons.push(document.getElementById("grid-cell-$i"));</script>
+        <button class="cell" id="grid-cell-$i" onclick="editor.onLEDClicked($i);">
+        <script>editor.LEDs.push(document.getElementById("grid-cell-$i"));</script>
     HTML;
 }
 
 echo <<<HTML
     </div>
-    <script>updateControls();</script>
+    <script>editor.setControls();</script>
     <div id="frameIcons"></div>
     <script>$("#frameIcons").sortable({
         stop: (event, ui) => {
             const frameHolderDiv = event.target;
             const frameStringsArr = frameHolderDiv.innerHTML.match(/<p>.*(?=(<\/p>))/g);
-            if (!frameStringsArr) console.log("AAAAAAAAAAAAAAAA");
-            animation.frames = frameStringsArr.map((x) => x.replace(/<p>/g, ""));
-            updateIcons();
+            editor.frames = frameStringsArr.map((x) => x.replace(/<p>/g, ""));
+            editor.updateIcons();
         }
     });</script>
 HTML;

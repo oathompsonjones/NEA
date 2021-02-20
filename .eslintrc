@@ -10,13 +10,9 @@
     },
     "root": true,
     "ignorePatterns": [
-        "CSS",
-        "Databse",
-        "Images",
-        "Include",
-        "Pages",
         "**/*.php",
-        ".htaccess"
+        ".htaccess",
+        "**/*.inc"
     ],
     "plugins": [
         "@typescript-eslint"

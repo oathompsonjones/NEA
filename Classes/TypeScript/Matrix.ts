@@ -23,7 +23,7 @@ class Matrix {
     In actual fact, that changes the first value of EVERY row from 0 to 1.
     I don't know why this happens, but it does.
     */
-    private static create0Array(width: number, height: number): number[][] {
+    public static create0Array(width: number, height: number): number[][] {
         const A: number[][] = [];
         for (let i = 0; i < height; ++i) {
             A[i] = [];
