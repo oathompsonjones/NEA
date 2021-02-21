@@ -8,10 +8,11 @@ class AnimationEditor {
     _binaryString = "";
     _shiftIsDown = false;
     bitCount;
+    defaultOffColour;
     frames = [];
     LEDs = [];
+    playbackTimeout = 0;
     shiftedLEDs = [];
-    defaultOffColour;
     get binaryString() {
         return this._binaryString;
     }
@@ -23,6 +24,10 @@ class AnimationEditor {
         const matrixData = Matrix.create0Array(this.matrixWidth, this.matrixHeight);
         this.LEDBitPatterns.forEach((bit, i) => matrixData[Math.floor(i / this.matrixWidth)][i % this.matrixHeight] = parseInt(bit, 2));
         return new Matrix(matrixData);
+    }
+    get playbackFPS() {
+        const fpsInput = document.getElementById("fpsInput");
+        return parseInt(fpsInput.value, 10);
     }
     get shiftIsDown() {
         return this._shiftIsDown;
@@ -126,7 +131,7 @@ class AnimationEditor {
             .concat(this.calculateBresenhamLine(this.matrixWidth - 1, 0, 0, this.matrixHeight - 1));
         for (let y = 0; y < this.matrixHeight; ++y)
             for (let x = 0; x < this.matrixWidth; ++x)
-                if (coords.includes({ x, y }))
+                if (coords.filter((c) => c.x === x && c.y === y).length > 0)
                     bitPatterns[this.matrixWidth * y + x] = this.onColour;
         this.binaryString = bitPatterns.join("");
     }
@@ -183,6 +188,18 @@ class AnimationEditor {
     }
     move(direction) {
         this.binaryString = this.convertMatrixToString(this.matrix.translate(direction));
+    }
+    playback() {
+        clearTimeout(this.playbackTimeout);
+        const playbackDiv = document.getElementById("playback");
+        const frames = this.makeFrameIcons();
+        let i = 0;
+        const renderFrame = () => {
+            const currentFrame = frames[i++];
+            playbackDiv.innerHTML = `<img src=${currentFrame.image}>`;
+            this.playbackTimeout = setTimeout(renderFrame, 1000 / this.playbackFPS);
+        };
+        renderFrame();
     }
     onFrameCopy(binary) {
         this.binaryString = binary;
@@ -325,9 +342,13 @@ class RGBAnimationEditor extends AnimationEditor {
             <br><br>
         `);
         document.write(`
-            <label for="colour">Colour:</label><input id="colourInput" type="color" name="colour" value="${this.defaultOnColour}">
+            <label for="colour">Colour:</label>
+            <input id="colourInput" type="color" name="colour" value="${this.defaultOnColour}">
+            <br>
             <button class="btn btn-primary btn-sm" onclick="editor.frames.push(editor.binaryString); editor.updateIcons(); editor.clearScreen();" data-toggle="tooltip" data-placement="top" title="Save this frame and make a new one">➕</button>
-            <button class="btn btn-primary btn-sm" onclick="playback();" data-toggle="tooltip" data-placement="top" title="Play the animation">Play</button>
+            <button class="btn btn-primary btn-sm" onclick="editor.playback();" data-toggle="tooltip" data-placement="top" title="Play the animation">Play</button>
+            <label for="colour">FPS:</label>
+            <input id="fpsInput" type="number" name="fps" min="1" max="120" value="1">
         `);
     }
     updateLEDs() {
@@ -439,8 +460,11 @@ class VariableBrightnessAnimationEditor extends AnimationEditor {
         document.write(`
             <label for="colour">Brightness:</label>
             <input id="colourInput" type="number" name="colour" min="0" max="255" value="${this.defaultOnColour}">
+            <br>
             <button class="btn btn-primary btn-sm" onclick="editor.frames.push(editor.binaryString); editor.updateIcons(); editor.clearScreen();" data-toggle="tooltip" data-placement="top" title="Save this frame and make a new one">➕</button>
-            <button class="btn btn-primary btn-sm" onclick="playback();" data-toggle="tooltip" data-placement="top" title="Play the animation">Play</button>
+            <button class="btn btn-primary btn-sm" onclick="editor.playback();" data-toggle="tooltip" data-placement="top" title="Play the animation">Play</button>
+            <label for="colour">FPS:</label>
+            <input id="fpsInput" type="number" name="fps" min="1" max="120" value="1">
         `);
     }
     updateLEDs() {
@@ -546,7 +570,9 @@ class MonochromaticAnimationEditor extends AnimationEditor {
             </div>
             <br><br>
             <button class="btn btn-primary btn-sm" onclick="editor.frames.push(editor.binaryString); editor.updateIcons(); editor.clearScreen();" data-toggle="tooltip" data-placement="top" title="Save this frame and make a new one">➕</button>
-            <button class="btn btn-primary btn-sm" onclick="playback();" data-toggle="tooltip" data-placement="top" title="Play the animation">Play</button>
+            <button class="btn btn-primary btn-sm" onclick="editor.playback();" data-toggle="tooltip" data-placement="top" title="Play the animation">Play</button>
+            <label for="colour">FPS:</label>
+            <input id="fpsInput" type="number" name="fps" min="1" max="120" value="1">
         `);
     }
     updateLEDs() {

@@ -90,11 +90,10 @@ echo <<<HTML
     <script src="Classes/JavaScript/Matrix.js"></script>
     <script src="Classes/JavaScript/AnimationEditor.js"></script>
     <script>
-        const TYPE = $type;
-        const WIDTH = $width;
-        const HEIGHT = $height;
+        const editor = createAnimationEditor($type, $width, $height);
+        window.onkeydown = (e) => e.code === "ShiftLeft" && (editor.shiftIsDown = true);
+        window.onkeyup = (e) => e.code === "ShiftLeft" && (editor.shiftIsDown = false);
     </script>
-    <script src="Include/editor.js"></script>
 HTML;
 
 echo <<<HTML
@@ -113,14 +112,16 @@ echo <<<HTML
     </div>
     <script>editor.setControls();</script>
     <div id="frameIcons"></div>
-    <script>$("#frameIcons").sortable({
-        stop: (event, ui) => {
-            const frameHolderDiv = event.target;
-            const frameStringsArr = frameHolderDiv.innerHTML.match(/<p>.*(?=(<\/p>))/g);
-            editor.frames = frameStringsArr.map((x) => x.replace(/<p>/g, ""));
-            editor.updateIcons();
-        }
-    });</script>
+    <script>
+        $("#frameIcons").sortable({
+            stop: (event, ui) => {
+                const frameHolderDiv = event.target;
+                const frameStringsArr = frameHolderDiv.innerHTML.match(/<p>.*(?=(<\/p>))/g);
+                editor.frames = frameStringsArr.map((x) => x.replace(/<p>/g, ""));
+                editor.updateIcons();
+            }
+        });
+    </script>
 HTML;
 
 ?>
