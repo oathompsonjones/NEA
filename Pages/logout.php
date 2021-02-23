@@ -1,5 +1,4 @@
 <?php
-$_SESSION["user"] = null;
-$_SESSION["auth"] = false;
+session_destroy();
 require "Include/redirect.inc";
 ?>

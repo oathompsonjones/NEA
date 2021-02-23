@@ -1,4 +1,11 @@
 <?php
+$width = $_SESSION["width"];
+$height = $_SESSION["height"];
+$type = $_SESSION["type"];
+
+if (isset($_GET["frames"])) $_SESSION["frames"] = $_GET["frames"];
+$frames = $_SESSION["frames"];
+
 // CSS
 $columnWidth = strval(25 / $height) . "%";
 echo <<<HTML
@@ -90,7 +97,7 @@ echo <<<HTML
     <script src="Classes/JavaScript/Matrix.js"></script>
     <script src="Classes/JavaScript/AnimationEditor.js"></script>
     <script>
-        const editor = createAnimationEditor($type, $width, $height);
+        const editor = createAnimationEditor($type, $width, $height, $frames);
         window.onkeydown = (e) => e.code === "ShiftLeft" && (editor.shiftIsDown = true);
         window.onkeyup = (e) => e.code === "ShiftLeft" && (editor.shiftIsDown = false);
     </script>
@@ -110,8 +117,12 @@ for ($i = 0; $i < $width * $height; ++$i) {
 
 echo <<<HTML
     </div>
-    <script>editor.setControls();</script>
+    <div id="controls"></div>
     <div id="frameIcons"></div>
+    <script>
+        editor.setControls();
+        editor.displayIcons();
+    </script>
     <script>
         $("#frameIcons").sortable({
             stop: (event, ui) => {

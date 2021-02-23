@@ -39,12 +39,13 @@ class AnimationEditor {
         this.displayShiftState();
     }
     defaultOnColour;
-    constructor(matrixWidth, matrixHeight, LEDBitLength) {
+    constructor(matrixWidth, matrixHeight, frames, LEDBitLength) {
         this.matrixWidth = matrixWidth;
         this.matrixHeight = matrixHeight;
         this.LEDBitLength = LEDBitLength;
         this.bitCount = this.matrixWidth * this.matrixHeight * this.LEDBitLength;
         this.defaultOffColour = "0".repeat(this.LEDBitLength);
+        this.frames = frames;
         this.clearScreen();
     }
     calculateBresenhamLine(x0, y0, x1, y1) {
@@ -108,6 +109,19 @@ class AnimationEditor {
     }
     convertMatrixToString(M) {
         return M.value.map((row) => row.map((x) => x.toString(2).padStart(this.LEDBitLength, "0")).join("")).join("");
+    }
+    displayIcons() {
+        const frameIconsDiv = document.getElementById("frameIcons");
+        frameIconsDiv.innerHTML = this.makeFrameIcons().map((icon, i) => `
+            <div class="icon">
+                <img src="${icon.image}">
+                <div class="buttons">
+                    <button class="btn btn-secondary btn-sm" data-toggle="tooltip" data-placement="top" title="Copy this frame to the editor" onclick="editor.onFrameCopy('${icon.binary}')">Copy</button><br>
+                    <button class="btn btn-secondary btn-sm" data-toggle="tooltip" data-placement="top" title="Delete this frame" onclick="editor.onFrameDelete(${i})">Delete</button>
+                </div>
+                <p>${icon.binary}</p>
+            </div>
+        `).join("");
     }
     displayShiftState() {
         const shiftButton = document.getElementById("shiftBtn");
@@ -236,18 +250,8 @@ class AnimationEditor {
         this.shiftIsDown = !this.shiftIsDown;
     }
     updateIcons() {
-        const frameIconsDiv = document.getElementById("frameIcons");
-        frameIconsDiv.innerHTML = this.makeFrameIcons()
-            .map((icon, i) => `
-                    <div class="icon">
-                    <img src="${icon.image}">
-                    <div class="buttons">
-                        <button class="btn btn-secondary btn-sm" data-toggle="tooltip" data-placement="top" title="Copy this frame to the editor" onclick="editor.onFrameCopy('${icon.binary}')">Copy</button><br>
-                        <button class="btn btn-secondary btn-sm" data-toggle="tooltip" data-placement="top" title="Delete this frame" onclick="editor.onFrameDelete(${i})">Delete</button>
-                    </div>
-                    <p>${icon.binary}</p>
-                </div>
-                `).join("");
+        const data = JSON.stringify(this.frames);
+        document.location.assign(`${document.URL.split("?")[0]}?frames=${encodeURIComponent(data)}`);
     }
 }
 class RGBAnimationEditor extends AnimationEditor {
@@ -261,8 +265,8 @@ class RGBAnimationEditor extends AnimationEditor {
         return parseInt(colourInput.value.slice(1), 16).toString(2).padStart(24, "0");
     }
     ;
-    constructor(width, height) {
-        super(width, height, 24);
+    constructor(width, height, frames) {
+        super(width, height, frames, 24);
     }
     makeFrameIcons() {
         return this.frames.map((frame) => {
@@ -289,7 +293,8 @@ class RGBAnimationEditor extends AnimationEditor {
         });
     }
     setControls() {
-        document.write(`
+        let html = "";
+        html += `
             <br>
             <div class="btn-group">
                 <button class="btn btn-primary btn-sm" onclick="editor.clearScreen();   " data-toggle="tooltip" data-placement="top" title="Turn off all LEDs">Clear</button>
@@ -298,50 +303,48 @@ class RGBAnimationEditor extends AnimationEditor {
                 <button class="btn btn-primary btn-sm" onclick="editor.toggleShift();   " data-toggle="tooltip" data-placement="top" title="Hold shift to draw straight lines" id="shiftBtn" >Shift</button>
                 <button class="btn btn-primary btn-sm" onclick="editor.flip(false);     " data-toggle="tooltip" data-placement="top" title="Flip the image vertically">↕</button>
                 <button class="btn btn-primary btn-sm" onclick="editor.flip(true);      " data-toggle="tooltip" data-placement="top" title="Flip the image horizontally">↔</button>
-        `);
+        `;
         if (this.matrixWidth === this.matrixHeight)
-            document.write(`
+            html += `
                 <button class="btn btn-primary btn-sm" onclick="editor.move('left');    " data-toggle="tooltip" data-placement="top" title="Move the image to the left">⬅</button>
                 <button class="btn btn-primary btn-sm" onclick="editor.move('right');   " data-toggle="tooltip" data-placement="top" title="Move the image to the right">➡</button>
                 <button class="btn btn-primary btn-sm" onclick="editor.move('up');      " data-toggle="tooltip" data-placement="top" title="Move the image up">⬆</button>
                 <button class="btn btn-primary btn-sm" onclick="editor.move('down');    " data-toggle="tooltip" data-placement="top" title="Move the image down">⬇</button>
                 <button class="btn btn-primary btn-sm" onclick="editor.rotate(270);     " data-toggle="tooltip" data-placement="top" title="Rotate the image anticlockwise">↪</button>
                 <button class="btn btn-primary btn-sm" onclick="editor.rotate(90);      " data-toggle="tooltip" data-placement="top" title="Rotate the image clockwise">↩</button>
-            `);
+            `;
         else
-            document.write(`
+            html += `
                 <button class="btn btn-primary btn-sm" onclick="editor.move('left');    " disabled>⬅</button>
                 <button class="btn btn-primary btn-sm" onclick="editor.move('right');   " disabled>➡</button>
                 <button class="btn btn-primary btn-sm" onclick="editor.move('up');      " disabled>⬆</button>
                 <button class="btn btn-primary btn-sm" onclick="editor.move('down');    " disabled>⬇</button>
                 <button class="btn btn-primary btn-sm" onclick="editor.rotate(270);     " disabled>↪</button>
                 <button class="btn btn-primary btn-sm" onclick="editor.rotate(90);      " disabled>↩</button>
-            `);
-        document.write(`
+            `;
+        html += `
             </div>
             <br><br>
             <div class="btn-group">
                 <button class="btn btn-primary btn-sm" onclick="editor.drawPlus();      " data-toggle="tooltip" data-placement="top" title="Draw a plus sign">➕</button>
                 <button class="btn btn-primary btn-sm" onclick="editor.drawCross();     " data-toggle="tooltip" data-placement="top" title="Draw a diagonal cross">❌</button>
                 <button class="btn btn-primary btn-sm" onclick="editor.drawBorder();    " data-toggle="tooltip" data-placement="top" title="Draw a border">🔲</button>
-        `);
+        `;
         if (this.matrixWidth === this.matrixHeight)
-            document.write(`
+            html += `
                 <button class="btn btn-primary btn-sm" onclick="editor.drawCircle();    " data-toggle="tooltip" data-placement="top" title="Draw a circle outline">⭕</button>
                 <button class="btn btn-primary btn-sm" onclick="editor.drawCircle(true);" data-toggle="tooltip" data-placement="top" title="Draw a circle">🔴</button>
                 <button class="btn btn-primary btn-sm" onclick="editor.drawNoEntry();   " data-toggle="tooltip" data-placement="top" title="Draw a no entry sign">🚫</button>
-            `);
+            `;
         else
-            document.write(`
+            html += `
                 <button class="btn btn-primary btn-sm" onclick="editor.drawCircle();    " disabled>⭕</button>
                 <button class="btn btn-primary btn-sm" onclick="editor.drawCircle(true);" disabled>🔴</button>
                 <button class="btn btn-primary btn-sm" onclick="editor.drawNoEntry();   " disabled>🚫</button>
-            `);
-        document.write(`
+            `;
+        html += `
             </div>
             <br><br>
-        `);
-        document.write(`
             <label for="colour">Colour:</label>
             <input id="colourInput" type="color" name="colour" value="${this.defaultOnColour}">
             <br>
@@ -349,7 +352,9 @@ class RGBAnimationEditor extends AnimationEditor {
             <button class="btn btn-primary btn-sm" onclick="editor.playback();" data-toggle="tooltip" data-placement="top" title="Play the animation">Play</button>
             <label for="colour">FPS:</label>
             <input id="fpsInput" type="number" name="fps" min="1" max="120" value="1">
-        `);
+        `;
+        const controlsDiv = document.getElementById("controls");
+        controlsDiv.innerHTML = html;
     }
     updateLEDs() {
         this.LEDs.forEach((button, i) => {
@@ -375,8 +380,8 @@ class VariableBrightnessAnimationEditor extends AnimationEditor {
         return parseInt(colourInput.value).toString(2).padStart(8, "0");
     }
     ;
-    constructor(width, height) {
-        super(width, height, 8);
+    constructor(width, height, frames) {
+        super(width, height, frames, 8);
     }
     makeFrameIcons() {
         const map = (x, inMin, inMax, outMin, outMax) => ((x - inMin) * (outMax - outMin)) / (inMax - inMin) + outMin;
@@ -405,7 +410,8 @@ class VariableBrightnessAnimationEditor extends AnimationEditor {
         });
     }
     setControls() {
-        document.write(`
+        let html = "";
+        html += `
             <br>
             <div class="btn-group">
                 <button class="btn btn-primary btn-sm" onclick="editor.clearScreen();   " data-toggle="tooltip" data-placement="top" title="Turn off all LEDs">Clear</button>
@@ -414,50 +420,48 @@ class VariableBrightnessAnimationEditor extends AnimationEditor {
                 <button class="btn btn-primary btn-sm" onclick="editor.toggleShift();   " data-toggle="tooltip" data-placement="top" title="Hold shift to draw straight lines" id="shiftBtn" >Shift</button>
                 <button class="btn btn-primary btn-sm" onclick="editor.flip(false);     " data-toggle="tooltip" data-placement="top" title="Flip the image vertically">↕</button>
                 <button class="btn btn-primary btn-sm" onclick="editor.flip(true);      " data-toggle="tooltip" data-placement="top" title="Flip the image horizontally">↔</button>
-        `);
+        `;
         if (this.matrixWidth === this.matrixHeight)
-            document.write(`
+            html += `
                 <button class="btn btn-primary btn-sm" onclick="editor.move('left');    " data-toggle="tooltip" data-placement="top" title="Move the image to the left">⬅</button>
                 <button class="btn btn-primary btn-sm" onclick="editor.move('right');   " data-toggle="tooltip" data-placement="top" title="Move the image to the right">➡</button>
                 <button class="btn btn-primary btn-sm" onclick="editor.move('up');      " data-toggle="tooltip" data-placement="top" title="Move the image up">⬆</button>
                 <button class="btn btn-primary btn-sm" onclick="editor.move('down');    " data-toggle="tooltip" data-placement="top" title="Move the image down">⬇</button>
                 <button class="btn btn-primary btn-sm" onclick="editor.rotate(270);     " data-toggle="tooltip" data-placement="top" title="Rotate the image anticlockwise">↪</button>
                 <button class="btn btn-primary btn-sm" onclick="editor.rotate(90);      " data-toggle="tooltip" data-placement="top" title="Rotate the image clockwise">↩</button>
-            `);
+            `;
         else
-            document.write(`
+            html += `
                 <button class="btn btn-primary btn-sm" onclick="editor.move('left');    " disabled>⬅</button>
                 <button class="btn btn-primary btn-sm" onclick="editor.move('right');   " disabled>➡</button>
                 <button class="btn btn-primary btn-sm" onclick="editor.move('up');      " disabled>⬆</button>
                 <button class="btn btn-primary btn-sm" onclick="editor.move('down');    " disabled>⬇</button>
                 <button class="btn btn-primary btn-sm" onclick="editor.rotate(270);     " disabled>↪</button>
                 <button class="btn btn-primary btn-sm" onclick="editor.rotate(90);      " disabled>↩</button>
-            `);
-        document.write(`
+            `;
+        html += `
             </div>
             <br><br>
             <div class="btn-group">
                 <button class="btn btn-primary btn-sm" onclick="editor.drawPlus();      " data-toggle="tooltip" data-placement="top" title="Draw a plus sign">➕</button>
                 <button class="btn btn-primary btn-sm" onclick="editor.drawCross();     " data-toggle="tooltip" data-placement="top" title="Draw a diagonal cross">❌</button>
                 <button class="btn btn-primary btn-sm" onclick="editor.drawBorder();    " data-toggle="tooltip" data-placement="top" title="Draw a border">🔲</button>
-        `);
+        `;
         if (this.matrixWidth === this.matrixHeight)
-            document.write(`
+            html += `
                 <button class="btn btn-primary btn-sm" onclick="editor.drawCircle();    " data-toggle="tooltip" data-placement="top" title="Draw a circle outline">⭕</button>
                 <button class="btn btn-primary btn-sm" onclick="editor.drawCircle(true);" data-toggle="tooltip" data-placement="top" title="Draw a circle">🔴</button>
                 <button class="btn btn-primary btn-sm" onclick="editor.drawNoEntry();   " data-toggle="tooltip" data-placement="top" title="Draw a no entry sign">🚫</button>
-            `);
+            `;
         else
-            document.write(`
+            html += `
                 <button class="btn btn-primary btn-sm" onclick="editor.drawCircle();    " disabled>⭕</button>
                 <button class="btn btn-primary btn-sm" onclick="editor.drawCircle(true);" disabled>🔴</button>
                 <button class="btn btn-primary btn-sm" onclick="editor.drawNoEntry();   " disabled>🚫</button>
-            `);
-        document.write(`
+            `;
+        html += `
             </div>
             <br><br>
-        `);
-        document.write(`
             <label for="colour">Brightness:</label>
             <input id="colourInput" type="number" name="colour" min="0" max="255" value="${this.defaultOnColour}">
             <br>
@@ -465,7 +469,9 @@ class VariableBrightnessAnimationEditor extends AnimationEditor {
             <button class="btn btn-primary btn-sm" onclick="editor.playback();" data-toggle="tooltip" data-placement="top" title="Play the animation">Play</button>
             <label for="colour">FPS:</label>
             <input id="fpsInput" type="number" name="fps" min="1" max="120" value="1">
-        `);
+        `;
+        const controlsDiv = document.getElementById("controls");
+        controlsDiv.innerHTML = html;
     }
     updateLEDs() {
         this.LEDs.forEach((button, i) => {
@@ -490,8 +496,8 @@ class MonochromaticAnimationEditor extends AnimationEditor {
         return this.defaultOnColour;
     }
     ;
-    constructor(width, height) {
-        super(width, height, 1);
+    constructor(width, height, frames) {
+        super(width, height, frames, 1);
     }
     makeFrameIcons() {
         return this.frames.map((frame) => {
@@ -518,7 +524,8 @@ class MonochromaticAnimationEditor extends AnimationEditor {
         });
     }
     setControls() {
-        document.write(`
+        let html = "";
+        html += `
             <br>
             <div class="btn-group">
                 <button class="btn btn-primary btn-sm" onclick="editor.clearScreen();   " data-toggle="tooltip" data-placement="top" title="Turn off all LEDs">Clear</button>
@@ -527,53 +534,55 @@ class MonochromaticAnimationEditor extends AnimationEditor {
                 <button class="btn btn-primary btn-sm" onclick="editor.toggleShift();   " data-toggle="tooltip" data-placement="top" title="Hold shift to draw straight lines" id="shiftBtn" >Shift</button>
                 <button class="btn btn-primary btn-sm" onclick="editor.flip(false);     " data-toggle="tooltip" data-placement="top" title="Flip the image vertically">↕</button>
                 <button class="btn btn-primary btn-sm" onclick="editor.flip(true);      " data-toggle="tooltip" data-placement="top" title="Flip the image horizontally">↔</button>
-        `);
+        `;
         if (this.matrixWidth === this.matrixHeight)
-            document.write(`
+            html += `
                 <button class="btn btn-primary btn-sm" onclick="editor.move('left');    " data-toggle="tooltip" data-placement="top" title="Move the image to the left">⬅</button>
                 <button class="btn btn-primary btn-sm" onclick="editor.move('right');   " data-toggle="tooltip" data-placement="top" title="Move the image to the right">➡</button>
                 <button class="btn btn-primary btn-sm" onclick="editor.move('up');      " data-toggle="tooltip" data-placement="top" title="Move the image up">⬆</button>
                 <button class="btn btn-primary btn-sm" onclick="editor.move('down');    " data-toggle="tooltip" data-placement="top" title="Move the image down">⬇</button>
                 <button class="btn btn-primary btn-sm" onclick="editor.rotate(270);     " data-toggle="tooltip" data-placement="top" title="Rotate the image anticlockwise">↪</button>
                 <button class="btn btn-primary btn-sm" onclick="editor.rotate(90);      " data-toggle="tooltip" data-placement="top" title="Rotate the image clockwise">↩</button>
-            `);
+            `;
         else
-            document.write(`
+            html += `
                 <button class="btn btn-primary btn-sm" onclick="editor.move('left');    " disabled>⬅</button>
                 <button class="btn btn-primary btn-sm" onclick="editor.move('right');   " disabled>➡</button>
                 <button class="btn btn-primary btn-sm" onclick="editor.move('up');      " disabled>⬆</button>
                 <button class="btn btn-primary btn-sm" onclick="editor.move('down');    " disabled>⬇</button>
                 <button class="btn btn-primary btn-sm" onclick="editor.rotate(270);     " disabled>↪</button>
                 <button class="btn btn-primary btn-sm" onclick="editor.rotate(90);      " disabled>↩</button>
-            `);
-        document.write(`
+            `;
+        html += `
             </div>
             <br><br>
             <div class="btn-group">
                 <button class="btn btn-primary btn-sm" onclick="editor.drawPlus();      " data-toggle="tooltip" data-placement="top" title="Draw a plus sign">➕</button>
                 <button class="btn btn-primary btn-sm" onclick="editor.drawCross();     " data-toggle="tooltip" data-placement="top" title="Draw a diagonal cross">❌</button>
                 <button class="btn btn-primary btn-sm" onclick="editor.drawBorder();    " data-toggle="tooltip" data-placement="top" title="Draw a border">🔲</button>
-        `);
+        `;
         if (this.matrixWidth === this.matrixHeight)
-            document.write(`
+            html += `
                 <button class="btn btn-primary btn-sm" onclick="editor.drawCircle();    " data-toggle="tooltip" data-placement="top" title="Draw a circle outline">⭕</button>
                 <button class="btn btn-primary btn-sm" onclick="editor.drawCircle(true);" data-toggle="tooltip" data-placement="top" title="Draw a circle">🔴</button>
                 <button class="btn btn-primary btn-sm" onclick="editor.drawNoEntry();   " data-toggle="tooltip" data-placement="top" title="Draw a no entry sign">🚫</button>
-            `);
+            `;
         else
-            document.write(`
+            html += `
                 <button class="btn btn-primary btn-sm" onclick="editor.drawCircle();    " disabled>⭕</button>
                 <button class="btn btn-primary btn-sm" onclick="editor.drawCircle(true);" disabled>🔴</button>
                 <button class="btn btn-primary btn-sm" onclick="editor.drawNoEntry();   " disabled>🚫</button>
-            `);
-        document.write(`
+            `;
+        html += `
             </div>
             <br><br>
             <button class="btn btn-primary btn-sm" onclick="editor.frames.push(editor.binaryString); editor.updateIcons(); editor.clearScreen();" data-toggle="tooltip" data-placement="top" title="Save this frame and make a new one">➕</button>
             <button class="btn btn-primary btn-sm" onclick="editor.playback();" data-toggle="tooltip" data-placement="top" title="Play the animation">Play</button>
             <label for="colour">FPS:</label>
             <input id="fpsInput" type="number" name="fps" min="1" max="120" value="1">
-        `);
+        `;
+        const controlsDiv = document.getElementById("controls");
+        controlsDiv.innerHTML = html;
     }
     updateLEDs() {
         this.LEDs.forEach((button, i) => {
@@ -586,6 +595,6 @@ class MonochromaticAnimationEditor extends AnimationEditor {
         });
     }
 }
-function createAnimationEditor(type, width, height) {
-    return new [MonochromaticAnimationEditor, VariableBrightnessAnimationEditor, RGBAnimationEditor][type](width, height);
+function createAnimationEditor(type, width, height, frames = []) {
+    return new [MonochromaticAnimationEditor, VariableBrightnessAnimationEditor, RGBAnimationEditor][type](width, height, frames);
 }
