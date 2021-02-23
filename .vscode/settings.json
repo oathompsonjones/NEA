@@ -6,4 +6,7 @@
         "editor.defaultFormatter": "dbaeumer.vscode-eslint"
     },
     "git.ignoreLimitWarning": true,
+    "cSpell.words": [
+        "microbit"
+    ],
 }
