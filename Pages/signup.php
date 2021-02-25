@@ -55,4 +55,3 @@ if(isset($_SESSION["auth"]) && $_SESSION["auth"]) {
     }
     require "Include/signupForm.inc";
 } else require "Include/signupForm.inc";
-?>

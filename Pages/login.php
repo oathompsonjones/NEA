@@ -27,7 +27,7 @@ if (isset($_SESSION["auth"]) && $_SESSION["auth"]) {
         HTML;
     }
     // Tell user if username or password are incorrect.
-    else if ($credentials[$username] != md5($password)) {
+    else if ($credentials[$username] !== md5($password)) {
         echo <<<HTML
             <div class="alert alert-danger" role="alert">
                 Incorrect username or password.
@@ -43,4 +43,3 @@ if (isset($_SESSION["auth"]) && $_SESSION["auth"]) {
     }
     require "Include/loginForm.inc";
 } else require "Include/loginForm.inc";
-?>

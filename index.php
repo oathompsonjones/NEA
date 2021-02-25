@@ -24,7 +24,7 @@ $loggingInOrOut = $page === "login" || $page === "signup" || $page === "logout";
 require "Include/header.inc";
 
 // Render a message telling the user they need to log in.
-if(!$loggedIn && !$loggingInOrOut) {
+if (!$loggedIn && !$loggingInOrOut) {
     echo <<<HTML
         <h1>Microcontroller Animations</h1>
         <div class="alert alert-danger" role="alert">
@@ -48,4 +48,3 @@ else {
 
 // Render page footer.
 require "Include/footer.inc";
-?>

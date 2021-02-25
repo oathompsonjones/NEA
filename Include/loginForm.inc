@@ -1,13 +1,15 @@
 <!-- form for user login -->
 <form action="login?submit=login" method="post" style="padding: 10px;">
     <h1>Log In</h1>
-    <div class="form-group">
+    <div class="form-floating">
+        <input type="text" class="form-control bg-dark text-white" id="inputUsername" name="username" placeholder="Username">
         <label for="inputUsername">Username</label>
-        <input type="text" class="form-control" id="inputUsername" aria-describedby="usernameHelp" name="username">
     </div>
-    <div class="form-group">
+    <br>
+    <div class="form-floating">
+        <input type="password" class="form-control bg-dark text-white" id="inputPassword" name="password" placeholder="Password">
         <label for="inputPassword">Password</label>
-        <input type="password" class="form-control" id="inputPassword" name="password">
     </div>
-    <button type="submit" class="btn btn-primary">Log In</button>
+    <br>
+    <button type="submit" class="btn btn-dark">Log In</button>
 </form>
