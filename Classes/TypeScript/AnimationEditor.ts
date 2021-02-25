@@ -19,9 +19,23 @@ abstract class AnimationEditor {
         this._binaryString = val;
         this.updateLEDs();
     }
+    public get int32Frames(): number[] {
+        return (this.frames
+            // Make sure each frame is some-multiple-of-32 bits long.
+            .map((frame) => frame.padStart(32 - frame.length % 32 + frame.length, "0"))
+            // Create one string from all the frames.
+            .join("")
+            // Split the string into 32 bit chunks.
+            .match(/.{1,32}/g) ?? [])
+            // Map the 32 bit strings into numbers.
+            .map((bits) => parseInt(bits, 2));
+    };
+    public get currentLEDBitPatterns(): string[] {
+        return this.binaryString.match(new RegExp(`.{1,${this.LEDBitLength}}`, "g")) as string[];
+    };
     public get matrix(): Matrix {
         const matrixData = Matrix.create0Array(this.matrixWidth, this.matrixHeight);
-        this.LEDBitPatterns.forEach((bit, i) => matrixData[Math.floor(i / this.matrixWidth)][i % this.matrixHeight] = parseInt(bit, 2));
+        this.currentLEDBitPatterns.forEach((bit, i) => matrixData[Math.floor(i / this.matrixWidth)][i % this.matrixHeight] = parseInt(bit, 2));
         return new Matrix(matrixData);
     }
     public get playbackFPS(): number {
@@ -39,13 +53,23 @@ abstract class AnimationEditor {
 
     public abstract defaultOnColour: string;
 
-    public abstract get LEDBitPatterns(): string[];
     public abstract get onColour(): string;
 
-    protected constructor(protected matrixWidth: number, protected matrixHeight: number, frames: string[], public LEDBitLength: number) {
+    protected constructor(protected matrixWidth: number, protected matrixHeight: number, frames: number[], public LEDBitLength: number) {
         this.bitCount = this.matrixWidth * this.matrixHeight * this.LEDBitLength;
         this.defaultOffColour = "0".repeat(this.LEDBitLength);
-        this.frames = frames;
+        
+        const frameLength: number = this.LEDBitLength * this.matrixWidth * this.matrixHeight;
+        this.frames = (frames
+            // Map the numbers into 32 bit strings.
+            .map((int) => int.toString(2).padStart(32, "0"))
+            // Create one string from all the chunks.
+            .join("")
+            // Split this string into each individual frame.
+            .match(new RegExp(`.{1,${32 - frameLength % 32 + frameLength}}`, "g")) ?? [])
+            // Cut each frame down to the correct length.
+            .map((frame) => frame.slice(32 - frameLength % 32));
+
         this.clearScreen();
     }
 
@@ -130,7 +154,7 @@ abstract class AnimationEditor {
     }
 
     public drawPlus(): void {
-        const bitPatterns: string[] = this.LEDBitPatterns;
+        const bitPatterns: string[] = this.currentLEDBitPatterns;
         for (let y = 0; y < this.matrixHeight; ++y) {
             for (let x = 0; x < this.matrixWidth; ++x) {
                 const validX = x === Math.floor(this.matrixWidth / 2) || x === Math.floor((this.matrixWidth - 1) / 2);
@@ -142,7 +166,7 @@ abstract class AnimationEditor {
     }
 
     public drawCross(): void {
-        const bitPatterns: string[] = this.LEDBitPatterns;
+        const bitPatterns: string[] = this.currentLEDBitPatterns;
         const coords = this.calculateBresenhamLine(0, 0, this.matrixWidth - 1, this.matrixHeight - 1)
             .concat(this.calculateBresenhamLine(this.matrixWidth - 1, 0, 0, this.matrixHeight - 1));
         for (let y = 0; y < this.matrixHeight; ++y)
@@ -153,7 +177,7 @@ abstract class AnimationEditor {
     }
 
     public drawBorder(): void {
-        const bitPatterns: string[] = this.LEDBitPatterns;
+        const bitPatterns: string[] = this.currentLEDBitPatterns;
         for (let y = 0; y < this.matrixHeight; ++y) {
             for (let x = 0; x < this.matrixWidth; ++x) {
                 const validX = x === 0 || x === this.matrixWidth - 1;
@@ -165,7 +189,7 @@ abstract class AnimationEditor {
     }
 
     public drawCircle(full = false): void {
-        const bitPatterns: string[] = this.LEDBitPatterns;
+        const bitPatterns: string[] = this.currentLEDBitPatterns;
         const size = Math.min(this.matrixWidth, this.matrixHeight);
         const radius = (size % 2 === 0 ? size : size - 1) / 2;
         for (let y = 0; y < this.matrixHeight; ++y) {
@@ -182,7 +206,7 @@ abstract class AnimationEditor {
     }
 
     public drawNoEntry(): void {
-        const bitPatterns: string[] = this.LEDBitPatterns;
+        const bitPatterns: string[] = this.currentLEDBitPatterns;
         const size = Math.min(this.matrixWidth, this.matrixHeight);
         const radius = (size % 2 === 0 ? size : size - 1) / 2;
         for (let y = 0; y < this.matrixHeight; ++y) {
@@ -237,7 +261,7 @@ abstract class AnimationEditor {
     }
 
     public onLEDClicked(index: number): void {
-        const bitPatterns: string[] = this.LEDBitPatterns;
+        const bitPatterns: string[] = this.currentLEDBitPatterns;
         if (this.shiftIsDown) {
             if (this.shiftedLEDs.length === 0) {
                 this.shiftedLEDs.push(index);
@@ -269,23 +293,29 @@ abstract class AnimationEditor {
     }
 
     public updateIcons(): void {
-        const data: string = JSON.stringify(this.frames);
+        /**
+         * Get the frames as 32 bit numbers,
+         * create a JSON string,
+         * then replace the numbers with hex strings,
+         * then remove the quotes.
+        */
+        const data: string = JSON.stringify(
+            this.int32Frames,
+            (_, value): string => typeof value === "number" ? `0x${value.toString(16)}` : value
+        ).replace(/"/g, "");
         document.location.assign(`${document.URL.split("?")[0]}?frames=${encodeURIComponent(data)}`);
     }
 }
 
 class RGBAnimationEditor extends AnimationEditor {
     public defaultOnColour: string = "#ff0000";
-    
-    public get LEDBitPatterns(): string[] {
-        return this.binaryString.match(/.{1,24}/g) as string[];
-    };
+
     public get onColour(): string {
         const colourInput = document.getElementById("colourInput") as HTMLInputElement;
         return parseInt(colourInput.value.slice(1), 16).toString(2).padStart(24, "0");
     };
 
-    public constructor(width: number, height: number, frames: string[]) {
+    public constructor(width: number, height: number, frames: number[]) {
         super(width, height, frames, 24);
     }
 
@@ -297,16 +327,13 @@ class RGBAnimationEditor extends AnimationEditor {
             const context = canvas.getContext("2d");
             if (context === null) throw Error();
             (frame.match(/.{1,24}/g) as string[])
-                .map((x) =>
-                    (x.match(/.{1,8}/g) as string[]).map((y) => parseInt(y, 2))
-                )
+                .map((x) => (x.match(/.{1,8}/g) as string[]).map((y) => parseInt(y, 2)))
                 .forEach((bytes, i) => {
                     context.fillStyle = bytes.some((byte) => byte > 0)
                         ? `rgb(${bytes[0]}, ${bytes[1]}, ${bytes[2]})`
                         : "rgba(0, 0, 0, 0.1)";
                     const x: number = (i % this.matrixWidth) * pixelSize;
-                    const y: number =
-                        Math.floor(i / this.matrixWidth) * pixelSize;
+                    const y: number = Math.floor(i / this.matrixWidth) * pixelSize;
                     context.fillRect(x, y, pixelSize, pixelSize);
                 });
             return {
@@ -385,7 +412,7 @@ class RGBAnimationEditor extends AnimationEditor {
         this.LEDs.forEach((button, i) => {
             const offColour = "rgba(0, 0, 0, 0.1)";
             let colour = offColour;
-            const bits = this.LEDBitPatterns[i];
+            const bits = this.currentLEDBitPatterns[i];
             const num = parseInt(bits, 2);
             const bitsArr = bits.match(/.{1,8}/g) as string[];
             const numArr = bitsArr.map((x) => parseInt(x, 2));
@@ -397,16 +424,13 @@ class RGBAnimationEditor extends AnimationEditor {
 
 class VariableBrightnessAnimationEditor extends AnimationEditor {
     public defaultOnColour: string = "255";
-    
-    public get LEDBitPatterns(): string[] {
-        return this.binaryString.match(/.{1,8}/g) as string[];
-    };
+
     public get onColour(): string {
         const colourInput = document.getElementById("colourInput") as HTMLInputElement;
         return parseInt(colourInput.value).toString(2).padStart(8, "0");
     };
     
-    public constructor(width: number, height: number, frames: string[]) {
+    public constructor(width: number, height: number, frames: number[]) {
         super(width, height, frames, 8);
     }
 
@@ -512,7 +536,7 @@ class VariableBrightnessAnimationEditor extends AnimationEditor {
         this.LEDs.forEach((button, i) => {
             const offColour = "rgba(0, 0, 0, 0.1)";
             let colour = offColour;
-            const bits = this.LEDBitPatterns[i];
+            const bits = this.currentLEDBitPatterns[i];
             const num = parseInt(bits, 2);
             colour = num
                 ? `rgba(255, 0, 0, ${map(num, 0, 255, 0, 1)})`
@@ -525,14 +549,11 @@ class VariableBrightnessAnimationEditor extends AnimationEditor {
 class MonochromaticAnimationEditor extends AnimationEditor {
     public defaultOnColour: string = "1";
     
-    public get LEDBitPatterns(): string[] {
-        return this.binaryString.split("");
-    };
     public get onColour(): string {
         return this.defaultOnColour;
     };
     
-    public constructor(width: number, height: number, frames: string[]) {
+    public constructor(width: number, height: number, frames: number[]) {
         super(width, height, frames, 1);
     }
 
@@ -629,7 +650,7 @@ class MonochromaticAnimationEditor extends AnimationEditor {
         this.LEDs.forEach((button, i) => {
             const offColour = "rgba(0, 0, 0, 0.1)";
             let colour = offColour;
-            const bits = this.LEDBitPatterns[i];
+            const bits = this.currentLEDBitPatterns[i];
             const num = parseInt(bits, 2);
             colour = num ? "rgb(255, 0, 0)" : offColour;
             button.style.background = colour;
@@ -637,6 +658,6 @@ class MonochromaticAnimationEditor extends AnimationEditor {
     }
 }
 
-function createAnimationEditor(type: 0 | 1 | 2, width: number, height: number, frames: string[] = []): AnimationEditor {
+function createAnimationEditor(type: 0 | 1 | 2, width: number, height: number, frames: number[] = []): AnimationEditor {
     return new [MonochromaticAnimationEditor, VariableBrightnessAnimationEditor, RGBAnimationEditor][type](width, height, frames);
 }
