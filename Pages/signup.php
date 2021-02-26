@@ -1,9 +1,9 @@
 <?php
-// Valid usernames and passwords.
-$credentials = $_SESSION["database"]->getLoginCredentials();
+// Valid usernames.
+$usernames = $_SESSION["database"]->select("Username", "User");
 
 // Checks that the auth variable exists and is true.
-if(isset($_SESSION["auth"]) && $_SESSION["auth"]) {
+if (isset($_SESSION["auth"]) && $_SESSION["auth"]) {
     // Redirects you back to the home page if already logged in.
     require "Include/redirect.inc";
 } else if (isset($_GET["submit"])) {
@@ -21,7 +21,7 @@ if(isset($_SESSION["auth"]) && $_SESSION["auth"]) {
         HTML;
     }
     // Tell user if username is taken.
-    else if ($credentials[$username]) {
+    else if (!is_null($_SESSION["database"]->select("Username", "User", "Username = '$username'"))) {
         echo <<<HTML
             <div class="alert alert-danger" role="alert">
                 Username is already taken.

@@ -25,13 +25,4 @@ class Database
     {
         $this->mysqli->query("INSERT INTO $table ($columns) \n VALUES ($values);");
     }
-
-    public function getLoginCredentials()
-    {
-        $result = $this->select("Username, PasswordHash", "User");
-        if (is_null($result)) return [];
-        $credentials = array();
-        while ($row = array_shift($result)) $credentials[$row[0]] = $row[1];
-        return $credentials;
-    }
 }

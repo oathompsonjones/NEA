@@ -1,6 +1,8 @@
 <?php
 // Valid usernames and passwords.
-$credentials = $_SESSION["database"]->getLoginCredentials();
+$result = $_SESSION["database"]->select("Username, PasswordHash", "User");
+$credentials = [];
+if (!is_null($result)) while ($row = array_shift($result)) $credentials[$row[0]] = $row[1];
 
 // Checks that the auth variable exists and is true.
 if (isset($_SESSION["auth"]) && $_SESSION["auth"]) {
