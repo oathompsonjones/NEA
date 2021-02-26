@@ -56,12 +56,12 @@ abstract class AnimationEditor {
 
     public abstract get onColour(): string;
 
-    protected constructor(protected matrixWidth: number, protected matrixHeight: number, frames: number[], public LEDBitLength: number) {
+    protected constructor(protected matrixWidth: number, protected matrixHeight: number, data: number[], public LEDBitLength: number) {
         this.bitCount = this.matrixWidth * this.matrixHeight * this.LEDBitLength;
         this.defaultOffColour = "0".repeat(this.LEDBitLength);
         
         const frameLength: number = this.LEDBitLength * this.matrixWidth * this.matrixHeight;
-        this.frames = (frames
+        this.frames = (data
             // Map the numbers into 32 bit strings.
             .map((int) => int.toString(2).padStart(32, "0"))
             // Create one string from all the chunks.
@@ -70,12 +70,11 @@ abstract class AnimationEditor {
             .match(new RegExp(`.{1,${32 - frameLength % 32 + frameLength}}`, "g")) ?? [])
             // Cut each frame down to the correct length.
             .map((frame) => frame.slice(32 - frameLength % 32));
-
+        
         this.clearScreen();
     }
 
     public abstract makeFrameIcons(): Array<{ image: string; binary: string }>;
-    public abstract setControls(): void;
     public abstract updateLEDs(): void;
 
     public calculateBresenhamLine(x0: number, y0: number, x1: number, y1: number): Array<{ x: number; y: number; }> {
@@ -239,6 +238,19 @@ abstract class AnimationEditor {
         this.binaryString = this.convertMatrixToString(this.matrix.translate(direction));
     }
 
+    public new(): void {
+        const form: HTMLFormElement = document.createElement("form");
+        form.style.display = "none";
+        form.setAttribute("method", "post");
+        const input: HTMLInputElement = document.createElement("input");
+        input.setAttribute("type", "text");
+        input.setAttribute("name", "createNew");
+        input.setAttribute("value", "true");
+        form.appendChild(input);
+        document.getElementsByTagName("body")[0].appendChild(form);
+        form.submit();
+    }
+
     public playback(): void {
         clearTimeout(this.playbackTimeout);
         const playbackDiv = document.getElementById("playback") as HTMLDivElement;
@@ -289,22 +301,138 @@ abstract class AnimationEditor {
         this.binaryString = this.convertMatrixToString(this.matrix.rotate(angle));
     }
 
+    public save(): void {
+        const form: HTMLFormElement = document.createElement("form");
+        form.style.display = "none";
+        form.setAttribute("method", "post");
+        const input: HTMLInputElement = document.createElement("input");
+        input.setAttribute("type", "text");
+        input.setAttribute("name", "saveToDB");
+        input.setAttribute("value", "true");
+        form.appendChild(input);
+        document.getElementsByTagName("body")[0].appendChild(form);
+        form.submit();
+    }
+
+    public setControls(fps: number, colour: string | null): void {
+        const controlsDiv = document.getElementById("controls") as HTMLDivElement;
+        let html: string = /*html*/ `
+            <br>
+            <div class="btn-group">
+                <button class="btn btn-dark btn-sm" onclick="editor.clearScreen();   " data-toggle="tooltip" data-placement="top" title="Turn off all LEDs">Clear</button>
+                <button class="btn btn-dark btn-sm" onclick="editor.fillScreen();    " data-toggle="tooltip" data-placement="top" title="Turn on all LEDs">Fill</button>
+                <button class="btn btn-dark btn-sm" onclick="editor.invertScreen();  " data-toggle="tooltip" data-placement="top" title="Invert all LEDs">Invert</button>
+                <button class="btn btn-dark btn-sm" onclick="editor.toggleShift();   " data-toggle="tooltip" data-placement="top" title="Hold shift to draw straight lines" id="shiftBtn" >Shift</button>
+                <button class="btn btn-dark btn-sm" onclick="editor.flip(false);     " data-toggle="tooltip" data-placement="top" title="Flip the image vertically">↕</button>
+                <button class="btn btn-dark btn-sm" onclick="editor.flip(true);      " data-toggle="tooltip" data-placement="top" title="Flip the image horizontally">↔</button>
+                <button class="btn btn-dark btn-sm" onclick="editor.move('left');    " ${this.matrixWidth === this.matrixHeight ? 'data-toggle="tooltip" data-placement="top" title="Move the image to the left"' : "disabled"} >⬅</button>
+                <button class="btn btn-dark btn-sm" onclick="editor.move('right');   " ${this.matrixWidth === this.matrixHeight ? 'data-toggle="tooltip" data-placement="top" title="Move the image to the right"' : "disabled"} >➡</button>
+                <button class="btn btn-dark btn-sm" onclick="editor.move('up');      " ${this.matrixWidth === this.matrixHeight ? 'data-toggle="tooltip" data-placement="top" title="Move the image up"' : "disabled"} >⬆</button>
+                <button class="btn btn-dark btn-sm" onclick="editor.move('down');    " ${this.matrixWidth === this.matrixHeight ? 'data-toggle="tooltip" data-placement="top" title="Move the image down"' : "disabled"} >⬇</button>
+                <button class="btn btn-dark btn-sm" onclick="editor.rotate(270);     " ${this.matrixWidth === this.matrixHeight ? 'data-toggle="tooltip" data-placement="top" title="Rotate the image anticlockwise"' : "disabled"} >↪</button>
+                <button class="btn btn-dark btn-sm" onclick="editor.rotate(90);      " ${this.matrixWidth === this.matrixHeight ? 'data-toggle="tooltip" data-placement="top" title="Rotate the image clockwise"' : "disabled"} >↩</button>
+            </div>
+            <br>
+            <div class="btn-group">
+                <button class="btn btn-dark btn-sm" onclick="editor.drawPlus();      " data-toggle="tooltip" data-placement="top" title="Draw a plus sign">➕</button>
+                <button class="btn btn-dark btn-sm" onclick="editor.drawCross();     " data-toggle="tooltip" data-placement="top" title="Draw a diagonal cross">❌</button>
+                <button class="btn btn-dark btn-sm" onclick="editor.drawBorder();    " data-toggle="tooltip" data-placement="top" title="Draw a border">🔲</button>
+                <button class="btn btn-dark btn-sm" onclick="editor.drawCircle();    " ${this.matrixWidth === this.matrixHeight ? 'data-toggle="tooltip" data-placement="top" title="Draw a circle outline"' : "disabled"}>⭕</button>
+                <button class="btn btn-dark btn-sm" onclick="editor.drawCircle(true);" ${this.matrixWidth === this.matrixHeight ? 'data-toggle="tooltip" data-placement="top" title="Draw a circle"' : "disabled"}>🔴</button>
+                <button class="btn btn-dark btn-sm" onclick="editor.drawNoEntry();   " ${this.matrixWidth === this.matrixHeight ? 'data-toggle="tooltip" data-placement="top" title="Draw a no entry sign"' : "disabled"}>🚫</button>
+            </div>
+            <br>
+            <div class="input-group">
+        `;
+        if (this instanceof MonochromaticAnimationEditor) {
+            html += /*html*/`
+                <div class="form-floating bg-dark text-white" style="width: 10%">
+                    <select class="form-control bg-dark text-white" id="fps" name="fps" placeholder="FPS">
+            `;
+            for (let i = 1; i < 121; ++i) html += /*html*/`<option value=${i}>${i}</option>`;
+            html += /*html*/`
+                    </select>
+                    <label for="fps">FPS</label>
+                </div>
+            `;
+        } else if (this instanceof VariableBrightnessAnimationEditor) {
+            html += /*html*/`
+                <div class="form-floating bg-dark text-white" style="width: 10%">
+                    <select class="form-control bg-dark text-white" id="fps" name="fps" placeholder="FPS">
+            `;
+            for (let i = 1; i < 121; ++i) html += /*html*/`<option value=${i}>${i}</option>`;
+            html += /*html*/`
+                    </select>
+                    <label for="fps">FPS</label>
+                </div>
+                <div class="form-floating bg-dark text-white" style="width: 10%">
+                    <select class="form-control bg-dark text-white" id="colourInput" name="colour" placeholder="Brightness" value="${this.defaultOnColour}">
+            `;
+            for (let i = 255; i >= 0; --i) html += /*html*/`<option value=${i}>${i}</option>`;
+            html += /*html*/`
+                    </select>
+                    <label for="colourInput">Brightness</label>
+                </div>
+            `;
+        } else if (this instanceof RGBAnimationEditor) {
+            html += /*html*/`
+                <div class="form-floating bg-dark text-white" style="width: 10%">
+                    <select class="form-control bg-dark text-white" id="fps" name="fps" placeholder="FPS">
+            `;
+            for (let i = 1; i < 121; ++i) html += /*html*/`<option value=${i}>${i}</option>`;
+            html += /*html*/`
+                    </select>
+                    <label for="fps">FPS</label>
+                </div>
+                <input id="colourInput" class="form-control form-control-color bg-dark" type="color" name="colour" value="${this.defaultOnColour}">
+            `;
+        }
+        html += /*html*/`
+            </div>
+            <div class="btn-group">
+                <button class="btn btn-dark btn-sm" onclick="editor.frames.push(editor.binaryString); editor.updateIcons(); editor.clearScreen();" data-toggle="tooltip" data-placement="top" title="Save this frame and make a new one">➕</button>
+                <button class="btn btn-dark btn-sm" onclick="editor.playback();" data-toggle="tooltip" data-placement="top" title="Play the animation">Play</button>
+            </div>
+            <div class="btn-group">
+                <button id="save" class="btn btn-dark btn-sm" onclick="editor.save()" data-toggle="tooltip" data-placement="top" title="Save this animation to the database">Save</button>
+                <button id="new" class="btn btn-dark btn-sm" onclick="editor.new()" data-toggle="tooltip" data-placement="top" title="Create a new animation">New</button>
+            </div>
+        `;
+        controlsDiv.innerHTML = html;
+        const fpsInput = document.getElementById("fps") as HTMLInputElement;
+        fpsInput.value = fps.toString();
+        if (colour !== null) {
+            const colourInput = document.getElementById("colourInput") as HTMLInputElement;
+            if (this instanceof VariableBrightnessAnimationEditor) colourInput.value = parseInt(colour, 2).toString(10);
+            else if (this instanceof RGBAnimationEditor) colourInput.value = `#${parseInt(colour, 2).toString(16)}`;
+        }
+    }
+
     public toggleShift(): void {
         this.shiftIsDown = !this.shiftIsDown;
     }
 
     public updateIcons(): void {
-        /**
-         * Get the frames as 32 bit numbers,
-         * create a JSON string,
-         * then replace the numbers with hex strings,
-         * then remove the quotes.
-        */
-        const data: string = JSON.stringify(
-            this.int32Frames,
-            (_, value): string => typeof value === "number" ? `0x${value.toString(16)}` : value
-        ).replace(/"/g, "");
-        document.location.assign(`${document.URL.split("?")[0]}?frames=${encodeURIComponent(data)}`);
+        const form: HTMLFormElement = document.createElement("form");
+        form.style.display = "none";
+        form.setAttribute("method", "post");
+        const data: HTMLInputElement = document.createElement("input");
+        data.setAttribute("type", "text");
+        data.setAttribute("name", "data");
+        data.setAttribute("value", JSON.stringify(this.int32Frames));
+        form.appendChild(data);
+        const fps: HTMLInputElement = document.createElement("input");
+        fps.setAttribute("type", "text");
+        fps.setAttribute("name", "fps");
+        fps.setAttribute("value", this.playbackFPS.toString());
+        form.appendChild(fps);
+        const colour: HTMLInputElement = document.createElement("input");
+        colour.setAttribute("type", "text");
+        colour.setAttribute("name", "colour");
+        colour.setAttribute("value", this.onColour);
+        form.appendChild(colour);
+        document.getElementsByTagName("body")[0].appendChild(form);
+        form.submit();
     }
 }
 
@@ -316,8 +444,8 @@ class RGBAnimationEditor extends AnimationEditor {
         return parseInt(colourInput.value.slice(1), 16).toString(2).padStart(24, "0");
     };
 
-    public constructor(width: number, height: number, frames: number[]) {
-        super(width, height, frames, 24);
+    public constructor(width: number, height: number, data: number[]) {
+        super(width, height, data, 24);
     }
 
     public makeFrameIcons(): Array<{ image: string; binary: string }> {
@@ -343,78 +471,6 @@ class RGBAnimationEditor extends AnimationEditor {
             };
         });
     }
-
-    public setControls(): void {
-        let html: string = "";
-        html += /*html*/ `
-            <br>
-            <div class="btn-group">
-                <button class="btn btn-dark btn-sm" onclick="editor.clearScreen();   " data-toggle="tooltip" data-placement="top" title="Turn off all LEDs">Clear</button>
-                <button class="btn btn-dark btn-sm" onclick="editor.fillScreen();    " data-toggle="tooltip" data-placement="top" title="Turn on all LEDs">Fill</button>
-                <button class="btn btn-dark btn-sm" onclick="editor.invertScreen();  " data-toggle="tooltip" data-placement="top" title="Invert all LEDs">Invert</button>
-                <button class="btn btn-dark btn-sm" onclick="editor.toggleShift();   " data-toggle="tooltip" data-placement="top" title="Hold shift to draw straight lines" id="shiftBtn" >Shift</button>
-                <button class="btn btn-dark btn-sm" onclick="editor.flip(false);     " data-toggle="tooltip" data-placement="top" title="Flip the image vertically">↕</button>
-                <button class="btn btn-dark btn-sm" onclick="editor.flip(true);      " data-toggle="tooltip" data-placement="top" title="Flip the image horizontally">↔</button>
-        `;
-        if (this.matrixWidth === this.matrixHeight)
-            html += /*html*/ `
-                <button class="btn btn-dark btn-sm" onclick="editor.move('left');    " data-toggle="tooltip" data-placement="top" title="Move the image to the left">⬅</button>
-                <button class="btn btn-dark btn-sm" onclick="editor.move('right');   " data-toggle="tooltip" data-placement="top" title="Move the image to the right">➡</button>
-                <button class="btn btn-dark btn-sm" onclick="editor.move('up');      " data-toggle="tooltip" data-placement="top" title="Move the image up">⬆</button>
-                <button class="btn btn-dark btn-sm" onclick="editor.move('down');    " data-toggle="tooltip" data-placement="top" title="Move the image down">⬇</button>
-                <button class="btn btn-dark btn-sm" onclick="editor.rotate(270);     " data-toggle="tooltip" data-placement="top" title="Rotate the image anticlockwise">↪</button>
-                <button class="btn btn-dark btn-sm" onclick="editor.rotate(90);      " data-toggle="tooltip" data-placement="top" title="Rotate the image clockwise">↩</button>
-            `;
-        else
-            html += /*html*/ `
-                <button class="btn btn-dark btn-sm" onclick="editor.move('left');    " disabled>⬅</button>
-                <button class="btn btn-dark btn-sm" onclick="editor.move('right');   " disabled>➡</button>
-                <button class="btn btn-dark btn-sm" onclick="editor.move('up');      " disabled>⬆</button>
-                <button class="btn btn-dark btn-sm" onclick="editor.move('down');    " disabled>⬇</button>
-                <button class="btn btn-dark btn-sm" onclick="editor.rotate(270);     " disabled>↪</button>
-                <button class="btn btn-dark btn-sm" onclick="editor.rotate(90);      " disabled>↩</button>
-            `;
-        html += /*html*/ `
-            </div>
-            <br>
-            <div class="btn-group">
-                <button class="btn btn-dark btn-sm" onclick="editor.drawPlus();      " data-toggle="tooltip" data-placement="top" title="Draw a plus sign">➕</button>
-                <button class="btn btn-dark btn-sm" onclick="editor.drawCross();     " data-toggle="tooltip" data-placement="top" title="Draw a diagonal cross">❌</button>
-                <button class="btn btn-dark btn-sm" onclick="editor.drawBorder();    " data-toggle="tooltip" data-placement="top" title="Draw a border">🔲</button>
-        `;
-        if (this.matrixWidth === this.matrixHeight)
-            html += /*html*/ `
-                <button class="btn btn-dark btn-sm" onclick="editor.drawCircle();    " data-toggle="tooltip" data-placement="top" title="Draw a circle outline">⭕</button>
-                <button class="btn btn-dark btn-sm" onclick="editor.drawCircle(true);" data-toggle="tooltip" data-placement="top" title="Draw a circle">🔴</button>
-                <button class="btn btn-dark btn-sm" onclick="editor.drawNoEntry();   " data-toggle="tooltip" data-placement="top" title="Draw a no entry sign">🚫</button>
-            `;
-        else
-            html += /*html*/ `
-                <button class="btn btn-dark btn-sm" onclick="editor.drawCircle();    " disabled>⭕</button>
-                <button class="btn btn-dark btn-sm" onclick="editor.drawCircle(true);" disabled>🔴</button>
-                <button class="btn btn-dark btn-sm" onclick="editor.drawNoEntry();   " disabled>🚫</button>
-            `;
-        html += /*html*/ `
-            </div>
-            <br>
-            <label for="colour">Colour:</label>
-            <input id="colourInput" class="form-control form-control-color" type="color" name="colour" value="${this.defaultOnColour}">
-            <div class="form-floating bg-dark text-white" style="width: 10%">
-                <select class="form-control bg-dark text-white" id="fps" name="fps" placeholder="FPS">
-        `;
-        for (let i = 1; i < 121; ++i) html += /*html*/`
-                    <option value=${i}>${i}</option>
-        `;
-        html += /*html*/`
-                </select>
-                <label for="fps">FPS</label>
-            </div>
-            <button class="btn btn-dark btn-sm" onclick="editor.frames.push(editor.binaryString); editor.updateIcons(); editor.clearScreen();" data-toggle="tooltip" data-placement="top" title="Save this frame and make a new one">➕</button>
-            <button class="btn btn-dark btn-sm" onclick="editor.playback();" data-toggle="tooltip" data-placement="top" title="Play the animation">Play</button>
-        `;
-        const controlsDiv = document.getElementById("controls") as HTMLDivElement;
-        controlsDiv.innerHTML = html;
-    }
     
     public updateLEDs(): void {
         this.LEDs.forEach((button, i) => {
@@ -438,8 +494,8 @@ class VariableBrightnessAnimationEditor extends AnimationEditor {
         return parseInt(colourInput.value).toString(2).padStart(8, "0");
     };
     
-    public constructor(width: number, height: number, frames: number[]) {
-        super(width, height, frames, 8);
+    public constructor(width: number, height: number, data: number[]) {
+        super(width, height, data, 8);
     }
 
     public makeFrameIcons(): Array<{ image: string; binary: string }> {
@@ -474,88 +530,6 @@ class VariableBrightnessAnimationEditor extends AnimationEditor {
             };
         });
     }
-
-    public setControls(): void {
-        let html: string = "";
-        html += /*html*/ `
-            <br>
-            <div class="btn-group">
-                <button class="btn btn-dark btn-sm" onclick="editor.clearScreen();   " data-toggle="tooltip" data-placement="top" title="Turn off all LEDs">Clear</button>
-                <button class="btn btn-dark btn-sm" onclick="editor.fillScreen();    " data-toggle="tooltip" data-placement="top" title="Turn on all LEDs">Fill</button>
-                <button class="btn btn-dark btn-sm" onclick="editor.invertScreen();  " data-toggle="tooltip" data-placement="top" title="Invert all LEDs">Invert</button>
-                <button class="btn btn-dark btn-sm" onclick="editor.toggleShift();   " data-toggle="tooltip" data-placement="top" title="Hold shift to draw straight lines" id="shiftBtn" >Shift</button>
-                <button class="btn btn-dark btn-sm" onclick="editor.flip(false);     " data-toggle="tooltip" data-placement="top" title="Flip the image vertically">↕</button>
-                <button class="btn btn-dark btn-sm" onclick="editor.flip(true);      " data-toggle="tooltip" data-placement="top" title="Flip the image horizontally">↔</button>
-        `;
-        if (this.matrixWidth === this.matrixHeight)
-            html += /*html*/ `
-                <button class="btn btn-dark btn-sm" onclick="editor.move('left');    " data-toggle="tooltip" data-placement="top" title="Move the image to the left">⬅</button>
-                <button class="btn btn-dark btn-sm" onclick="editor.move('right');   " data-toggle="tooltip" data-placement="top" title="Move the image to the right">➡</button>
-                <button class="btn btn-dark btn-sm" onclick="editor.move('up');      " data-toggle="tooltip" data-placement="top" title="Move the image up">⬆</button>
-                <button class="btn btn-dark btn-sm" onclick="editor.move('down');    " data-toggle="tooltip" data-placement="top" title="Move the image down">⬇</button>
-                <button class="btn btn-dark btn-sm" onclick="editor.rotate(270);     " data-toggle="tooltip" data-placement="top" title="Rotate the image anticlockwise">↪</button>
-                <button class="btn btn-dark btn-sm" onclick="editor.rotate(90);      " data-toggle="tooltip" data-placement="top" title="Rotate the image clockwise">↩</button>
-            `;
-        else
-            html += /*html*/ `
-                <button class="btn btn-dark btn-sm" onclick="editor.move('left');    " disabled>⬅</button>
-                <button class="btn btn-dark btn-sm" onclick="editor.move('right');   " disabled>➡</button>
-                <button class="btn btn-dark btn-sm" onclick="editor.move('up');      " disabled>⬆</button>
-                <button class="btn btn-dark btn-sm" onclick="editor.move('down');    " disabled>⬇</button>
-                <button class="btn btn-dark btn-sm" onclick="editor.rotate(270);     " disabled>↪</button>
-                <button class="btn btn-dark btn-sm" onclick="editor.rotate(90);      " disabled>↩</button>
-            `;
-        html += /*html*/ `
-            </div>
-            <br>
-            <div class="btn-group">
-                <button class="btn btn-dark btn-sm" onclick="editor.drawPlus();      " data-toggle="tooltip" data-placement="top" title="Draw a plus sign">➕</button>
-                <button class="btn btn-dark btn-sm" onclick="editor.drawCross();     " data-toggle="tooltip" data-placement="top" title="Draw a diagonal cross">❌</button>
-                <button class="btn btn-dark btn-sm" onclick="editor.drawBorder();    " data-toggle="tooltip" data-placement="top" title="Draw a border">🔲</button>
-        `;
-        if (this.matrixWidth === this.matrixHeight)
-            html += /*html*/ `
-                <button class="btn btn-dark btn-sm" onclick="editor.drawCircle();    " data-toggle="tooltip" data-placement="top" title="Draw a circle outline">⭕</button>
-                <button class="btn btn-dark btn-sm" onclick="editor.drawCircle(true);" data-toggle="tooltip" data-placement="top" title="Draw a circle">🔴</button>
-                <button class="btn btn-dark btn-sm" onclick="editor.drawNoEntry();   " data-toggle="tooltip" data-placement="top" title="Draw a no entry sign">🚫</button>
-            `;
-        else
-            html += /*html*/ `
-                <button class="btn btn-dark btn-sm" onclick="editor.drawCircle();    " disabled>⭕</button>
-                <button class="btn btn-dark btn-sm" onclick="editor.drawCircle(true);" disabled>🔴</button>
-                <button class="btn btn-dark btn-sm" onclick="editor.drawNoEntry();   " disabled>🚫</button>
-            `;
-        html += /*html*/ `
-            </div>
-            <br>
-            <div class="input-group bg-dark text-white" style="width: 20%">
-                <div class="form-floating bg-dark text-white" style="width: 50%">
-                    <select class="form-control bg-dark text-white" id="colourInput" name="colour" placeholder="Brightness" value="${this.defaultOnColour}">
-        `;
-        for (let i = 255; i >= 0; --i) html += /*html*/`
-                        <option value=${i}>${i}</option>
-        `;
-        html += /*html*/`
-                    </select>
-                    <label for="colourInput">Brightness</label>
-                </div>
-                <div class="form-floating bg-dark text-white" style="width: 50%">
-                    <select class="form-control bg-dark text-white" id="fps" name="fps" placeholder="FPS">
-        `;
-        for (let i = 1; i < 121; ++i) html += /*html*/`
-                        <option value=${i}>${i}</option>
-        `;
-        html += /*html*/`
-                    </select>
-                    <label for="fps">FPS</label>
-                </div>
-            </div>
-            <button class="btn btn-dark btn-sm" onclick="editor.frames.push(editor.binaryString); editor.updateIcons(); editor.clearScreen();" data-toggle="tooltip" data-placement="top" title="Save this frame and make a new one">➕</button>
-            <button class="btn btn-dark btn-sm" onclick="editor.playback();" data-toggle="tooltip" data-placement="top" title="Play the animation">Play</button>
-        `;
-        const controlsDiv = document.getElementById("controls") as HTMLDivElement;
-        controlsDiv.innerHTML = html;
-    }
     
     public updateLEDs(): void {
         this.LEDs.forEach((button, i) => {
@@ -578,8 +552,8 @@ class MonochromaticAnimationEditor extends AnimationEditor {
         return this.defaultOnColour;
     };
     
-    public constructor(width: number, height: number, frames: number[]) {
-        super(width, height, frames, 1);
+    public constructor(width: number, height: number, data: number[]) {
+        super(width, height, data, 1);
     }
 
     public makeFrameIcons(): Array<{ image: string; binary: string }> {
@@ -607,76 +581,6 @@ class MonochromaticAnimationEditor extends AnimationEditor {
             };
         });
     }
-
-    public setControls(): void {
-        let html: string = "";
-        html += /*html*/ `
-            <br>
-            <div class="btn-group">
-                <button class="btn btn-dark btn-sm" onclick="editor.clearScreen();   " data-toggle="tooltip" data-placement="top" title="Turn off all LEDs">Clear</button>
-                <button class="btn btn-dark btn-sm" onclick="editor.fillScreen();    " data-toggle="tooltip" data-placement="top" title="Turn on all LEDs">Fill</button>
-                <button class="btn btn-dark btn-sm" onclick="editor.invertScreen();  " data-toggle="tooltip" data-placement="top" title="Invert all LEDs">Invert</button>
-                <button class="btn btn-dark btn-sm" onclick="editor.toggleShift();   " data-toggle="tooltip" data-placement="top" title="Hold shift to draw straight lines" id="shiftBtn" >Shift</button>
-                <button class="btn btn-dark btn-sm" onclick="editor.flip(false);     " data-toggle="tooltip" data-placement="top" title="Flip the image vertically">↕</button>
-                <button class="btn btn-dark btn-sm" onclick="editor.flip(true);      " data-toggle="tooltip" data-placement="top" title="Flip the image horizontally">↔</button>
-        `;
-        if (this.matrixWidth === this.matrixHeight)
-            html += /*html*/ `
-                <button class="btn btn-dark btn-sm" onclick="editor.move('left');    " data-toggle="tooltip" data-placement="top" title="Move the image to the left">⬅</button>
-                <button class="btn btn-dark btn-sm" onclick="editor.move('right');   " data-toggle="tooltip" data-placement="top" title="Move the image to the right">➡</button>
-                <button class="btn btn-dark btn-sm" onclick="editor.move('up');      " data-toggle="tooltip" data-placement="top" title="Move the image up">⬆</button>
-                <button class="btn btn-dark btn-sm" onclick="editor.move('down');    " data-toggle="tooltip" data-placement="top" title="Move the image down">⬇</button>
-                <button class="btn btn-dark btn-sm" onclick="editor.rotate(270);     " data-toggle="tooltip" data-placement="top" title="Rotate the image anticlockwise">↪</button>
-                <button class="btn btn-dark btn-sm" onclick="editor.rotate(90);      " data-toggle="tooltip" data-placement="top" title="Rotate the image clockwise">↩</button>
-            `;
-        else
-            html += /*html*/ `
-                <button class="btn btn-dark btn-sm" onclick="editor.move('left');    " disabled>⬅</button>
-                <button class="btn btn-dark btn-sm" onclick="editor.move('right');   " disabled>➡</button>
-                <button class="btn btn-dark btn-sm" onclick="editor.move('up');      " disabled>⬆</button>
-                <button class="btn btn-dark btn-sm" onclick="editor.move('down');    " disabled>⬇</button>
-                <button class="btn btn-dark btn-sm" onclick="editor.rotate(270);     " disabled>↪</button>
-                <button class="btn btn-dark btn-sm" onclick="editor.rotate(90);      " disabled>↩</button>
-            `;
-        html += /*html*/ `
-            </div>
-            <br>
-            <div class="btn-group">
-                <button class="btn btn-dark btn-sm" onclick="editor.drawPlus();      " data-toggle="tooltip" data-placement="top" title="Draw a plus sign">➕</button>
-                <button class="btn btn-dark btn-sm" onclick="editor.drawCross();     " data-toggle="tooltip" data-placement="top" title="Draw a diagonal cross">❌</button>
-                <button class="btn btn-dark btn-sm" onclick="editor.drawBorder();    " data-toggle="tooltip" data-placement="top" title="Draw a border">🔲</button>
-        `;
-        if (this.matrixWidth === this.matrixHeight)
-            html += /*html*/ `
-                <button class="btn btn-dark btn-sm" onclick="editor.drawCircle();    " data-toggle="tooltip" data-placement="top" title="Draw a circle outline">⭕</button>
-                <button class="btn btn-dark btn-sm" onclick="editor.drawCircle(true);" data-toggle="tooltip" data-placement="top" title="Draw a circle">🔴</button>
-                <button class="btn btn-dark btn-sm" onclick="editor.drawNoEntry();   " data-toggle="tooltip" data-placement="top" title="Draw a no entry sign">🚫</button>
-            `;
-        else
-            html += /*html*/ `
-                <button class="btn btn-dark btn-sm" onclick="editor.drawCircle();    " disabled>⭕</button>
-                <button class="btn btn-dark btn-sm" onclick="editor.drawCircle(true);" disabled>🔴</button>
-                <button class="btn btn-dark btn-sm" onclick="editor.drawNoEntry();   " disabled>🚫</button>
-            `;
-        html += /*html*/ `
-            </div>
-            <br>
-            <div class="form-control" style="width: 10%">
-                <select class="form-control bg-dark text-white" id="fps" name="fps" placeholder="FPS">
-        `;
-        for (let i = 1; i < 121; ++i) html += /*html*/`
-                    <option value=${i}>${i}</option>
-        `;
-        html += /*html*/`
-                </select>
-                <label for="fps">FPS</label>
-            </div>
-            <button class="btn btn-dark btn-sm" onclick="editor.frames.push(editor.binaryString); editor.updateIcons(); editor.clearScreen();" data-toggle="tooltip" data-placement="top" title="Save this frame and make a new one">➕</button>
-            <button class="btn btn-dark btn-sm" onclick="editor.playback();" data-toggle="tooltip" data-placement="top" title="Play the animation">Play</button>
-        `;
-        const controlsDiv = document.getElementById("controls") as HTMLDivElement;
-        controlsDiv.innerHTML = html;
-    }
     
     public updateLEDs(): void {
         this.LEDs.forEach((button, i) => {
@@ -690,6 +594,15 @@ class MonochromaticAnimationEditor extends AnimationEditor {
     }
 }
 
-function createAnimationEditor(type: 0 | 1 | 2, width: number, height: number, frames: number[] = []): AnimationEditor {
-    return new [MonochromaticAnimationEditor, VariableBrightnessAnimationEditor, RGBAnimationEditor][type](width, height, frames);
+function createAnimationEditor(
+    type: 0 | 1 | 2,
+    width: number,
+    height: number,
+    data: number[] = []
+): AnimationEditor {
+    return new [
+        MonochromaticAnimationEditor,
+        VariableBrightnessAnimationEditor,
+        RGBAnimationEditor
+    ][type](width, height, data);
 }

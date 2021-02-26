@@ -1,4 +1,13 @@
 <?php
+if (isset($_POST["createNew"]) && $_POST["createNew"] === "true") {
+    unset($_SESSION["matrix"]);
+    unset($_SESSION["editor"]);
+}
+
+if (isset($_POST["saveToDB"]) && $_POST["saveToDB"] === "true") {
+    // Save to database.
+}
+
 $tmpWidth = $_POST["width"];
 $tmpHeight = $_POST["height"];
 $tmpType = $_POST["type"];
@@ -18,11 +27,11 @@ if (isset($_POST["setup"])) {
     }
 }
 
-if (!isset($_SESSION["width"])) $_SESSION["width"] = $tmpWidth;
-if (!isset($_SESSION["height"])) $_SESSION["height"] = $tmpHeight;
-if (!isset($_SESSION["type"])) $_SESSION["type"] = $tmpType;
+if (!isset($_SESSION["matrix"]["width"])) $_SESSION["matrix"]["width"] = $tmpWidth;
+if (!isset($_SESSION["matrix"]["height"])) $_SESSION["matrix"]["height"] = $tmpHeight;
+if (!isset($_SESSION["matrix"]["type"])) $_SESSION["matrix"]["type"] = $tmpType;
 
-if (!isset($_SESSION["type"]) || !isset($_SESSION["width"]) || !isset($_SESSION["height"])) {
+if (!isset($_SESSION["matrix"]["type"]) || !isset($_SESSION["matrix"]["width"]) || !isset($_SESSION["matrix"]["height"])) {
     echo <<<HTML
         <h1>Animation Settings</h1>
         <form method="post">
@@ -80,12 +89,21 @@ if (!isset($_SESSION["type"]) || !isset($_SESSION["width"]) || !isset($_SESSION[
         </script>
     HTML;
 } else {
-    $width = $_SESSION["width"];
-    $height = $_SESSION["height"];
-    $type = $_SESSION["type"];
+    $type = $_SESSION["matrix"]["type"];
+    $width = $_SESSION["matrix"]["width"];
+    $height = $_SESSION["matrix"]["height"];
 
-    if (isset($_GET["frames"])) $_SESSION["frames"] = $_GET["frames"];
-    $frames = $_SESSION["frames"];
+    if (isset($_POST["data"])) $_SESSION["editor"]["data"] = $_POST["data"];
+    if (is_null($_SESSION["editor"]["data"])) $_SESSION["editor"]["data"] = "[]";
+    $data = $_SESSION["editor"]["data"];
+
+    if (isset($_POST["fps"])) $_SESSION["editor"]["fps"] = $_POST["fps"];
+    if (is_null($_SESSION["editor"]["fps"])) $_SESSION["editor"]["fps"] = 1;
+    $fps = $_SESSION["editor"]["fps"];
+
+    if (isset($_POST["colour"])) $_SESSION["editor"]["colour"] = $_POST["colour"];
+    if (is_null($_SESSION["editor"]["colour"])) $_SESSION["editor"]["colour"] = "";
+    $colour = $_SESSION["editor"]["colour"];
 
     // CSS
     $columnWidth = strval(25 / $height) . "%";
@@ -169,6 +187,21 @@ if (!isset($_SESSION["type"]) || !isset($_SESSION["width"]) || !isset($_SESSION[
         </style>
     HTML;
 
+    // Alert box
+    echo <<<HTML
+        <div id="alert">
+    HTML;
+    if (isset($_POST["saveToDB"]) && $_POST["saveToDB"] === "true") {
+        echo <<<HTML
+            <div class="alert alert-success" role="alert">
+                Animation Saved!
+            </div>
+        HTML;
+    }
+    echo <<<HTML
+        </div>
+    HTML;
+
     // JS
     echo <<<HTML
         <script>
@@ -178,7 +211,7 @@ if (!isset($_SESSION["type"]) || !isset($_SESSION["width"]) || !isset($_SESSION[
         <script src="Classes/JavaScript/Matrix.js"></script>
         <script src="Classes/JavaScript/AnimationEditor.js"></script>
         <script>
-            const editor = createAnimationEditor($type, $width, $height, $frames);
+            const editor = createAnimationEditor($type, $width, $height, $data);
             window.onkeydown = (e) => e.code === "ShiftLeft" && (editor.shiftIsDown = true);
             window.onkeyup = (e) => e.code === "ShiftLeft" && (editor.shiftIsDown = false);
         </script>
@@ -201,7 +234,7 @@ if (!isset($_SESSION["type"]) || !isset($_SESSION["width"]) || !isset($_SESSION[
         <div id="controls"></div>
         <div id="frameIcons"></div>
         <script>
-            editor.setControls();
+            editor.setControls($fps, "$colour" || null);
             editor.displayIcons();
         </script>
         <script>
