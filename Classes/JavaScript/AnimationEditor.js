@@ -58,12 +58,7 @@ class AnimationEditor {
         this.LEDBitLength = LEDBitLength;
         this.bitCount = this.matrixWidth * this.matrixHeight * this.LEDBitLength;
         this.defaultOffColour = "0".repeat(this.LEDBitLength);
-        const frameLength = this.LEDBitLength * this.matrixWidth * this.matrixHeight;
-        this.frames = (data
-            .map((int) => int.toString(2).padStart(32, "0"))
-            .join("")
-            .match(new RegExp(`.{1,${32 - frameLength % 32 + frameLength}}`, "g")) ?? [])
-            .map((frame) => frame.slice(32 - frameLength % 32));
+        this.frames = data;
         this.clearScreen();
     }
     calculateBresenhamLine(x0, y0, x1, y1) {
@@ -399,7 +394,7 @@ class AnimationEditor {
         const data = document.createElement("input");
         data.setAttribute("type", "text");
         data.setAttribute("name", "data");
-        data.setAttribute("value", JSON.stringify(this.int32Frames));
+        data.setAttribute("value", JSON.stringify(this.frames));
         form.appendChild(data);
         const fps = document.createElement("input");
         fps.setAttribute("type", "text");

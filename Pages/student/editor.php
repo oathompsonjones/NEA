@@ -5,12 +5,35 @@ if (isset($_POST["createNew"]) && $_POST["createNew"] === "true") {
 }
 
 if (isset($_POST["saveToDB"]) && $_POST["saveToDB"] === "true") {
-    // Save to database.
+    // Get session variables.
+    $db = $_SESSION["database"];
+    $width = $_SESSION["matrix"]["width"];
+    $height = $_SESSION["matrix"]["height"];
+    $type = $_SESSION["matrix"]["type"];
+    $id = $_SESSION["matrix"]["id"];
+    $name = $_SESSION["matrix"]["name"];
+    $frames = isset($_SESSION["editor"]["data"]) && !is_null($_SESSION["editor"]["data"])
+        ? json_decode($_SESSION["editor"]["data"])
+        : [];
+    $username = unserialize($_SESSION["user"])->username;
+    // Get a list of the currently saved animations.
+    $currentIDs = $db->select("AnimationID", "Animation")[0];
+    // Check if the current animation already exists in the database.
+    $animationExists = $currentIDs ? in_array($id, $currentIDs) : [];
+    // If it does, delete the saved frames.
+    if ($animationExists) $db->delete("Frame", "AnimationID = '$id'");
+    // If it doesn't add it.
+    else $db->insert("Animation", "AnimationID, Name, Username, Width, Height, Type", "'$id', '$name', '$username', $width, $height, $type");
+    // Get all of the current frames.
+    for ($i = 0; $i < count($frames); ++$i)
+        $db->insert("Frame", "FrameID, AnimationID, FramePosition, BinaryString", "'$id$i', $id, $i, '$frames[$i]'");
 }
 
 $tmpWidth = $_POST["width"];
 $tmpHeight = $_POST["height"];
 $tmpType = $_POST["type"];
+$tmpName = $_POST["name"];
+$tmpID = $_POST["id"];
 
 if (isset($_POST["setup"])) {
     switch ($_POST["setup"]) {
@@ -27,54 +50,107 @@ if (isset($_POST["setup"])) {
     }
 }
 
+if (isset($_POST["preMade"]) && $_POST["preMade"] !== "New") {
+    function findAnimation($value)
+    {
+        return $value->id === $_POST["preMade"];
+    }
+    $animation = array_values(array_filter(unserialize($_SESSION["user"])->animations, "findAnimation"))[0];
+    $tmpWidth = $animation->width;
+    $tmpHeight = $animation->height;
+    $tmpType = $animation->type;
+    $tmpName = $animation->name;
+    $tmpId = $animation->id;
+    $frames = is_null($animation->frames) ? [] : $animation->frames;
+    function mapFrames($value)
+    {
+        return $value->binary;
+    }
+    $_SESSION["editor"]["data"] = json_encode(array_map("mapFrames", $frames));
+}
+
 if (!isset($_SESSION["matrix"]["width"])) $_SESSION["matrix"]["width"] = $tmpWidth;
 if (!isset($_SESSION["matrix"]["height"])) $_SESSION["matrix"]["height"] = $tmpHeight;
 if (!isset($_SESSION["matrix"]["type"])) $_SESSION["matrix"]["type"] = $tmpType;
+if (!isset($_SESSION["matrix"]["name"])) $_SESSION["matrix"]["name"] = $tmpName;
+if (!isset($_SESSION["matrix"]["id"])) $_SESSION["matrix"]["id"] = $tmpID;
 
-if (!isset($_SESSION["matrix"]["type"]) || !isset($_SESSION["matrix"]["width"]) || !isset($_SESSION["matrix"]["height"])) {
+if (
+    !isset($_SESSION["matrix"]["width"])
+    || !isset($_SESSION["matrix"]["height"])
+    || !isset($_SESSION["matrix"]["type"])
+    || !isset($_SESSION["matrix"]["name"])
+    || !isset($_SESSION["matrix"]["id"])
+) {
+    $timestamp = time();
     echo <<<HTML
         <h1>Animation Settings</h1>
         <form method="post">
-            <div id="setup" class="form-floating">
-                <select class="form-control bg-dark text-white" id="setupOptions" name="setup">
-                    <option value="Micro:Bit">Micro:Bit</option>
-                    <option value="NeoPixel RGB 8x8">NeoPixel RGB 8x8</option>
-                    <option value="Custom">Custom</option>
+            <input name="id" type="text" style="display: none;" value='$timestamp'>
+            <div class="form-floating">
+                <select class="form-control bg-dark text-white" id="preMade" name="preMade">
+                    <option value="New">Create new</option>
+    HTML;
+    $animations = unserialize($_SESSION["user"])->animations;
+    for ($i = 0; $i < count($animations); ++$i) {
+        $id = $animations[$i]->id;
+        $name = $animations[$i]->name;
+        echo <<<HTML
+            <option value="$id">$name</option>
+        HTML;
+    }
+    echo <<<HTML
                 </select>
-                <label for="setupOptions">Matrix Setup</label>
+                <label for="preMade">Saved Animations</label>
             </div>
             <br>
-            <div id="customSetup" style="display: none;">
-                <h3>Custom Setup</h3>
+            <div id="setup">
                 <div class="form-floating">
-                    <select class="form-control bg-dark text-white" id="width" name="width" placeholder="Width">
+                    <select class="form-control bg-dark text-white" id="setupOptions" name="setup">
+                        <option value="Micro:Bit">Micro:Bit</option>
+                        <option value="NeoPixel RGB 8x8">NeoPixel RGB 8x8</option>
+                        <option value="Custom">Custom</option>
+                    </select>
+                    <label for="setupOptions">Matrix Setup</label>
+                </div>
+                <br>
+                <div class="form-floating">
+                    <input type="text" class="form-control bg-dark text-white" id="inputName" name="name" placeholder="Name">
+                    <label for="inputName">Name</label>
+                </div>
+                <br>
+                <div id="customSetup" style="display: none;">
+                    <h3>Custom Setup</h3>
+                    <div class="form-floating">
+                        <select class="form-control bg-dark text-white" id="width" name="width" placeholder="Width">
     HTML;
     for ($i = 1; $i < 26; ++$i) echo <<<HTML
         <option value=$i>$i</option>
     HTML;
     echo <<<HTML
-                    </select>
-                    <label for="width">Width</label>
-                </div>
-                <br>
-                <div class="form-floating">
-                    <select class="form-control bg-dark text-white" id="height" name="height" placeholder="Height">
+                        </select>
+                        <label for="width">Width</label>
+                    </div>
+                    <br>
+                    <div class="form-floating">
+                        <select class="form-control bg-dark text-white" id="height" name="height" placeholder="Height">
     HTML;
     for ($i = 1; $i < 26; ++$i) echo <<<HTML
         <option value=$i>$i</option>
     HTML;
     echo <<<HTML
-                    </select>
-                    <label for="height">Height</label>
+                        </select>
+                        <label for="height">Height</label>
+                    </div>
+                    <br>
+                    <input type="radio" id="0" name="type" value=0 checked>
+                    <label for="0">Monochromatic</label>
+                    <input type="radio" id="1" name="type" value=1>
+                    <label for="1">Variable brightness</label>
+                    <input type="radio" id="2" name="type" value=2>
+                    <label for="2">RGB</label>
+                    <br>
                 </div>
-                <br>
-                <input type="radio" id="0" name="type" value=0 checked>
-                <label for="0">Monochromatic</label>
-                <input type="radio" id="1" name="type" value=1>
-                <label for="1">Variable brightness</label>
-                <input type="radio" id="2" name="type" value=2>
-                <label for="2">RGB</label>
-                <br>
             </div>
             <br>
             <input class="btn btn-dark btn-sm" type="submit">
@@ -85,6 +161,11 @@ if (!isset($_SESSION["matrix"]["type"]) || !isset($_SESSION["matrix"]["width"]) 
                 const customSetupDiv = document.getElementById("customSetup");
                 if (setupList.value === "Custom") customSetupDiv.style.display = "block";
                 else customSetupDiv.style.display = "none";
+
+                const preMadeList = document.getElementById("preMade");
+                const setupDiv = document.getElementById("setup");
+                if (preMadeList.value === "New") setupDiv.style.display = "block";
+                else setupDiv.style.display = "none";
             });
         </script>
     HTML;

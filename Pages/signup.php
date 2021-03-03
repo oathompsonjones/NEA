@@ -5,7 +5,7 @@ $usernames = $_SESSION["database"]->select("Username", "User");
 // Checks that the auth variable exists and is true.
 if (isset($_SESSION["auth"]) && $_SESSION["auth"]) {
     // Redirects you back to the home page if already logged in.
-    require "Include/redirect.inc";
+    require_once "Include/redirect.inc";
 } else if (isset($_GET["submit"])) {
     // Get form data.
     $username = $_POST["username"];
@@ -51,7 +51,7 @@ if (isset($_SESSION["auth"]) && $_SESSION["auth"]) {
         // Log in new user and set session variable to keep track of the user.
         $_SESSION["auth"] = true;
         $_SESSION["user"] = serialize(new User($username));
-        require "Include/redirect.inc";
+        require_once "Include/redirect.inc";
     }
-    require "Include/signupForm.inc";
-} else require "Include/signupForm.inc";
+    require_once "Include/signupForm.inc";
+} else require_once "Include/signupForm.inc";

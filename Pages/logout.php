@@ -1,3 +1,3 @@
 <?php
 session_destroy();
-require "Include/redirect.inc";
+require_once "Include/redirect.inc";

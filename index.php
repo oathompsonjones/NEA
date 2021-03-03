@@ -4,8 +4,9 @@ session_start();
 
 
 // Import all classes.
-require "Classes/PHP/user.php";
-require "Database/database.php";
+require_once "Classes/PHP/user.php";
+require_once "Classes/PHP/animation.php";
+require_once "Database/database.php";
 // Create new instance of the database handling class.
 $_SESSION["database"] = new Database();
 
@@ -21,7 +22,7 @@ $loggedIn = isset($_SESSION["auth"]) && $_SESSION["auth"];
 $loggingInOrOut = $page === "login" || $page === "signup" || $page === "logout";
 
 // Render page header.
-require "Include/header.inc";
+require_once "Include/header.inc";
 
 // Render a message telling the user they need to log in.
 if (!$loggedIn && !$loggingInOrOut) {
@@ -33,7 +34,7 @@ if (!$loggedIn && !$loggingInOrOut) {
     HTML;
 }
 // Redirect user to loin, logout or signup.
-else if ($loggingInOrOut) require "Pages/$page.php";
+else if ($loggingInOrOut) require_once "Pages/$page.php";
 // Redirect user to the requested page, taking into account their access level.
 else {
     // Get the object for the current user.
@@ -43,8 +44,8 @@ else {
     if (preg_match("/.*(login)|(logout)|(signup)\.php/", $page)) $page = str_replace("/$user->type", "", $page);
     if (!file_exists($page)) $page = "Pages/404.php";
     // Render the requested page.
-    require $page;
+    require_once $page;
 }
 
 // Render page footer.
-require "Include/footer.inc";
+require_once "Include/footer.inc";

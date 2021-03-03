@@ -7,7 +7,7 @@ if (!is_null($result)) while ($row = array_shift($result)) $credentials[$row[0]]
 // Checks that the auth variable exists and is true.
 if (isset($_SESSION["auth"]) && $_SESSION["auth"]) {
     // Redirects you back to the home page if already logged in.
-    require "Include/redirect.inc";
+    require_once "Include/redirect.inc";
 } else if (isset($_GET["submit"])) {
     // Get form data.
     $username = $_POST["username"];
@@ -41,7 +41,7 @@ if (isset($_SESSION["auth"]) && $_SESSION["auth"]) {
         // Set session variable to keep track of the user.
         $_SESSION["auth"] = true;
         $_SESSION["user"] = serialize(new User($username));
-        require "Include/redirect.inc";
+        require_once "Include/redirect.inc";
     }
-    require "Include/loginForm.inc";
-} else require "Include/loginForm.inc";
+    require_once "Include/loginForm.inc";
+} else require_once "Include/loginForm.inc";

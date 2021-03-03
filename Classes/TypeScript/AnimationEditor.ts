@@ -56,20 +56,11 @@ abstract class AnimationEditor {
 
     public abstract get onColour(): string;
 
-    protected constructor(protected matrixWidth: number, protected matrixHeight: number, data: number[], public LEDBitLength: number) {
+    protected constructor(protected matrixWidth: number, protected matrixHeight: number, data: string[], public LEDBitLength: number) {
         this.bitCount = this.matrixWidth * this.matrixHeight * this.LEDBitLength;
         this.defaultOffColour = "0".repeat(this.LEDBitLength);
         
-        const frameLength: number = this.LEDBitLength * this.matrixWidth * this.matrixHeight;
-        this.frames = (data
-            // Map the numbers into 32 bit strings.
-            .map((int) => int.toString(2).padStart(32, "0"))
-            // Create one string from all the chunks.
-            .join("")
-            // Split this string into each individual frame.
-            .match(new RegExp(`.{1,${32 - frameLength % 32 + frameLength}}`, "g")) ?? [])
-            // Cut each frame down to the correct length.
-            .map((frame) => frame.slice(32 - frameLength % 32));
+        this.frames = data;
         
         this.clearScreen();
     }
@@ -419,7 +410,7 @@ abstract class AnimationEditor {
         const data: HTMLInputElement = document.createElement("input");
         data.setAttribute("type", "text");
         data.setAttribute("name", "data");
-        data.setAttribute("value", JSON.stringify(this.int32Frames));
+        data.setAttribute("value", JSON.stringify(this.frames));
         form.appendChild(data);
         const fps: HTMLInputElement = document.createElement("input");
         fps.setAttribute("type", "text");
@@ -444,7 +435,7 @@ class RGBAnimationEditor extends AnimationEditor {
         return parseInt(colourInput.value.slice(1), 16).toString(2).padStart(24, "0");
     };
 
-    public constructor(width: number, height: number, data: number[]) {
+    public constructor(width: number, height: number, data: string[]) {
         super(width, height, data, 24);
     }
 
@@ -494,7 +485,7 @@ class VariableBrightnessAnimationEditor extends AnimationEditor {
         return parseInt(colourInput.value).toString(2).padStart(8, "0");
     };
     
-    public constructor(width: number, height: number, data: number[]) {
+    public constructor(width: number, height: number, data: string[]) {
         super(width, height, data, 8);
     }
 
@@ -552,7 +543,7 @@ class MonochromaticAnimationEditor extends AnimationEditor {
         return this.defaultOnColour;
     };
     
-    public constructor(width: number, height: number, data: number[]) {
+    public constructor(width: number, height: number, data: string[]) {
         super(width, height, data, 1);
     }
 
@@ -598,7 +589,7 @@ function createAnimationEditor(
     type: 0 | 1 | 2,
     width: number,
     height: number,
-    data: number[] = []
+    data: string[] = []
 ): AnimationEditor {
     return new [
         MonochromaticAnimationEditor,
