@@ -29,51 +29,40 @@ if (isset($_POST["saveToDB"]) && $_POST["saveToDB"] === "true") {
         $db->insert("Frame", "FrameID, AnimationID, FramePosition, BinaryString", "'$id$i', $id, $i, '$frames[$i]'");
 }
 
-$tmpWidth = $_POST["width"];
-$tmpHeight = $_POST["height"];
-$tmpType = $_POST["type"];
-$tmpName = $_POST["name"];
-$tmpID = $_POST["id"];
-
-if (isset($_POST["setup"])) {
-    switch ($_POST["setup"]) {
-        case "Micro:Bit":
-            $tmpWidth = 5;
-            $tmpHeight = 5;
-            $tmpType = 1;
-            break;
-        case "NeoPixel RGB 8x8":
-            $tmpWidth = 8;
-            $tmpHeight = 8;
-            $tmpType = 2;
-            break;
-    }
-}
-
 if (isset($_POST["preMade"]) && $_POST["preMade"] !== "New") {
     function findAnimation($value)
     {
         return $value->id === $_POST["preMade"];
     }
     $animation = array_values(array_filter(unserialize($_SESSION["user"])->animations, "findAnimation"))[0];
-    $tmpWidth = $animation->width;
-    $tmpHeight = $animation->height;
-    $tmpType = $animation->type;
-    $tmpName = $animation->name;
-    $tmpId = $animation->id;
+    $_SESSION["matrix"]["width"] = $animation->width;
+    $_SESSION["matrix"]["height"] = $animation->height;
+    $_SESSION["matrix"]["type"] = $animation->type;
+    $_SESSION["matrix"]["name"] = $animation->name;
+    $_SESSION["matrix"]["id"] = $animation->id;
     $frames = is_null($animation->frames) ? [] : $animation->frames;
     function mapFrames($value)
     {
         return $value->binary;
     }
     $_SESSION["editor"]["data"] = json_encode(array_map("mapFrames", $frames));
+} else if (isset($_POST["setup"])) {
+    switch ($_POST["setup"]) {
+        case "Micro:Bit":
+            $_SESSION["matrix"]["width"] = 5;
+            $_SESSION["matrix"]["height"] = 5;
+            $_SESSION["matrix"]["type"] = 1;
+            break;
+        case "NeoPixel RGB 8x8":
+            $_SESSION["matrix"]["width"] = 8;
+            $_SESSION["matrix"]["height"] = 8;
+            $_SESSION["matrix"]["type"] = 2;
+            break;
+    }
 }
 
-if (!isset($_SESSION["matrix"]["width"])) $_SESSION["matrix"]["width"] = $tmpWidth;
-if (!isset($_SESSION["matrix"]["height"])) $_SESSION["matrix"]["height"] = $tmpHeight;
-if (!isset($_SESSION["matrix"]["type"])) $_SESSION["matrix"]["type"] = $tmpType;
-if (!isset($_SESSION["matrix"]["name"])) $_SESSION["matrix"]["name"] = $tmpName;
-if (!isset($_SESSION["matrix"]["id"])) $_SESSION["matrix"]["id"] = $tmpID;
+if (!isset($_SESSION["matrix"]["name"])) $_SESSION["matrix"]["name"] = $_POST["name"];
+if (!isset($_SESSION["matrix"]["id"])) $_SESSION["matrix"]["id"] = $_POST["id"];
 
 if (
     !isset($_SESSION["matrix"]["width"])

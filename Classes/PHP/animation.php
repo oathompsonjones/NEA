@@ -28,7 +28,7 @@ class Animation
             case "type":
                 return $db->select("Type", "Animation", "AnimationID = '$id'")[0][0];
             case "frames":
-                $frames = $db->select("FrameID", "Frame", "AnimationID = '$id'");
+                $frames = $db->select("FrameID", "Frame", "AnimationID = '$id'", "FramePosition ASC");
                 if (is_null($frames)) return NULL;
                 return array_map("mapFrame", $frames);
             default:
