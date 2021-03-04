@@ -88,7 +88,6 @@ class MicroBitBuiltInAnimation extends Animation
     {
         $fps = 1;
         $code = "from microbit import *"
-            . "\nimport math"
             . "\n"
             . "\ndef play(animation):"
             . "\n\tfor frame in animation:"
