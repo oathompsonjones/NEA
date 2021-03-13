@@ -46,7 +46,9 @@ if (isset($_POST["preMade"]) && $_POST["preMade"] !== "New") {
         return $value->binary;
     }
     $_SESSION["editor"]["data"] = json_encode(array_map("mapFrames", $frames));
-} else if (isset($_POST["setup"])) {
+} else if (isset($_POST["setup"]) && $_POST["setup"] !== "Custom") {
+    $_SESSION["matrix"]["name"] = $_POST["name"];
+    $_SESSION["matrix"]["id"] = $_POST["id"];
     switch ($_POST["setup"]) {
         case "Micro:Bit":
             $_SESSION["matrix"]["width"] = 5;
@@ -58,11 +60,13 @@ if (isset($_POST["preMade"]) && $_POST["preMade"] !== "New") {
             $_SESSION["matrix"]["height"] = 8;
             $_SESSION["matrix"]["type"] = 2;
             break;
+        default:
+            $_SESSION["matrix"]["width"] = $_POST["width"];
+            $_SESSION["matrix"]["height"] = $_POST["height"];
+            $_SESSION["matrix"]["type"] = $_POST["type"];
+            break;
     }
 }
-
-if (!isset($_SESSION["matrix"]["name"])) $_SESSION["matrix"]["name"] = $_POST["name"];
-if (!isset($_SESSION["matrix"]["id"])) $_SESSION["matrix"]["id"] = $_POST["id"];
 
 if (
     !isset($_SESSION["matrix"]["width"])
