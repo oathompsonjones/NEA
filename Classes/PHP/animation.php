@@ -94,7 +94,7 @@ class MicroBitBuiltInAnimation extends Animation
             . "\n\t\tbits = [255 & frame[0]]"
             . "\n\t\tfor i in range(len(frame) - 1):"
             . "\n\t\t\tfor j in range(4):"
-            . "\n\t\t\t\tbits.append(255 & frame[i + 1] << j * 8 >> 24)"
+            . "\n\t\t\t\tbits.append(255 & frame[i + 1] >> 24 - j * 8)"
             . "\n\t\tfor i in range(len(bits)):"
             . "\n\t\t\tx = i % 5"
             . "\n\t\t\ty = i // 5"
@@ -123,7 +123,40 @@ class MicroBitBuiltInAnimation extends Animation
 
     public function generateTypeScriptCode($animationJSON)
     {
-        return "Error: I haven't done this yet.";
+        $fps = 1;
+        $code = "const play = (animation: number[][]) => {"
+            . "\n\tanimation.forEach((frame: number[]) => {"
+            . "\n\t\tconst bits: number[] = [255 & frame[0]];"
+            . "\n\t\tfor (let i = 0; i < frame.length - 1; ++i)"
+            . "\n\t\t\tfor (let j = 0; j < 4; ++j)"
+            . "\n\t\t\t\tbits.push(255 & frame[i + 1] >> 24 - j * 8);"
+            . "\n\t\tfor (let i = 0; i < bits.length; ++i) {"
+            . "\n\t\t\tconst x = i % 5;"
+            . "\n\t\t\tconst y = Math.floor(i / 5);"
+            . "\n\t\t\tled.plotBrightness(x, y, bits[i]);"
+            . "\n\t\t}"
+            . "\n\t\tbasic.pause(1000 / $fps);"
+            . "\n\t\tbasic.clearScreen();"
+            . "\n\t});"
+            . "\n}"
+            . "\n"
+            . "\ninput.onButtonPressed(Button.A, () => {"
+            . "\n\tplay(";
+
+        $lines = explode("\n", $animationJSON);
+        for ($i = 0; $i < count($lines); ++$i) {
+            $line = trim($lines[$i]);
+            $nextLine = trim($lines[$i + 1]);
+            $nextNextLine = trim($lines[$i + 2]);
+            if (!$nextLine) $code = "$code$line";
+            else if (!$nextNextLine) $code = "$code$line\n\t";
+            else if ($nextLine[0] === "[" || $nextLine[0] === "]") $code = "$code$line\n\t\t";
+            else if ($nextLine[1] === "b") $code = "$code$line\n\t\t\t";
+        }
+
+        $code = "$code);"
+            . "\n});";
+        return $code;
     }
 
     public function generateHexFile($animationJSON)
