@@ -1,4 +1,52 @@
 - Code output
+    - Micro:Bit internal
+        - MicroPython   √
+        - TypeScript    √
+        - Hex file
+    - Scroll Bit 17x7 for Micro:Bit
+        - MicroPython
+        - TypeScript
+        - Hex file
+    - LOL Shield
+        - Arduino
+    - Pico 4x4 RGB Keypad
+        - MicroPython
+        - C++
+        - uf2 file
+    - NeoPixel
+        - Arduino
+        - Micro:Bit MicroPython
+        - Micro:Bit TypeScript
+        - Micro:Bit Hex file
+    - 16x9
+        - Arduino
+        - Micro:Bit MicroPython
+        - Micro:Bit TypeScript
+        - Micro:Bit Hex file
+    - 8x8
+        - With Control Board
+            - Arduino
+            - Micro:Bit MicroPython
+            - Micro:Bit TypeScript
+            - Micro:Bit Hex file
+        - Without Control Board
+            - Arduino
+            - Micro:Bit MicroPython
+            - Micro:Bit TypeScript
+            - Micro:Bit Hex file
 - Backend
+    - Admin controls
+        - Delete/Add users
+        - Reset Passwords
+        - Delete Posts
+        - Delete Classes
 - Social Network
+    - Profile page - just DB retrieval and updating with some CSS
+    - Feed - just DB retrieval and updating with some CSS
+    - Posting - just DB retrieval and updating with some CSS and some forms
+    - Comments - just DB retrieval and updating with some CSS and some forms
+    - Likes - just DB retrieval and updating with some CSS and some forms
+    - Classes
+        - Assignments
+        - Chat Room
 - Update documentation (algorithms were way too over complicated)
