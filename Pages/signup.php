@@ -21,7 +21,7 @@ if (isset($_SESSION["auth"]) && $_SESSION["auth"]) {
         HTML;
     }
     // Tell user if username is taken.
-    else if (!is_null($_SESSION["database"]->select("Username", "User", "Username = '$username'"))) {
+    else if (!is_null($_SESSION["database"]->select("Username", "User", "Username = '$username'")[0])) {
         echo <<<HTML
             <div class="alert alert-danger" role="alert">
                 Username is already taken.
