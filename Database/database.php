@@ -29,6 +29,16 @@ class Database
         $this->mysqli->query("INSERT INTO $table ($columns) VALUES ($values);");
     }
 
+    public function update($table, $columns, $values, $condition)
+    {
+        if (count($columns) !== count($values)) return NULL;
+        $query = "UPDATE $table SET";
+        for ($i = 0; $i < count($columns); ++$i)
+            $query = $query . " $columns[$i] = '$values[$i]'" . ($i !== count($columns) - 1 ? "," : "");
+        $query = $query . " WHERE $condition";
+        $this->mysqli->query($query);
+    }
+
     public function delete($table, $condition)
     {
         $this->mysqli->query("DELETE FROM $table WHERE $condition;");
