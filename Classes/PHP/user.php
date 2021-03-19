@@ -4,6 +4,11 @@ function mapAnimation($value)
     return new Animation($value[0]);
 }
 
+function mapPosts($value)
+{
+    return new Post($value[0]);
+}
+
 class User
 {
     private $username;
@@ -41,9 +46,26 @@ class User
                 if (is_null($animations)) return NULL;
                 return array_map("mapAnimation", $animations);
             case "posts":
+                $posts = $db->select("PostID", "Post", "Username = '$username'");
+                if (is_null($posts)) return NULL;
+                return array_map("mapPosts", $posts);
             default:
                 throw new Exception("Property $name does not exist on type User.");
         }
+    }
+
+    public function delete()
+    {
+        $db = $_SESSION["database"];
+        $db->delete("User", "Username = '$this->username'");
+        for ($i = 0; $i < count($this->animations); ++$i) $this->animations[$i]->delete();
+        for ($i = 0; $i < count($this->posts); ++$i) $this->posts[$i]->delete();
+        $db->delete("PostLike", "Username = '$this->username'");
+        $db->delete("Comment", "Username = '$this->username'");
+        $db->delete("UserFollowing", "Username = '$this->username' OR FollowingUsername = '$this->username'");
+        $db->delete("ChatMessage", "Username = '$this->username'");
+        $db->delete("MutedUser", "Username = '$this->username'");
+        $db->delete("AssignmentWork", "Username = '$this->username'");
     }
 
     public function followUser($username)

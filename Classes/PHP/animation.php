@@ -36,6 +36,16 @@ class Animation
         }
     }
 
+    public function delete()
+    {
+        $db = $_SESSION["database"];
+        $db->delete("Animation", "AnimationID = '$this->id'");
+        for ($i = 0; $i < count($this->frames); ++$i) $this->frames[$i]->delete();
+        $posts = $db->select("PostID", "Post", "AnimationID = '$this->id'");
+        for ($i = 0; $i < count($posts); ++$i) (new Post($posts[$i]))->delete();
+        $db->delete("AssignmentWork", "AnimationID = '$this->id'");
+    }
+
     public function getFramesAs32BitIntegersJSON()
     {
         function mapBinary($val)

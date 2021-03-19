@@ -22,4 +22,10 @@ class Frame
                 throw new Exception("Property $name does not exist on type Frame.");
         }
     }
+
+    public function delete()
+    {
+        $db = $_SESSION["database"];
+        $db->delete("Frame", "FrameID = '$this->id'");
+    }
 }
