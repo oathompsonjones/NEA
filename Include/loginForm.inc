@@ -2,12 +2,12 @@
 <form action="login?submit=login" method="post" style="padding: 10px;">
     <h1>Log In</h1>
     <div class="form-floating">
-        <input type="text" class="form-control bg-dark text-white" id="inputUsername" name="username" placeholder="Username">
+        <input type="text" class="form-control bg-dark text-light border-dark" id="inputUsername" name="username" placeholder="Username">
         <label for="inputUsername">Username</label>
     </div>
     <br>
     <div class="form-floating">
-        <input type="password" class="form-control bg-dark text-white" id="inputPassword" name="password" placeholder="Password">
+        <input type="password" class="form-control bg-dark text-light border-dark" id="inputPassword" name="password" placeholder="Password">
         <label for="inputPassword">Password</label>
     </div>
     <br>
