@@ -12,9 +12,7 @@ if (isset($_POST["saveToDB"]) && $_POST["saveToDB"] === "true") {
     $type = $_SESSION["matrix"]["type"];
     $id = $_SESSION["matrix"]["id"];
     $name = $_SESSION["matrix"]["name"];
-    $frames = isset($_SESSION["editor"]["data"]) && !is_null($_SESSION["editor"]["data"])
-        ? json_decode($_SESSION["editor"]["data"])
-        : [];
+    $frames = isset($_SESSION["editor"]["data"]) && !is_null($_SESSION["editor"]["data"]) ? json_decode($_SESSION["editor"]["data"]) : [];
     $username = unserialize($_SESSION["user"])->username;
     // Get a list of the currently saved animations.
     $currentIDs = $db->select("AnimationID", "Animation")[0];
@@ -25,8 +23,7 @@ if (isset($_POST["saveToDB"]) && $_POST["saveToDB"] === "true") {
     // If it doesn't add it.
     else $db->insert("Animation", "AnimationID, Name, Username, Width, Height, Type", "'$id', '$name', '$username', $width, $height, $type");
     // Get all of the current frames.
-    for ($i = 0; $i < count($frames); ++$i)
-        $db->insert("Frame", "FrameID, AnimationID, FramePosition, BinaryString", "'$id$i', $id, $i, '$frames[$i]'");
+    for ($i = 0; $i < count($frames); ++$i) $db->insert("Frame", "FrameID, AnimationID, FramePosition, BinaryString", "'$id$i', $id, $i, '$frames[$i]'");
 }
 
 if (isset($_POST["preMade"]) && $_POST["preMade"] !== "New") {
@@ -81,7 +78,7 @@ if (
         <form method="post">
             <input name="id" type="text" style="display: none;" value='$timestamp'>
             <div class="form-floating">
-                <select class="form-control bg-dark text-white" id="preMade" name="preMade">
+                <select class="form-control bg-dark text-light border-dark" id="preMade" name="preMade">
                     <option value="New">Create new</option>
     HTML;
     $animations = unserialize($_SESSION["user"])->animations;
@@ -99,7 +96,7 @@ if (
             <br>
             <div id="setup">
                 <div class="form-floating">
-                    <select class="form-control bg-dark text-white" id="setupOptions" name="setup">
+                    <select class="form-control bg-dark text-light border-dark" id="setupOptions" name="setup">
                         <option value="Micro:Bit">Micro:Bit</option>
                         <option value="NeoPixel RGB 8x8">NeoPixel RGB 8x8</option>
                         <option value="Custom">Custom</option>
@@ -108,14 +105,14 @@ if (
                 </div>
                 <br>
                 <div class="form-floating">
-                    <input type="text" class="form-control bg-dark text-white" id="inputName" name="name" placeholder="Name">
+                    <input type="text" class="form-control bg-dark text-light border-dark" id="inputName" name="name" placeholder="Name">
                     <label for="inputName">Name</label>
                 </div>
                 <br>
                 <div id="customSetup" style="display: none;">
                     <h3>Custom Setup</h3>
                     <div class="form-floating">
-                        <select class="form-control bg-dark text-white" id="width" name="width" placeholder="Width">
+                        <select class="form-control bg-dark text-light border-dark" id="width" name="width" placeholder="Width">
     HTML;
     for ($i = 1; $i < 26; ++$i) echo <<<HTML
         <option value=$i>$i</option>
@@ -126,7 +123,7 @@ if (
                     </div>
                     <br>
                     <div class="form-floating">
-                        <select class="form-control bg-dark text-white" id="height" name="height" placeholder="Height">
+                        <select class="form-control bg-dark text-light border-dark" id="height" name="height" placeholder="Height">
     HTML;
     for ($i = 1; $i < 26; ++$i) echo <<<HTML
         <option value=$i>$i</option>

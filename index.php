@@ -35,15 +35,12 @@ if (!$loggedIn && !$loggingInOrOut) {
         </div>
     HTML;
 }
-// Redirect user to loin, logout or signup.
+// Redirect user to login, logout or signup.
 else if ($loggingInOrOut) require_once "Pages/$page.php";
 // Redirect user to the requested page, taking into account their access level.
 else {
-    // Get the object for the current user.
-    $user = unserialize($_SESSION["user"]);
     // Get the path for the requested page.
-    $page = "Pages/$user->type/" . $page . ".php";
-    if (preg_match("/.*(login)|(logout)|(signup)\.php/", $page)) $page = str_replace("/$user->type", "", $page);
+    $page = "Pages/" . $page . ".php";
     if (!file_exists($page)) $page = "Pages/404.php";
     // Render the requested page.
     require_once $page;
