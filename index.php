@@ -7,6 +7,7 @@ session_start();
 require_once "Classes/PHP/user.php";
 require_once "Classes/PHP/animation.php";
 require_once "Classes/PHP/frame.php";
+require_once "Classes/PHP/post.php";
 require_once "Database/database.php";
 // Create new instance of the database handling class.
 $_SESSION["database"] = new Database();
