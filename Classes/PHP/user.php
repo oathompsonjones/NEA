@@ -46,7 +46,7 @@ class User
                 if (is_null($animations)) return NULL;
                 return array_map("mapAnimation", $animations);
             case "posts":
-                $posts = $db->select("PostID", "Post", "Username = '$username'");
+                $posts = $db->select("PostID", "Post", "Username = '$username'", "CreatedAt DESC");
                 if (is_null($posts)) return NULL;
                 return array_map("mapPosts", $posts);
             default:
@@ -70,9 +70,15 @@ class User
 
     public function followUser($username)
     {
+        $db = $_SESSION["database"];
+        $user = new User($username);
+        $db->insert("UserFollowing", "Username, FollowingUsername", "'$this->username', '$user->username'");
     }
 
     public function unfollowUser($username)
     {
+        $db = $_SESSION["database"];
+        $user = new User($username);
+        $db->delete("UserFollowing", "Username = '$this->username' AND FollowingUsername = '$user->username'");
     }
 }

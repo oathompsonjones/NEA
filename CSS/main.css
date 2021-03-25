@@ -4,3 +4,36 @@ body {
     background: #121212;
     color: #efefef;
 }
+.icon {
+    height: 100%;
+    vertical-align: top;
+    padding: 5px;
+    display: inline-block;
+    position: relative;
+}
+.icon img {
+    height: 100%;
+    display: block;
+}
+.icon p {
+    display: none;
+}
+.icon .buttons {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    -ms-transform: translate(-50%, -50%);
+    opacity: 0;
+    text-align: center;
+}
+.icon .buttons button {
+    padding: 2px;
+}
+.icon:hover img {
+    background-color: rgba(0, 0, 0, 0.5);
+    filter: brightness(50%);
+}
+.icon:hover .buttons {
+    opacity: 1;
+}

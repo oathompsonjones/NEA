@@ -1,42 +1,134 @@
 <?php
-$animations = unserialize($_SESSION["user"])->animations;
+function mapIconsSrc($value)
+{
+    return "data:image/png;base64,$value";
+}
+
+$db = $_SESSION["database"];
+$user = unserialize($_SESSION["user"]);
+
+if (isset($_POST["deleteAnimation"]) && !is_null($_POST["deleteAnimation"])) {
+    $tmp = new Animation($_POST["deleteAnimation"]);
+    $name = $tmp->name;
+    $id = $tmp->id;
+    echo <<<HTML
+        <div class="alert alert-danger" role="alert" style="display: flex;">
+            <p>Are you sure you want to permanently delete the animation $name? This can <strong>not</strong> be undone. All data will be erased.<p>
+            <form method="post" style="padding-left: 5px;">
+                <input style="display: none;" name="deleteAnimationConfirmed" type="text" value="$id">
+                <button class="btn btn-danger btn-sm" type="submit">Yes</button>
+            </form>
+            <form method="post" style="padding-left: 5px;">
+                <button class="btn btn-danger btn-sm" type="submit">No</button>
+            </form>
+        </div>
+    HTML;
+} else if (isset($_POST["deleteAnimationConfirmed"]) && !is_null($_POST["deleteAnimationConfirmed"])) {
+    (new Animation($_POST["deleteAnimationConfirmed"]))->delete();
+    require "Include/clearPost.inc";
+}
+
+if (isset($_POST["shareAnimation"]) && !is_null($_POST["shareAnimation"])) {
+    $timestamp = time();
+    $id = md5($user->username . $timestamp);
+    $animationID = $_POST["shareAnimation"];
+    $fps = $_POST["fps"];
+    $db->insert("Post", "PostID, Username, AnimationID, CreatedAt, FPS", "'$id', '$user->username', '$animationID', '$timestamp', $fps");
+    require "Include/clearPost.inc";
+}
+
+if (isset($_POST["unShareAnimation"]) && !is_null($_POST["unShareAnimation"])) {
+    $id = $_POST["unShareAnimation"];
+    (new Post($db->select("PostID", "Post", "AnimationID = '$id'")[0][0]))->delete();
+    require "Include/clearPost.inc";
+}
+
+$animations = $user->animations;
+$posts = $user->posts;
+function postAnimationIDs($val)
+{
+    return $val->animationID;
+}
+$postedAnimationIDs = array_map("postAnimationIDs", $posts);
+
 echo <<<HTML
     <h1>My Animations</h1>
     <div class="accordion accordion-flush" id="accordion">
+        <script>
+            const playback = (index, frames) => {
+                const img = document.getElementById(index.toString() + "-icon");
+                const card = document.getElementById(index.toString() + "-card");
+                const buttons = document.getElementById(index.toString() + "-buttons");
+                const fps = document.getElementById(index.toString() + "-inputFPS")?.value || 1;
+                let i = 0;
+                card.className = "";
+                buttons.style.display = "none";
+                const interval = setInterval(() => img.src = frames[i++], 1000 / fps);
+                setTimeout(() => {
+                    clearInterval(interval);
+                    img.src = frames[0];
+                    card.className = "icon";
+                    buttons.style.display = "block";
+                }, 1000 * (frames.length + 1) / fps);
+            };
+        </script>
+        <div class="row row-cols-1 row-cols-md-5 g-4">
 HTML;
 for ($i = 0; $i < count($animations); ++$i) {
-    $id = $animations[$i]->id;
-    $name = $animations[$i]->name;
+    $animation = $animations[$i];
+    $id = $animation->id;
+    $name = $animation->name;
+    $frameCount = count($animation->frames);
+    $type = $animation->typeString;
+    $icons = array_map("mapIconsSrc", $animation->generateFrameIcons());
+    $jsonIcons = json_encode($icons);
+    $firstIcon = $icons[0];
+
+    if (in_array($id, $postedAnimationIDs)) {
+        $shareButton = <<<HTML
+            <form method="post" style="padding-left: 5px;">
+                <input style="display: none;" name="unShareAnimation" type="text" value="$id">
+                <button class="btn btn-dark btn-md" type="submit">Unshare</button>
+            </form>
+        HTML;
+    } else {
+        $shareButton = <<<HTML
+            <form method="post" style="padding-left: 5px; display: flex;">
+                <input style="display: none;" name="shareAnimation" type="text" value="$id">
+                <input type="number" class="form-control bg-dark text-light border-dark" id="$i-inputFPS" name="fps" placeholder="FPS" min=1 max=60 value=1 required>
+                <button class="btn btn-dark btn-md" type="submit">Share</button>
+            </form>
+        HTML;
+    }
+
     echo <<<HTML
-        <div class="accordion-item">
-            <h2 class="accordion-header" id="flush-heading-$i">
-                <button id="button-$i" class="accordion-button collapsed text-light" type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapse-$i" aria-expanded="false" aria-controls="flush-collapse-$i">
-                    $name
-                </button>
-            </h2>
-            <div id="flush-collapse-$i" class="accordion-collapse collapse" aria-labelledby="flush-heading-$i" data-bs-parent="#accordion">
-                <div class="accordion-body">
-                    <form method="post" action="editor">
-                        <input style="display: none;" name="preMade" type="text" value="$id">
-                        <button class="btn btn-dark btn-md" type="submit">Edit</button>
-                    </form>
+        <div class="col">
+            <div class="card text-white bg-dark">
+                <div id="$i-card" class="icon">
+                    <img src="$firstIcon" class="card-img-top" id="$i-icon">
+                    <div id="$i-buttons" class="buttons">
+                        <button class="btn btn-secondary btn-lg" data-toggle="tooltip" data-placement="top" title="Play the animation" onclick='playback($i, $jsonIcons);'>Play</button>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <h5 class="card-title">$name</h5>
+                    <div style="display: flex;">
+                        <form method="post" style="padding-left: 5px;">
+                            <input style="display: none;" name="deleteAnimation" type="text" value="$id">
+                            <button class="btn btn-danger btn-md" type="submit">Delete</button>
+                        </form>
+                        <form method="post" action="editor" style="padding-left: 5px;">
+                            <input style="display: none;" name="preMade" type="text" value="$id">
+                            <button class="btn btn-dark btn-md" type="submit">Edit</button>
+                        </form>
+                        $shareButton
+                    </div>
                 </div>
             </div>
         </div>
-        <script>
-            $("#button-$i").on("click", () => {
-                let button = document.getElementById("button-$i");
-                if (!button.className.includes("collapsed")) button.className += " bg-dark";
-                let i = 0;
-                button = document.getElementById("button-" + i);
-                while (button) {
-                    if (i !== $i) button.className = "accordion-button collapsed text-light";
-                    button = document.getElementById("button-" + ++i);
-                }
-            });
-        </script>
     HTML;
 }
 echo <<<HTML
+        </div>
     </div>
 HTML;

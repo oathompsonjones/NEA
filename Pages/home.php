@@ -5,24 +5,60 @@ $user = unserialize($_SESSION["user"]);
 if (isset($_POST["deleteUser"]) && !is_null($_POST["deleteUser"])) {
     $tmp = $_POST["deleteUser"];
     echo <<<HTML
-        <div class="alert alert-danger" role="alert">
-            Are you sure you want to permanently delete $tmp's account? This can <strong>not</strong> be undone. All data will be erased.
+        <div class="alert alert-danger" role="alert" style="display: flex;">
+            <p>Are you sure you want to permanently delete $tmp's account? This can <strong>not</strong> be undone. All data will be erased.</p>
+            <form method="post" style="padding-left: 5px;">
+                <input style="display: none;" name="deleteUserConfirmed" type="text" value="$tmp">
+                <button class="btn btn-danger btn-sm" type="submit">Yes</button>
+            </form>
+            <form method="post" style="padding-left: 5px;">
+                <button class="btn btn-danger btn-sm" type="submit">No</button>
+            </form>
         </div>
     HTML;
 } else if (isset($_POST["deleteUserConfirmed"]) && !is_null($_POST["deleteUserConfirmed"])) {
     (new User($_POST["deleteUserConfirmed"]))->delete();
+    require "Include/clearPost.inc";
 }
 
 if (isset($_POST["resetPassword"]) && !is_null($_POST["resetPassword"])) {
     $tmp = $_POST["resetPassword"];
     echo <<<HTML
-        <div class="alert alert-warning" role="alert">
-            Are you sure you want to reset $tmp's password? This can <strong>not</strong> be undone.
+        <div class="alert alert-danger" role="alert" style="display: flex;">
+            <p>Are you sure you want to reset $tmp's password? This can <strong>not</strong> be undone.</p>
+            <form method="post" style="padding-left: 5px;">
+                <input style="display: none;" name="resetPasswordConfirmed" type="text" value="$tmp">
+                <button class="btn btn-danger btn-sm" type="submit">Yes</button>
+            </form>
+            <form method="post" style="padding-left: 5px;">
+                <button class="btn btn-danger btn-sm" type="submit">No</button>
+            </form>
         </div>
     HTML;
 } else if (isset($_POST["resetPasswordConfirmed"]) && !is_null($_POST["resetPasswordConfirmed"])) {
     $tmp = $_POST["resetPasswordConfirmed"];
     $db->update("User", ["PasswordHash"], [md5($tmp)], "Username = '$tmp'");
+    require "Include/clearPost.inc";
+}
+
+if (isset($_POST["makeAdmin"]) && !is_null($_POST["makeAdmin"])) {
+    $tmp = $_POST["makeAdmin"];
+    echo <<<HTML
+        <div class="alert alert-danger" role="alert" style="display: flex;">
+            <p>Are you sure you want to make $tmp an admin? This can <strong>not</strong> be undone.</p>
+            <form method="post" style="padding-left: 5px;">
+                <input style="display: none;" name="makeAdminConfirmed" type="text" value="$tmp">
+                <button class="btn btn-danger btn-sm" type="submit">Yes</button>
+            </form>
+            <form method="post" style="padding-left: 5px;">
+                <button class="btn btn-danger btn-sm" type="submit">No</button>
+            </form>
+        </div>
+    HTML;
+} else if (isset($_POST["makeAdminConfirmed"]) && !is_null($_POST["makeAdminConfirmed"])) {
+    $tmp = $_POST["makeAdminConfirmed"];
+    $db->update("User", ["type"], [0], "Username = '$tmp'");
+    require "Include/clearPost.inc";
 }
 
 echo <<<HTML
@@ -37,7 +73,7 @@ switch ($user->type) {
         }
         $users = array_map("mapUsers", $db->select("Username", "User", NULL, "Username"));
         echo <<<HTML
-        <h3>Users</h3>
+            <h3>Users</h3>
             <table style="width: 100%;">
                 <tr>
                     <th>Username</th>
@@ -47,6 +83,7 @@ switch ($user->type) {
                     <th>Posts</th>
                     <th>Followers</th>
                     <th>Following</th>
+                    <th></th>
                     <th></th>
                     <th></th>
                 </tr>
@@ -69,15 +106,12 @@ switch ($user->type) {
                     <td>$followers</td>
                     <td>$following</td>
             HTML;
-            if (isset($_POST["deleteUser"]) && !is_null($_POST["deleteUser"])) {
+            if ($username === $user->username) {
                 echo <<<HTML
-                    <td>
-                        <form method="post">
-                            <input style="display: none;" type="text" name="deleteUserConfirmed" value="$username">
-                            <button class="btn btn-sm btn-danger">Delete</button>
-                        </form>
-                    </td>
-                HTML;
+                        <td>
+                            <button class="btn btn-sm btn-danger disabled">Delete</button>
+                        </td>
+                    HTML;
             } else {
                 echo <<<HTML
                     <td>
@@ -88,21 +122,26 @@ switch ($user->type) {
                     </td>
                 HTML;
             }
-            if (isset($_POST["resetPassword"]) && !is_null($_POST["resetPassword"])) {
+            echo <<<HTML
+                <td>
+                    <form method="post">
+                        <input style="display: none;" type="text" name="resetPassword" value="$username">
+                        <button class="btn btn-sm btn-warning">Reset Password</button>
+                    </form>
+                </td>
+            HTML;
+            if ($type === "admin") {
                 echo <<<HTML
-                    <td>
-                        <form method="post">
-                            <input style="display: none;" type="text" name="resetPasswordConfirmed" value="$username">
-                            <button class="btn btn-sm btn-warning">Reset Password</button>
-                        </form>
-                    </td>
-                HTML;
+                        <td>
+                            <button class="btn btn-sm btn-dark disabled">Make Admin</button>
+                        </td>
+                    HTML;
             } else {
                 echo <<<HTML
                     <td>
                         <form method="post">
-                            <input style="display: none;" type="text" name="resetPassword" value="$username">
-                            <button class="btn btn-sm btn-warning">Reset Password</button>
+                            <input style="display: none;" type="text" name="makeAdmin" value="$username">
+                            <button class="btn btn-sm btn-dark">Make Admin</button>
                         </form>
                     </td>
                 HTML;

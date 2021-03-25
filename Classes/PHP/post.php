@@ -25,12 +25,16 @@ class Post
                 return new User($db->select("UserID", "Post", "PostID = '$id'")[0][0]);
             case "animation":
                 return new Animation($db->select("AnimationID", "Post", "PostID = '$id'")[0][0]);
+            case "animationID":
+                return $db->select("AnimationID", "Post", "PostID = '$id'")[0][0];
+            case "fps":
+                return $db->select("FPS", "Post", "PostID = '$id'")[0][0];
             case "likedBy":
                 $likes = $db->select("Username", "PostLike", "PostID = '$id'");
                 if (is_null($likes)) return NULL;
                 return array_map("mapLikes", $likes);
             default:
-                throw new Exception("Property $name does not exist on type Animation.");
+                throw new Exception("Property $name does not exist on type Post.");
         }
     }
 

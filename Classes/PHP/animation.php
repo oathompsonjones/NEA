@@ -3,6 +3,14 @@ function mapFrame($value)
 {
     return new Frame($value[0]);
 }
+function mapFramesToBinary($value)
+{
+    return $value->binary;
+}
+function mapBinaryToIntegers($value)
+{
+    return bindec($value);
+}
 
 class Animation
 {
@@ -27,6 +35,8 @@ class Animation
                 return $db->select("Height", "Animation", "AnimationID = '$id'")[0][0];
             case "type":
                 return $db->select("Type", "Animation", "AnimationID = '$id'")[0][0];
+            case "typeString":
+                return $this->type == 0 ? "Monochromatic" : ($this->type == 1 ? "Variable Brightness" : "RGB");
             case "frames":
                 $frames = $db->select("FrameID", "Frame", "AnimationID = '$id'", "FramePosition ASC");
                 if (is_null($frames)) return NULL;
@@ -62,6 +72,67 @@ class Animation
         }
         $frames = array_map("frameToBinaryArray", $this->frames);
         return str_replace('"', "", json_encode($frames, JSON_PRETTY_PRINT));
+    }
+
+    public function generateFrameIcons()
+    {
+        $frames = $this->frames;
+        $ledWidth = 1024 / $this->width;
+        $ledHeight = 1024 / $this->height;
+        $binary = array_map("mapFramesToBinary", $frames);
+        $images = [];
+        for ($i = 0; $i < count($binary); ++$i) {
+            $image = imagecreatetruecolor(1024, 1024);
+            $bgColour = imagecolorallocatealpha($image, 255, 255, 255, 10);
+            imagefill($image, 0, 0, $bgColour);
+            $leds = [];
+            switch ($this->type) {
+                case 0:
+                    preg_match_all("/.{1,1}/", $binary[$i], $leds);
+                    $leds = array_map("mapBinaryToIntegers", $leds[0]);
+                    for ($j = 0; $j < count($leds); ++$j) {
+                        $x = $j % $this->width;
+                        $y = floor($j / $this->width);
+                        $ledColour = imagecolorallocate($image, $leds[$j] * 255, 0, 0);
+                        imagefilledrectangle($image, $x * $ledWidth, $y * $ledHeight, ($x + 1) * $ledWidth, ($y + 1) * $ledHeight, $ledColour);
+                    }
+                    break;
+                case 1:
+                    preg_match_all("/.{1,8}/", $binary[$i], $leds);
+                    $leds = array_map("mapBinaryToIntegers", $leds[0]);
+                    for ($j = 0; $j < count($leds); ++$j) {
+                        $x = $j % $this->width;
+                        $y = floor($j / $this->width);
+                        $ledColour = imagecolorallocate($image, $leds[$j], 0, 0);
+                        imagefilledrectangle($image, $x * $ledWidth, $y * $ledHeight, ($x + 1) * $ledWidth, ($y + 1) * $ledHeight, $ledColour);
+                    }
+                    break;
+                case 2:
+                    preg_match_all("/.{1,24}/", $binary[$i], $leds);
+                    $leds = $leds[0];
+                    for ($j = 0; $j < count($leds); ++$j) {
+                        $rgb = [];
+                        preg_match_all("/.{1,8}/", $leds[$j], $rgb);
+                        $rgb = array_map("mapBinaryToIntegers", $rgb[0]);
+                        $x = $j % $this->width;
+                        $y = floor($j / $this->width);
+                        $ledColour = imagecolorallocate($image, $rgb[0], $rgb[1], $rgb[2]);
+                        imagefilledrectangle($image, $x * $ledWidth, $y * $ledHeight, ($x + 1) * $ledWidth, ($y + 1) * $ledHeight, $ledColour);
+                    }
+                    break;
+            }
+            ob_start();
+            imagepng($image);
+            $contents = ob_get_contents();
+            ob_end_clean();
+            $images[$i] = base64_encode($contents);
+        }
+        return $images;
+    }
+
+    public function generateGIF()
+    {
+        $framePNGs = $this->generateFrameIcons();
     }
 
     // BBC Micro:Bit

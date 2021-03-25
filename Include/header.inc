@@ -52,6 +52,10 @@
                                 // Render the navbar for students and teachers.
                                 echo <<<HTML
                                     <li class="nav-item">
+                                        <a class="nav-link" href="profile">Profile</a>
+                                    </li>
+
+                                    <li class="nav-item">
                                         <a class="nav-link" href="animations">Animations</a>
                                     </li>
 
@@ -67,10 +71,6 @@
                                             <li><hr class="dropdown-divider"></li>
                                             <li><a class="dropdown-item" href="class">Join new class</a></li>
                                         </ul>
-                                    </li>
-
-                                    <li class="nav-item">
-                                        <a class="nav-link" href="profile">Profile</a>
                                     </li>
 
                                     <li class="nav-item">

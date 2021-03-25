@@ -36,12 +36,13 @@
             - Micro:Bit Hex file
 - Backend
     - Admin controls
-        - Delete/Add users
-        - Reset Passwords
+        - Delete/Add users √
+        - Reset Passwords √
         - Delete Posts
         - Delete Classes
 - Social Network
-    - Profile page - just DB retrieval and updating with some CSS
+    - Profile page - just DB retrieval and updating with some CSS √
+    - Following/UnFollowing Users √
     - Feed - just DB retrieval and updating with some CSS
     - Posting - just DB retrieval and updating with some CSS and some forms
     - Comments - just DB retrieval and updating with some CSS and some forms

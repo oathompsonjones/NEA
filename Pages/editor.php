@@ -1,4 +1,8 @@
 <?php
+function flattenIDs($value)
+{
+    return $value[0];
+}
 if (isset($_POST["createNew"]) && $_POST["createNew"] === "true") {
     unset($_SESSION["matrix"]);
     unset($_SESSION["editor"]);
@@ -15,15 +19,15 @@ if (isset($_POST["saveToDB"]) && $_POST["saveToDB"] === "true") {
     $frames = isset($_SESSION["editor"]["data"]) && !is_null($_SESSION["editor"]["data"]) ? json_decode($_SESSION["editor"]["data"]) : [];
     $username = unserialize($_SESSION["user"])->username;
     // Get a list of the currently saved animations.
-    $currentIDs = $db->select("AnimationID", "Animation")[0];
+    $currentIDs = array_map("flattenIDs", $db->select("AnimationID", "Animation"));
     // Check if the current animation already exists in the database.
-    $animationExists = $currentIDs ? in_array($id, $currentIDs) : [];
+    $animationExists = $currentIDs ? in_array($id, $currentIDs) : FALSE;
     // If it does, delete the saved frames.
     if ($animationExists) $db->delete("Frame", "AnimationID = '$id'");
     // If it doesn't add it.
     else $db->insert("Animation", "AnimationID, Name, Username, Width, Height, Type", "'$id', '$name', '$username', $width, $height, $type");
     // Get all of the current frames.
-    for ($i = 0; $i < count($frames); ++$i) $db->insert("Frame", "FrameID, AnimationID, FramePosition, BinaryString", "'$id$i', $id, $i, '$frames[$i]'");
+    for ($i = 0; $i < count($frames); ++$i) $db->insert("Frame", "FrameID, AnimationID, FramePosition, BinaryString", "'$id$i', '$id', $i, '$frames[$i]'");
 }
 
 if (isset($_POST["preMade"]) && $_POST["preMade"] !== "New") {
@@ -43,7 +47,7 @@ if (isset($_POST["preMade"]) && $_POST["preMade"] !== "New") {
         return $value->binary;
     }
     $_SESSION["editor"]["data"] = json_encode(array_map("mapFrames", $frames));
-} else if (isset($_POST["setup"]) && $_POST["setup"] !== "Custom") {
+} else if (isset($_POST["setup"]) && isset($_POST["name"]) && !is_null($_POST["name"])) {
     $_SESSION["matrix"]["name"] = $_POST["name"];
     $_SESSION["matrix"]["id"] = $_POST["id"];
     switch ($_POST["setup"]) {
@@ -105,31 +109,19 @@ if (
                 </div>
                 <br>
                 <div class="form-floating">
-                    <input type="text" class="form-control bg-dark text-light border-dark" id="inputName" name="name" placeholder="Name">
+                    <input type="text" class="form-control bg-dark text-light border-dark" id="inputName" name="name" placeholder="Name" required>
                     <label for="inputName">Name</label>
                 </div>
                 <br>
                 <div id="customSetup" style="display: none;">
                     <h3>Custom Setup</h3>
                     <div class="form-floating">
-                        <select class="form-control bg-dark text-light border-dark" id="width" name="width" placeholder="Width">
-    HTML;
-    for ($i = 1; $i < 26; ++$i) echo <<<HTML
-        <option value=$i>$i</option>
-    HTML;
-    echo <<<HTML
-                        </select>
+                        <input type="number" class="form-control bg-dark text-light border-dark" id="width" name="width" placeholder="Width" max=25 min=1 value=5>
                         <label for="width">Width</label>
                     </div>
                     <br>
                     <div class="form-floating">
-                        <select class="form-control bg-dark text-light border-dark" id="height" name="height" placeholder="Height">
-    HTML;
-    for ($i = 1; $i < 26; ++$i) echo <<<HTML
-        <option value=$i>$i</option>
-    HTML;
-    echo <<<HTML
-                        </select>
+                        <input type="number" class="form-control bg-dark text-light border-dark" id="height" name="height" placeholder="Height" max=25 min=1 value=5>
                         <label for="height">Height</label>
                     </div>
                     <br>
@@ -147,15 +139,15 @@ if (
         </form>
         <script>
             $("select").on("change", () => {
-                const setupList = document.getElementById("setupOptions");
-                const customSetupDiv = document.getElementById("customSetup");
-                if (setupList.value === "Custom") customSetupDiv.style.display = "block";
-                else customSetupDiv.style.display = "none";
+                const preMade = document.getElementById("preMade");
+                const setup = document.getElementById("setup");
+                const setupOptions = document.getElementById("setupOptions");
+                const inputName = document.getElementById("inputName");
+                const customSetup = document.getElementById("customSetup");
 
-                const preMadeList = document.getElementById("preMade");
-                const setupDiv = document.getElementById("setup");
-                if (preMadeList.value === "New") setupDiv.style.display = "block";
-                else setupDiv.style.display = "none";
+                setup.style.display = preMade.value === "New" ? "block" : "none";
+                inputName.required = preMade.value === "New";
+                customSetup.style.display = setupOptions.value === "Custom" ? "block" : "none";
             });
         </script>
     HTML;
@@ -209,39 +201,6 @@ if (
                 overflow-x: auto;
                 white-space: nowrap;
             }
-            .icon {
-                height: 100%;
-                vertical-align: top;
-                padding: 5px;
-                display: inline-block;
-                position: relative;
-            }
-            .icon img {
-                height: 100%;
-                display: block;
-            }
-            .icon p {
-                display: none;
-            }
-            .icon .buttons {
-                position: absolute;
-                top: 50%;
-                left: 50%;
-                transform: translate(-50%, -50%);
-                -ms-transform: translate(-50%, -50%);
-                opacity: 0;
-                text-align: center;
-            }
-            .icon .buttons button {
-                padding: 2px;
-            }
-            .icon:hover img {
-                background-color: rgba(0, 0, 0, 0.5);
-                filter: brightness(50%);
-            }
-            .icon:hover .buttons {
-                opacity: 1;
-            }
             #playback {
                 position: absolute;
                 top: 0;
@@ -259,19 +218,14 @@ if (
     HTML;
 
     // Alert box
-    echo <<<HTML
-        <div id="alert">
-    HTML;
     if (isset($_POST["saveToDB"]) && $_POST["saveToDB"] === "true") {
         echo <<<HTML
-            <div class="alert alert-success" role="alert">
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
                 Animation Saved!
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>
         HTML;
     }
-    echo <<<HTML
-        </div>
-    HTML;
 
     // JS
     echo <<<HTML
