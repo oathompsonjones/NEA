@@ -1,39 +1,41 @@
 <!doctype html>
 <html lang="en">
-    <head>
-        <!-- Meta Tags -->
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-        
-        <!-- Bootstrap CSS -->
-        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-giJF6kkoqNQ00vy+HMDP7azOuL0xtbfIcaT9wjKHr8RbDVddVHyTfAAsrekwKmP1" crossorigin="anonymous">
-        <link rel="stylesheet" href="CSS/main.css">
 
-        <!-- jQuery -->
-        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-        <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min.js"></script>
-        
-        <!--Tooltips-->
-        <script type="text/javascript">
-            $(document).ready(function() {
-                $('[data-toggle=tooltip]').tooltip();
-            }); 
-        </script>
-        
-        <title><?php echo "Microcontroller Animations | " . $title ?></title>
-    </head>
-    <body>
-        <nav class="navbar navbar-dark bg-dark fixed-top navbar-expand-lg">
-            <div class="container-fluid">
-                <a class="navbar-brand" href="/">Home</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="collapse navbar-collapse" id="navbarSupportedContent">
-                    <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+<head>
+    <!-- Meta Tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-giJF6kkoqNQ00vy+HMDP7azOuL0xtbfIcaT9wjKHr8RbDVddVHyTfAAsrekwKmP1" crossorigin="anonymous">
+    <link rel="stylesheet" href="CSS/main.css">
+
+    <!-- jQuery -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min.js"></script>
+
+    <!--Tooltips-->
+    <script type="text/javascript">
+        $(document).ready(function() {
+            $('[data-toggle=tooltip]').tooltip();
+        });
+    </script>
+
+    <title><?php echo "Microcontroller Animations | " . $title ?></title>
+</head>
+
+<body>
+    <nav class="navbar navbar-dark bg-dark fixed-top navbar-expand-lg">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="/">Home</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                     <?php
                     // Checks that the auth variable exists and is true.
-                    if(isset($_SESSION["auth"]) && $_SESSION["auth"]) {
+                    if (isset($_SESSION["auth"]) && $_SESSION["auth"]) {
                         // Get the object for the current user.
                         $user = unserialize($_SESSION["user"]);
 
@@ -92,7 +94,11 @@
                         HTML;
                     }
                     ?>
-                    </ul>
-                </div>
+                </ul>
+                <form class="d-flex" method="get" action="profile">
+                    <input class="form-control me-2" type="search" placeholder="Find Users..." aria-label="Search" name="user">
+                    <button class="btn btn-outline-success" type="submit">Search</button>
+                </form>
             </div>
-        </nav>
+        </div>
+    </nav>

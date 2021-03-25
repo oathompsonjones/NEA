@@ -9,7 +9,8 @@
     "cSpell.words": [
         "elif",
         "microbit",
-        "neopixel"
+        "neopixel",
+        "toggler"
     ],
     "python.pythonPath": "/usr/bin/python",
 }

@@ -27,6 +27,10 @@ $postsCount = count($user->posts);
 $loggedInUser = unserialize($_SESSION["user"]);
 $isLoggedInUser = $loggedInUser->username === $username;
 
+if ($isLoggedInUser && isset($_GET["user"])) echo <<<HTML
+    <script>window.location.replace("/profile");</script>
+HTML;
+
 $saveProfile = isset($_POST["saveProfile"]) && $_POST["saveProfile"] === "true";
 if ($saveProfile) {
     $bio = isset($_POST["Bio"]) ? $_POST["Bio"] : $bio;
@@ -90,7 +94,7 @@ if ($editProfile) {
     $followButton = "";
     if (!$isLoggedInUser) {
         $dbRes = $db->select("*", "UserFollowing", "Username = '$loggedInUser->username' AND FollowingUsername = '$user->username'")[0][0];
-        if ($dbRes === NULL) {
+        if (is_null($dbRes)) {
             $followButton = <<<HTML
                 <form method="post" style="padding-left: 10px;">
                     <input name="followUser" type="boolean" style="display: none;" value="true">
@@ -149,11 +153,11 @@ if ($editProfile) {
         $name = $post->animation->name;
         $type = $post->animation->typeString;
         $fps = $post->fps;
-        $title = $name !== NULL
+        $title = !is_null($name)
             ? <<<HTML
                 $name<br><span class='badge rounded-pill bg-secondary'>$type - $fps FPS</span>
             HTML : "";
-        $icons = $post !== NULL
+        $icons = !is_null($post)
             ? array_map("mapIconsSrc", $post->animation->generateFrameIcons())
             : [];
         $jsonIcons = json_encode($icons);
