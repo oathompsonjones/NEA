@@ -3,6 +3,10 @@ function mapIconsSrc($value)
 {
     return "data:image/png;base64,$value";
 }
+function flattenUsernamesArray($value)
+{
+    return $value[0];
+}
 $db = $_SESSION["database"];
 $user = unserialize($_SESSION["user"]);
 if (isset($_GET["user"]) && !is_null($_GET["user"])) {
@@ -10,7 +14,26 @@ if (isset($_GET["user"]) && !is_null($_GET["user"])) {
     $dbUser = $db->select("*", "User", "Username = '$getUser'")[0][0];
     if (!is_null($dbUser)) $user = new User($_GET["user"]);
     else {
-        require "Pages/404.php";
+        $allUsernames = array_map("flattenUsernamesArray", $db->Select("Username", "User"));
+        function searchForUsernames($value)
+        {
+            return strpos(strtolower($value), strtolower($_GET["user"])) !== false;
+        }
+        $searchedUsernames = array_values(array_filter($allUsernames, "searchForUsernames"));
+        echo <<<HTML
+            <h2>User not found</h2>
+        HTML;
+        if (count($searchedUsernames) > 0) echo <<<HTML
+            <h5>Here are some other suggestions...</h5>
+        HTML;
+        else echo <<<HTML
+            <h5>No search results were found...</h5>
+        HTML;
+        for ($i = 0; $i < count($searchedUsernames); ++$i) {
+            echo <<<HTML
+                <h4><a href="profile?user=$searchedUsernames[$i]" style="text-decoration: none;">$searchedUsernames[$i]</a></h4><br>
+            HTML;
+        }
         exit;
     }
 }
