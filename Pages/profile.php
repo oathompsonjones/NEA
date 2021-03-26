@@ -57,8 +57,36 @@ HTML;
 $saveProfile = isset($_POST["saveProfile"]) && $_POST["saveProfile"] === "true";
 if ($saveProfile) {
     $bio = isset($_POST["Bio"]) ? $_POST["Bio"] : $bio;
-    $passwordHash = isset($_POST["Password"]) && strlen($_POST["Password"]) > 0 ? md5($_POST["Password"]) : $passwordHash;
-    $db->update("User", ["PasswordHash", "Bio"], [$passwordHash, $bio], "Username = '$username'");
+    $oldPasswordHashed = isset($_POST["OldPassword"]) && strlen($_POST["OldPassword"]) > 0 ? md5($_POST["OldPassword"]) : NULL;
+    $newPasswordHashed = isset($_POST["NewPassword"]) && strlen($_POST["NewPassword"]) > 0 ? md5($_POST["NewPassword"]) : NULL;
+    $confirmPasswordHashed = isset($_POST["ConfirmPassword"]) && strlen($_POST["ConfirmPassword"]) > 0 ? md5($_POST["ConfirmPassword"]) : NULL;
+    $allNotNull = !is_null($oldPasswordHashed) && !is_null($newPasswordHashed) && !is_null($confirmPasswordHashed);
+    $newHash = $passwordHash;
+    if ($allNotNull) {
+        if ($oldPasswordHashed !== $passwordHash) {
+            echo <<<HTML
+                <div class="alert alert-danger" role="alert">
+                    Your old password is incorrect.
+                </div>
+            HTML;
+            $_POST["editProfile"] = "true";
+        } else if ($oldPasswordHashed === $newPasswordHashed) {
+            echo <<<HTML
+                <div class="alert alert-danger" role="alert">
+                    You must use a new password.
+                </div>
+            HTML;
+            $_POST["editProfile"] = "true";
+        } else if ($newPasswordHashed !== $confirmPasswordHashed) {
+            echo <<<HTML
+                <div class="alert alert-danger" role="alert">
+                    Your password confirmation does not match.
+                </div>
+            HTML;
+            $_POST["editProfile"] = "true";
+        } else $newHash = $confirmPasswordHashed;
+    }
+    $db->update("User", ["PasswordHash", "Bio"], [$newHash, $bio], "Username = '$username'");
 }
 
 $followUser = isset($_POST["followUser"]) && $_POST["followUser"] === "true";
@@ -73,9 +101,9 @@ if ($unFollowUser) {
     require "Include/clearPost.inc";
 }
 
-$editProfile = isset($_POST["editProfile"]) && $_POST["editProfile"] === "true";
-$deleteProfile = isset($_POST["deleteProfile"]) && $_POST["deleteProfile"] === "true";
-$deleteProfileConfirm = isset($_POST["deleteProfileConfirm"]) && $_POST["deleteProfileConfirm"] === "true";
+$editProfile = isset($_POST["editProfile"]) && $_POST["editProfile"] === "true" && $isLoggedInUser;
+$deleteProfile = isset($_POST["deleteProfile"]) && $_POST["deleteProfile"] === "true" && $isLoggedInUser;
+$deleteProfileConfirm = isset($_POST["deleteProfileConfirm"]) && $_POST["deleteProfileConfirm"] === "true" && $isLoggedInUser;
 if ($editProfile) {
     echo <<<HTML
         <form method="post">
@@ -84,14 +112,36 @@ if ($editProfile) {
                 <label for="inputBio">Bio</label>
             </div>
             <br>
+            <br>
             <div class="form-floating">
-                <input id="inputPassword" name="Password" type="password" class="form-control bg-dark text-light border-dark" placeholder="Password" aria-label="Password" aria-describedby="basic-addon1">
-                <label for="inputPassword">Change Password</label>
+                <input id="inputOldPassword" name="OldPassword" type="password" class="passwordInputs form-control bg-dark text-light border-dark" placeholder="Old Password" aria-label="Old Password" aria-describedby="basic-addon1">
+                <label for="inputOldPassword">Old Password</label>
+            </div>
+            <br>
+            <div class="form-floating">
+                <input id="inputNewPassword" name="NewPassword" type="password" class="passwordInputs form-control bg-dark text-light border-dark" placeholder="New Password" aria-label="New Password" aria-describedby="basic-addon1">
+                <label for="inputNewPassword">New Password</label>
+            </div>
+            <br>
+            <div class="form-floating">
+                <input id="inputConfirmPassword" name="ConfirmPassword" type="password" class="passwordInputs form-control bg-dark text-light border-dark" placeholder="Confirm Password" aria-label="Confirm Password" aria-describedby="basic-addon1">
+                <label for="inputConfirmPassword">Confirm Password</label>
             </div>
             <input name="saveProfile" type="text" style="display: none;" value="true">
             <br>
             <button class="btn btn-dark btn-sm" type="submit">Save</button>
         </form>
+        <script>
+            const updateRequired = () => {
+                const passwordInputs = [...document.getElementsByClassName("passwordInputs")];
+                const someHaveValues = passwordInputs.some((input) => input.value !== null && input.value.length > 0);
+                passwordInputs.forEach((input) => input.required = someHaveValues);
+            };
+            $("#inputOldPassword").change(updateRequired);
+            $("#inputNewPassword").change(updateRequired);
+            $("#inputConfirmPassword").change(updateRequired);
+        </script>
+        <br>
         <form method="post">
             <input name="deleteProfile" type="text" style="display: none;" value="true">
             <button class="btn btn-danger btn-sm" type="submit">Delete Account</button>
@@ -103,14 +153,17 @@ if ($editProfile) {
         require_once "Pages/logout.php";
     } else {
         echo <<<HTML
-            <div class="alert alert-danger" role="alert">
-                Are you sure you want to permanently delete your account? This can <strong>not</strong> be undone. All data will be erased.
+            <div class="alert alert-danger" role="alert" style="display: flex;">
+                <p>Are you sure you want to permanently delete your account? This can <strong>not</strong> be undone. All data will be erased.</p>
+                <form method="post" style="padding-left: 5px;">
+                    <input name="deleteProfile" type="text" style="display: none;" value="true">
+                    <input name="deleteProfileConfirm" type="text" style="display: none;" value="true">
+                    <button class="btn btn-danger btn-sm" type="submit" style="float: right;">Yes</button>
+                </form>
+                <form method="post" style="padding-left: 5px;">
+                    <button class="btn btn-danger btn-sm" type="submit" style="float: right;">No</button>
+                </form>
             </div>
-            <form method="post">
-                <input name="deleteProfile" type="text" style="display: none;" value="true">
-                <input name="deleteProfileConfirm" type="text" style="display: none;" value="true">
-                <button class="btn btn-danger btn-sm" type="submit">Delete Account</button>
-            </form>
         HTML;
     }
 } else {
