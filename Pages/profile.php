@@ -143,10 +143,14 @@ if ($editProfile) {
                 <h3 style="display: flex;">$followersCount Followers $followButton</h3>
                 <h3>$followingCount Following</h3>
                 <h3>$postsCount Posts</h3>
-                <form method="post">
-                    <input name="editProfile" type="boolean" style="display: none;" value="true">
-                    <button class="btn btn-dark btn-sm" type="submit">Edit Profile</button>
-                </form>
+    HTML;
+    if ($isLoggedInUser) echo <<<HTML
+        <form method="post">
+            <input name="editProfile" type="boolean" style="display: none;" value="true">
+            <button class="btn btn-dark btn-sm" type="submit">Edit Profile</button>
+        </form>
+    HTML;
+    echo <<<HTML
             </div>
         </div>
         <hr>
