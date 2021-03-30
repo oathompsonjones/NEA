@@ -21,21 +21,21 @@ if (isset($_GET["searchUser"]) && !is_null($_GET["searchUser"]) && strlen($_GET[
         <h2>Results for $getUser...</h2>
     HTML;
     else echo <<<HTML
-        <h2>No results were found for $getUser...</h2>
+        <h2>No results were found for $getUser.</h2>
     HTML;
     for ($i = 0; $i < count($searchedUsernames); ++$i) {
         $thisUser = new User($searchedUsernames[$i]);
         $thisUsername = $thisUser->username;
         $thisBio = $thisUser->bio;
         echo <<<HTML
-            <div class="card bg-dark">
-                <div class="card-body">
-                    <h5 class="card-title">
-                        <a href="profile?user=$thisUsername" style="text-decoration: none;">$thisUsername</a>
-                    </h5>
-                    $thisBio
+            <a href="profile?user=$thisUsername">
+                <div class="card bg-dark">
+                    <div class="card-body">
+                        <h5 class="card-title">$thisUsername</h5>
+                        $thisBio
+                    </div>
                 </div>
-            </div>
+            </a>
             <br>
         HTML;
     }
@@ -54,7 +54,7 @@ $postsCount = count($user->posts);
 $loggedInUser = unserialize($_SESSION["user"]);
 $isLoggedInUser = $loggedInUser->username === $username;
 
-if ($isLoggedInUser && (isset($_GET["user"]) || isset($_GET["searchUser"]))) echo <<<HTML
+if ($isLoggedInUser && (isset($_GET["user"]) || isset($_GET["searchUser"])) || isset($_GET["user"]) && strlen($_GET["user"]) === 0) echo <<<HTML
     <script>window.location.replace("/profile");</script>
 HTML;
 
@@ -108,6 +108,8 @@ if ($unFollowUser) {
 $editProfile = isset($_POST["editProfile"]) && $_POST["editProfile"] === "true" && $isLoggedInUser;
 $deleteProfile = isset($_POST["deleteProfile"]) && $_POST["deleteProfile"] === "true" && $isLoggedInUser;
 $deleteProfileConfirm = isset($_POST["deleteProfileConfirm"]) && $_POST["deleteProfileConfirm"] === "true" && $isLoggedInUser;
+$displayFollowers = isset($_POST["displayFollowers"]) && $_POST["displayFollowers"] === "true";
+$displayFollowing = isset($_POST["displayFollowing"]) && $_POST["displayFollowing"] === "true";
 if ($editProfile) {
     echo <<<HTML
         <form method="post">
@@ -170,22 +172,74 @@ if ($editProfile) {
             </div>
         HTML;
     }
+} else if ($displayFollowers) {
+    $followers = is_null($user->followers) ? [] : $user->followers;
+    if (count($followers) > 0) echo <<<HTML
+        <h2><a href="$profile?user=r->username">$user->username</a>'s followers...</h2>
+    HTML;
+    else echo <<<HTML
+        <h2><a href="profile?user=$user->username">$user->username</a> has no followers.</h2>
+    HTML;
+    for ($i = 0; $i < count($followers); ++$i) {
+        $thisUser = $followers[$i];
+        $thisUsername = $thisUser->username;
+        $thisBio = $thisUser->bio;
+        echo <<<HTML
+            <a href="profile?user=$thisUsername">
+                <div class="card bg-dark">
+                    <div class="card-body">
+                        <h5 class="card-title">$thisUsername</h5>
+                        $thisBio
+                    </div>
+                </div>
+            </a>
+            <br>
+        HTML;
+    }
+} else if ($displayFollowing) {
+    $following = is_null($user->following) ? [] : $user->following;
+    if (count($following) > 0) echo <<<HTML
+        <h2><a href="profile?user=$user->username">$user->username</a> follows...</h2>
+    HTML;
+    else echo <<<HTML
+        <h2><a href="profile?user=$user->username">$user->username</a> does not follow anyone.</h2>
+    HTML;
+    for ($i = 0; $i < count($following); ++$i) {
+        $thisUser = $following[$i];
+        $thisUsername = $thisUser->username;
+        $thisBio = $thisUser->bio;
+        echo <<<HTML
+            <a href="profile?user=$thisUsername">
+                <div class="card bg-dark">
+                    <div class="card-body">
+                        <h5 class="card-title">$thisUsername</h5>
+                        $thisBio
+                    </div>
+                </div>
+            </a>
+            <br>
+        HTML;
+    }
 } else {
     $followButton = "";
     if (!$isLoggedInUser) {
-        $dbRes = $db->select("*", "UserFollowing", "Username = '$loggedInUser->username' AND FollowingUsername = '$user->username'")[0][0];
-        if (is_null($dbRes)) {
+        function mapUsernames($value)
+        {
+            return $value->username;
+        }
+        $isFollowing = in_array($loggedInUser->username, array_map("mapUsernames", $user->followers));
+        if ($isFollowing) {
             $followButton = <<<HTML
                 <form method="post" style="padding-left: 10px;">
-                    <input name="followUser" type="boolean" style="display: none;" value="true">
-                    <button class="btn btn-dark btn-sm" type="submit">Follow</button>
+                    <input name="unFollowUser" type="boolean" style="display: none;" value="true">
+                    <button class="btn btn-dark btn-sm" type="submit">Unfollow</button>
                 </form>
             HTML;
         } else {
             $followButton = <<<HTML
                 <form method="post" style="padding-left: 10px;">
-                    <input name="unFollowUser" type="boolean" style="display: none;" value="true">
-                    <button class="btn btn-dark btn-sm" type="submit">Unfollow</button>
+                    <input name="followUser" type="boolean" style="display: none;" value="true">
+                    <button class="btn btn-dark btn-sm" type="submit">Follow</button>
                 </form>
             HTML;
         }
@@ -197,8 +251,23 @@ if ($editProfile) {
                 <p>$bio</p>
             </div>
             <div style="flex: 50%; max-width: 50%; word-wrap: break-word;">
-                <h3 style="display: flex;">$followersCount Followers $followButton</h3>
-                <h3>$followingCount Following</h3>
+                <h3 style="display: flex;">
+                    <form method="post" id="followersForm">
+                        <input style="display: none;" type="text" name="displayFollowers" value="true">
+                        <a href="javascript:{}" onclick="document.getElementById('followersForm').submit();">
+                            $followersCount Followers
+                        </a>
+                    </form>
+                    $followButton
+                </h3>
+                <h3>
+                    <form method="post" id="followingForm">
+                        <input style="display: none;" type="text" name="displayFollowing" value="true">
+                        <a href="javascript:{}" onclick="document.getElementById('followingForm').submit();">
+                            $followingCount Following
+                        </a>
+                    </form>
+                </h3>
                 <h3>$postsCount Posts</h3>
     HTML;
     if ($isLoggedInUser) echo <<<HTML

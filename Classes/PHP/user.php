@@ -9,6 +9,11 @@ function mapPosts($value)
     return new Post($value[0]);
 }
 
+function mapUsers($value)
+{
+    return new User($value[0]);
+}
+
 class User
 {
     private $username;
@@ -38,9 +43,13 @@ class User
                         return "student";
                 }
             case "following":
-                return $db->select("FollowingUsername", "UserFollowing", "Username = '$username'");
+                $users = $db->select("FollowingUsername", "UserFollowing", "Username = '$username'");
+                if (is_null($users)) return NULL;
+                return array_map("mapUsers", $users);
             case "followers":
-                return $db->select("Username", "UserFollowing", "FollowingUsername = '$username'");
+                $users = $db->select("Username", "UserFollowing", "FollowingUsername = '$username'");
+                if (is_null($users)) return NULL;
+                return array_map("mapUsers", $users);
             case "animations":
                 $animations = $db->select("AnimationID", "Animation", "Username = '$username'");
                 if (is_null($animations)) return NULL;
