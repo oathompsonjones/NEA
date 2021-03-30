@@ -1,7 +1,7 @@
 - Code output
     - Micro:Bit internal
-        - MicroPython   √
-        - TypeScript    √
+        - MicroPython                                                               √
+        - TypeScript                                                                √
         - Hex file
     - Scroll Bit 17x7 for Micro:Bit
         - MicroPython
@@ -36,13 +36,13 @@
             - Micro:Bit Hex file
 - Backend
     - Admin controls
-        - Delete/Add users √
-        - Reset Passwords √
+        - Delete/Add users                                                          √
+        - Reset Passwords                                                           √
         - Delete Posts
         - Delete Classes
 - Social Network
-    - Profile page - just DB retrieval and updating with some CSS √
-    - Following/UnFollowing Users √
+    - Profile page - just DB retrieval and updating with some CSS                   √
+    - Following/UnFollowing Users                                                   √
     - Display who a user is following.
     - Display who is following a user.
     - Feed - just DB retrieval and updating with some CSS
@@ -52,4 +52,7 @@
     - Classes
         - Assignments
         - Chat Room
+- Other
+    - Editor
+        - Add more config options                                                   √
 - Update documentation (algorithms were way too over complicated)
