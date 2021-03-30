@@ -57,17 +57,14 @@ echo <<<HTML
         <script>
             const playback = (index, frames) => {
                 const img = document.getElementById(index.toString() + "-icon");
-                const card = document.getElementById(index.toString() + "-card");
                 const buttons = document.getElementById(index.toString() + "-buttons");
                 const fps = document.getElementById(index.toString() + "-inputFPS")?.value || 1;
                 let i = 0;
-                card.className = "";
                 buttons.style.display = "none";
                 const interval = setInterval(() => img.src = frames[i++], 1000 / fps);
                 setTimeout(() => {
                     clearInterval(interval);
                     img.src = frames[0];
-                    card.className = "icon";
                     buttons.style.display = "block";
                 }, 1000 * (frames.length + 1) / fps);
             };
@@ -86,17 +83,24 @@ for ($i = 0; $i < count($animations); ++$i) {
 
     if (in_array($id, $postedAnimationIDs)) {
         $shareButton = <<<HTML
-            <form method="post" style="padding-left: 5px;">
+            <form method="post" style="display: flex; width: 100%;">
                 <input style="display: none;" name="unShareAnimation" type="text" value="$id">
-                <button class="btn btn-dark btn-md" type="submit">Unshare</button>
+                <button class="btn btn-dark btn-sm" type="submit" style="width: 50%;">Unshare</button>
+                <div class="form-floating" style="width: 50%;">
+                    <input type="number" class="form-control bg-dark text-light border-dark" id="$i-inputFPS" name="fps" placeholder="FPS" min=1 max=60 value=1 required>
+                    <label for="$i-inputFPS" class="form-label">FPS</label>
+                </div>
             </form>
         HTML;
     } else {
         $shareButton = <<<HTML
-            <form method="post" style="padding-left: 5px; display: flex;">
+            <form method="post" style="display: flex; width: 100%;">
                 <input style="display: none;" name="shareAnimation" type="text" value="$id">
-                <input type="number" class="form-control bg-dark text-light border-dark" id="$i-inputFPS" name="fps" placeholder="FPS" min=1 max=60 value=1 required>
-                <button class="btn btn-dark btn-md" type="submit">Share</button>
+                <button class="btn btn-dark btn-sm" type="submit" style="width: 50%;">Share</button>
+                <div class="form-floating" style="width: 50%;">
+                    <input type="number" class="form-control bg-dark text-light border-dark" id="$i-inputFPS" name="fps" placeholder="FPS" min=1 max=60 value=1 required>
+                    <label for="$i-inputFPS" class="form-label">FPS</label>
+                </div>
             </form>
         HTML;
     }
@@ -113,16 +117,16 @@ for ($i = 0; $i < count($animations); ++$i) {
                 <div class="card-body">
                     <h5 class="card-title">$name</h5>
                     <div style="display: flex;">
-                        <form method="post" style="padding-left: 5px;">
+                        <form method="post" style="width: 50%;">
                             <input style="display: none;" name="deleteAnimation" type="text" value="$id">
-                            <button class="btn btn-danger btn-md" type="submit">Delete</button>
+                            <button class="btn btn-danger btn-sm" type="submit" style="width: 100%;">Delete</button>
                         </form>
-                        <form method="post" action="editor" style="padding-left: 5px;">
+                        <form method="post" action="editor" style="width: 50%;">
                             <input style="display: none;" name="preMade" type="text" value="$id">
-                            <button class="btn btn-dark btn-md" type="submit">Edit</button>
+                            <button class="btn btn-dark btn-sm" type="submit" style="width: 100%;">Edit</button>
                         </form>
-                        $shareButton
                     </div>
+                    $shareButton
                 </div>
             </div>
         </div>
