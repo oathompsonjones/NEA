@@ -51,16 +51,32 @@ if (isset($_POST["preMade"]) && $_POST["preMade"] !== "New") {
     $_SESSION["matrix"]["name"] = $_POST["name"];
     $_SESSION["matrix"]["id"] = $_POST["id"];
     switch ($_POST["setup"]) {
-        case "Micro:Bit":
+        case "1":
             $_SESSION["matrix"]["width"] = 5;
             $_SESSION["matrix"]["height"] = 5;
             $_SESSION["matrix"]["type"] = 1;
             break;
-        case "NeoPixel RGB 8x8":
+        case "2":
             $_SESSION["matrix"]["width"] = 8;
             $_SESSION["matrix"]["height"] = 8;
             $_SESSION["matrix"]["type"] = 2;
             break;
+        case "3":
+            $_SESSION["matrix"]["width"] = 4;
+            $_SESSION["matrix"]["height"] = 4;
+            $_SESSION["matrix"]["type"] = 2;
+            break;
+        case "4":
+            $_SESSION["matrix"]["width"] = 14;
+            $_SESSION["matrix"]["height"] = 9;
+            $_SESSION["matrix"]["type"] = 0;
+            break;
+        case "5":
+            $_SESSION["matrix"]["width"] = 17;
+            $_SESSION["matrix"]["height"] = 7;
+            $_SESSION["matrix"]["type"] = 0;
+            break;
+        case "0":
         default:
             $_SESSION["matrix"]["width"] = $_POST["width"];
             $_SESSION["matrix"]["height"] = $_POST["height"];
@@ -101,9 +117,12 @@ if (
             <div id="setup">
                 <div class="form-floating">
                     <select class="form-control bg-dark text-light border-dark" id="setupOptions" name="setup">
-                        <option value="Micro:Bit">Micro:Bit</option>
-                        <option value="NeoPixel RGB 8x8">NeoPixel RGB 8x8</option>
-                        <option value="Custom">Custom</option>
+                        <option value="1">Micro:Bit (5x5 Variable Brightness)</option>
+                        <option value="2">NeoPixel RGB 8x8 (8x8 RGB)</option>
+                        <option value="3">Raspberry Pi Pico RGB Keypad Base (4x4 RGB)</option>
+                        <option value="4">LoL Shield SMD (14x9 Monochromatic)</option>
+                        <option value="5">ScrollBit (17x7 Monochromatic)</option>
+                        <option value="0">Custom</option>
                     </select>
                     <label for="setupOptions">Matrix Setup</label>
                 </div>
