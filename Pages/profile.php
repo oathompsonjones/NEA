@@ -9,34 +9,38 @@ function flattenUsernamesArray($value)
 }
 $db = $_SESSION["database"];
 $user = unserialize($_SESSION["user"]);
-if (isset($_GET["user"]) && !is_null($_GET["user"])) {
-    $getUser = $_GET["user"];
-    $dbUser = $db->select("*", "User", "Username = '$getUser'")[0][0];
-    if (!is_null($dbUser)) $user = new User($_GET["user"]);
-    else {
-        $allUsernames = array_map("flattenUsernamesArray", $db->Select("Username", "User"));
-        function searchForUsernames($value)
-        {
-            return strpos(strtolower($value), strtolower($_GET["user"])) !== false;
-        }
-        $searchedUsernames = array_values(array_filter($allUsernames, "searchForUsernames"));
-        echo <<<HTML
-            <h2>User not found</h2>
-        HTML;
-        if (count($searchedUsernames) > 0) echo <<<HTML
-            <h5>Here are some other suggestions...</h5>
-        HTML;
-        else echo <<<HTML
-            <h5>No search results were found...</h5>
-        HTML;
-        for ($i = 0; $i < count($searchedUsernames); ++$i) {
-            echo <<<HTML
-                <h4><a href="profile?user=$searchedUsernames[$i]" style="text-decoration: none;">$searchedUsernames[$i]</a></h4><br>
-            HTML;
-        }
-        exit;
+if (isset($_GET["searchUser"]) && !is_null($_GET["searchUser"]) && strlen($_GET["searchUser"]) > 0) {
+    $getUser = $_GET["searchUser"];
+    $allUsernames = array_map("flattenUsernamesArray", $db->Select("Username", "User", "NOT Type = 0"));
+    function searchForUsernames($value)
+    {
+        return strpos(strtolower($value), strtolower($_GET["searchUser"])) !== false;
     }
-}
+    $searchedUsernames = array_values(array_filter($allUsernames, "searchForUsernames"));
+    if (count($searchedUsernames) > 0) echo <<<HTML
+        <h2>Results for $getUser...</h2>
+    HTML;
+    else echo <<<HTML
+        <h2>No results were found for $getUser...</h2>
+    HTML;
+    for ($i = 0; $i < count($searchedUsernames); ++$i) {
+        $thisUser = new User($searchedUsernames[$i]);
+        $thisUsername = $thisUser->username;
+        $thisBio = $thisUser->bio;
+        echo <<<HTML
+            <div class="card bg-dark">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <a href="profile?user=$thisUsername" style="text-decoration: none;">$thisUsername</a>
+                    </h5>
+                    $thisBio
+                </div>
+            </div>
+            <br>
+        HTML;
+    }
+    exit;
+} else if (isset($_GET["user"]) && !is_null($_GET["user"])) $user = new User($_GET["user"]);
 $passwordHash = $user->passwordHash;
 $username = $user->username;
 $bio = $user->bio;
@@ -50,7 +54,7 @@ $postsCount = count($user->posts);
 $loggedInUser = unserialize($_SESSION["user"]);
 $isLoggedInUser = $loggedInUser->username === $username;
 
-if ($isLoggedInUser && isset($_GET["user"])) echo <<<HTML
+if ($isLoggedInUser && (isset($_GET["user"]) || isset($_GET["searchUser"]))) echo <<<HTML
     <script>window.location.replace("/profile");</script>
 HTML;
 
@@ -213,16 +217,13 @@ if ($editProfile) {
             <script>
                 const playback = (index, frames, fps) => {
                     const img = document.getElementById(index.toString() + "-icon");
-                    const card = document.getElementById(index.toString() + "-card");
                     const buttons = document.getElementById(index.toString() + "-buttons");
                     let i = 0;
-                    card.className = "";
                     buttons.style.display = "none";
                     const interval = setInterval(() => img.src = frames[i++], 1000 / fps);
                     setTimeout(() => {
                         clearInterval(interval);
                         img.src = frames[0];
-                        card.className = "icon";
                         buttons.style.display = "block";
                     }, 1000 * (frames.length + 1) / fps);
                 };

@@ -26,7 +26,7 @@
 
 <body>
     <nav class="navbar navbar-dark bg-dark fixed-top navbar-expand-lg">
-        <div class="container-fluid">
+        <div class="container-fluid" style="padding-left: 30px; padding-right: 30px;">
             <a class="navbar-brand" href="/">Home</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
@@ -53,52 +53,48 @@
                             case "student":
                                 // Render the navbar for students and teachers.
                                 echo <<<HTML
-                                    <li class="nav-item">
-                                        <a class="nav-link" href="profile">Profile</a>
-                                    </li>
-
-                                    <li class="nav-item">
-                                        <a class="nav-link" href="animations">Animations</a>
-                                    </li>
-
-                                    <li class="nav-item">
-                                        <a class="nav-link" href="editor">Editor</a>
-                                    </li>
-
-                                    <li class="nav-item dropdown">
-                                        <a class="nav-link dropdown-toggle" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">Classes</a>
-                                        <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-                                            <li><a class="dropdown-item" href="class?classID=1">Class 1</a></li>
-                                            <li><a class="dropdown-item" href="class?classID=2">Class 2</a></li>
-                                            <li><hr class="dropdown-divider"></li>
-                                            <li><a class="dropdown-item" href="class">Join new class</a></li>
-                                        </ul>
-                                    </li>
-
-                                    <li class="nav-item">
-                                        <a class="nav-link" href="logout">Log Out</a>
-                                    </li>
+                                        <li class="nav-item">
+                                            <a class="nav-link" href="profile">Profile</a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a class="nav-link" href="animations">Animations</a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a class="nav-link" href="editor">Editor</a>
+                                        </li>
+                                        <li class="nav-item dropdown">
+                                            <a class="nav-link dropdown-toggle" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">Classes</a>
+                                            <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                                                <li><a class="dropdown-item" href="class?classID=1">Class 1</a></li>
+                                                <li><a class="dropdown-item" href="class?classID=2">Class 2</a></li>
+                                                <li><hr class="dropdown-divider"></li>
+                                                <li><a class="dropdown-item" href="class">Join new class</a></li>
+                                            </ul>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a class="nav-link" href="logout">Log Out</a>
+                                        </li>
+                                    </ul>
+                                    <form class="d-flex" method="get" action="profile">
+                                        <input class="form-control me-2" type="search" placeholder="Find Users..." aria-label="Search" name="searchUser">
+                                        <button class="btn btn-outline-success" type="submit">Search</button>
+                                    </form>
                                 HTML;
                                 break;
                         }
                     } else {
                         // Render the navbar for users who are not logged in.
                         echo <<<HTML
-                            <li class="nav-item">
-                                <a class="nav-link" href="login">Log In</a>
-                            </li>
-
-                            <li class="nav-item">
-                                <a class="nav-link" href="signup">Sign Up</a>
-                            </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="login">Log In</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="signup">Sign Up</a>
+                                </li>
+                            </ul>
                         HTML;
                     }
                     ?>
-                </ul>
-                <form class="d-flex" method="get" action="profile">
-                    <input class="form-control me-2" type="search" placeholder="Find Users..." aria-label="Search" name="user">
-                    <button class="btn btn-outline-success" type="submit">Search</button>
-                </form>
             </div>
         </div>
     </nav>
