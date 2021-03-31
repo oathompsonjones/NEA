@@ -61,10 +61,6 @@ if (isset($_POST["makeAdmin"]) && !is_null($_POST["makeAdmin"])) {
     require "Include/clearPost.inc";
 }
 
-echo <<<HTML
-    <h1>Microcontroller Animations</h1>
-HTML;
-
 switch ($user->type) {
     case "admin":
         function mapUsers($value)
@@ -73,6 +69,7 @@ switch ($user->type) {
         }
         $users = array_map("mapUsers", $db->select("Username", "User", NULL, "Username"));
         echo <<<HTML
+            <h1>Microcontroller Animations</h1>
             <h3>Users</h3>
             <table style="width: 100%;">
                 <tr>
@@ -167,7 +164,7 @@ switch ($user->type) {
         }
         function sortPostsByTimestamp($a, $b)
         {
-            return max($a->createdAt, $b->createdAt);
+            return intval($b->createdAt) - intval($a->createdAt);
         }
         function mapIconsSrc($value)
         {
@@ -175,9 +172,9 @@ switch ($user->type) {
         }
         usort($feedPosts, "sortPostsByTimestamp");
         echo <<<HTML
-            <div style="display: flex; height: 95%;">
+            <div style="display: flex; height: 100%;">
                 <div style="flex: 66%; max-width: 66%; word-wrap: break-word;">
-                    Stuff...
+                    <h1>Microcontroller Animations</h1>
                 </div>
                 <div style="flex: 33%; max-width: 33%; word-wrap: break-word;">
                     <h2>Your Feed</h2>
@@ -195,9 +192,9 @@ switch ($user->type) {
                             }, 1000 * (frames.length + 1) / fps);
                         };
                     </script>
-                    <div class="card-group" style="display: block; overflow: auto; height: 90%;">
+                    <div class="card-group" style="display: block; overflow: auto; height: 95%;">
         HTML;
-        for ($i = 0; $i < count($feedPosts); ++$i) {
+        for ($i = 0; $i < min(count($feedPosts), 100); ++$i) {
             $post = $feedPosts[$i];
             $username = $post->user->username;
             $name = $post->animation->name;
@@ -221,14 +218,14 @@ switch ($user->type) {
                         </div>
                     </div>
                     <div class="card-body">
-                        <h5 class="card-title">
-                            $name<br><span class='badge rounded-pill bg-secondary'>$type - $fps FPS</span>
-                        </h5>
+                        <h5 class="card-title">$name</h5>
+                        <p>$type - $fps FPS</p>
                     </div>
                     <div class="card-footer text-muted">
-                        <script>document.write(new Date(Date.now() - $timestamp).toGMTString());</script>
+                        <script>document.write(new Date($timestamp * 1000).toGMTString());</script>
                     </div>
                 </div>
+                <hr>
             HTML;
         }
         echo <<<HTML
