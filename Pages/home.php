@@ -173,11 +173,8 @@ switch ($user->type) {
         usort($feedPosts, "sortPostsByTimestamp");
         echo <<<HTML
             <div style="display: flex; height: 100%;">
-                <div style="flex: 66%; max-width: 66%; word-wrap: break-word;">
+                <div style="flex: 40%; max-width: 40%; word-wrap: break-word;">
                     <h1>Microcontroller Animations</h1>
-                </div>
-                <div style="flex: 33%; max-width: 33%; word-wrap: break-word;">
-                    <h2>Your Feed</h2>
                     <script>
                         const playback = (index, frames, fps) => {
                             const img = document.getElementById(index.toString() + "-icon");
@@ -204,6 +201,7 @@ switch ($user->type) {
             $icons = !is_null($post)
                 ? array_map("mapIconsSrc", $post->animation->generateFrameIcons())
                 : [];
+            $iconCount = count($icons);
             $jsonIcons = json_encode($icons);
             $firstIcon = $icons[0];
             echo <<<HTML
@@ -219,7 +217,7 @@ switch ($user->type) {
                     </div>
                     <div class="card-body">
                         <h5 class="card-title">$name</h5>
-                        <p>$type - $fps FPS</p>
+                        <p>$type - $iconCount Frames - $fps FPS</p>
                     </div>
                     <div class="card-footer text-muted">
                         <script>document.write(new Date($timestamp * 1000).toGMTString());</script>
@@ -230,6 +228,9 @@ switch ($user->type) {
         }
         echo <<<HTML
                     </div>
+                </div>
+                <div style="flex: 60%; max-width: 60%; word-wrap: break-word;">
+                    Other stuff goes here...
                 </div>
             </div>
         HTML;
