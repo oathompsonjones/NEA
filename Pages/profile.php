@@ -302,6 +302,7 @@ if ($editProfile) {
         $post = $posts[$i];
         $name = $post->animation->name;
         $type = $post->animation->typeString;
+        $timestamp = $post->createdAt;
         $fps = $post->fps;
         $title = !is_null($name)
             ? <<<HTML
@@ -323,6 +324,9 @@ if ($editProfile) {
                     </div>
                     <div class="card-body">
                         <h5 class="card-title">$title</h5>
+                    </div>
+                    <div class="card-footer text-muted">
+                        <script>document.write(new Date($timestamp * 1000).toGMTString());</script>
                     </div>
                 </div>
             </div>

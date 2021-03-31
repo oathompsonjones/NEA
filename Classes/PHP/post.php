@@ -22,7 +22,7 @@ class Post
             case "createdAt":
                 return $db->select("CreatedAt", "Post", "PostID = '$id'")[0][0];
             case "user":
-                return new User($db->select("UserID", "Post", "PostID = '$id'")[0][0]);
+                return new User($db->select("Username", "Post", "PostID = '$id'")[0][0]);
             case "animation":
                 return new Animation($db->select("AnimationID", "Post", "PostID = '$id'")[0][0]);
             case "animationID":

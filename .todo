@@ -45,8 +45,8 @@
     - Following/UnFollowing Users                                                   √
     - Display who a user is following.                                              √
     - Display who is following a user.                                              √
-    - Feed - just DB retrieval and updating with some CSS
-    - Posting - just DB retrieval and updating with some CSS and some forms
+    - Feed - just DB retrieval and updating with some CSS                           √
+    - Posting - just DB retrieval and updating with some CSS and some forms         √
     - Comments - just DB retrieval and updating with some CSS and some forms
     - Likes - just DB retrieval and updating with some CSS and some forms
     - Classes
