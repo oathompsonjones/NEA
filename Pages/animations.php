@@ -2,66 +2,15 @@
 $db = $_SESSION["database"];
 $user = unserialize($_SESSION["user"]);
 
-if (isset($_POST["deleteAnimation"]) && !is_null($_POST["deleteAnimation"])) {
-    $tmp = new Animation($_POST["deleteAnimation"]);
-    $name = $tmp->name;
-    $id = $tmp->id;
-    echo <<<HTML
-        <div class="alert alert-danger" role="alert" style="display: flex;">
-            <p>Are you sure you want to permanently delete the animation $name? This can <strong>not</strong> be undone. All data will be erased.<p>
-            <form method="post" style="padding-left: 5px;">
-                <input style="display: none;" name="deleteAnimationConfirmed" type="text" value="$id">
-                <button class="btn btn-danger btn-sm" type="submit">Yes</button>
-            </form>
-            <form method="post" style="padding-left: 5px;">
-                <button class="btn btn-danger btn-sm" type="submit">No</button>
-            </form>
-        </div>
-    HTML;
-} else if (isset($_POST["deleteAnimationConfirmed"]) && !is_null($_POST["deleteAnimationConfirmed"])) {
-    (new Animation($_POST["deleteAnimationConfirmed"]))->delete();
-    require "Include/clearPost.inc";
-}
-
-if (isset($_POST["shareAnimation"]) && !is_null($_POST["shareAnimation"])) {
-    $timestamp = time();
-    $id = md5($user->username . $timestamp);
-    $animationID = $_POST["shareAnimation"];
-    $fps = $_POST["fps"];
-    $db->insert("Post", "PostID, Username, AnimationID, CreatedAt, FPS", "'$id', '$user->username', '$animationID', '$timestamp', $fps");
-    require "Include/clearPost.inc";
-}
-
-if (isset($_POST["unShareAnimation"]) && !is_null($_POST["unShareAnimation"])) {
-    $id = $_POST["unShareAnimation"];
-    (new Post($db->select("PostID", "Post", "AnimationID = '$id'")[0][0]))->delete();
-    require "Include/clearPost.inc";
-}
-
+echo <<<HTML
+    <h1>My Animations</h1>
+    <div class="row row-cols-1 row-cols-md-5 g-4">
+        <style>.animation { display: none; }</style>
+HTML;
 $animations = $user->animations;
 $posts = $user->posts;
 $postedAnimationIDs = array_map("mapToAnimationID", $posts);
 
-echo <<<HTML
-    <h1>My Animations</h1>
-    <div class="accordion accordion-flush" id="accordion">
-        <script>
-            const playback = (index, frames) => {
-                const img = document.getElementById(index.toString() + "-icon");
-                const buttons = document.getElementById(index.toString() + "-buttons");
-                const fps = document.getElementById(index.toString() + "-inputFPS")?.value || 1;
-                let i = 0;
-                buttons.style.display = "none";
-                const interval = setInterval(() => img.src = frames[i++], 1000 / fps);
-                setTimeout(() => {
-                    clearInterval(interval);
-                    img.src = frames[0];
-                    buttons.style.display = "block";
-                }, 1000 * (frames.length + 1) / fps);
-            };
-        </script>
-        <div class="row row-cols-1 row-cols-md-5 g-4">
-HTML;
 for ($i = 0; $i < count($animations); ++$i) {
     $animation = $animations[$i];
     $id = $animation->id;
@@ -72,58 +21,85 @@ for ($i = 0; $i < count($animations); ++$i) {
     $jsonIcons = json_encode($icons);
     $firstIcon = $icons[0];
 
-    if (in_array($id, $postedAnimationIDs)) {
-        $shareButton = <<<HTML
-            <form method="post" style="display: flex; width: 100%;">
-                <input style="display: none;" name="unShareAnimation" type="text" value="$id">
-                <button class="btn btn-dark btn-sm" type="submit" style="width: 50%;">Unshare</button>
-                <div class="form-floating" style="width: 50%;">
-                    <input type="number" class="form-control bg-dark text-light border-dark" id="$i-inputFPS" name="fps" placeholder="FPS" min=1 max=60 value=1 required>
-                    <label for="$i-inputFPS" class="form-label">FPS</label>
-                </div>
-            </form>
-        HTML;
-    } else {
-        $shareButton = <<<HTML
-            <form method="post" style="display: flex; width: 100%;">
-                <input style="display: none;" name="shareAnimation" type="text" value="$id">
-                <button class="btn btn-dark btn-sm" type="submit" style="width: 50%;">Share</button>
-                <div class="form-floating" style="width: 50%;">
-                    <input type="number" class="form-control bg-dark text-light border-dark" id="$i-inputFPS" name="fps" placeholder="FPS" min=1 max=60 value=1 required>
-                    <label for="$i-inputFPS" class="form-label">FPS</label>
-                </div>
-            </form>
-        HTML;
-    }
-
+    $postExists = in_array($id, $postedAnimationIDs);
+    $shareButton = <<<HTML
+        <script>
+            const unShare_$id = () => {
+                const animationID = "$id";
+                $.post("Utils/Forms/unShareAnimation.php", { animationID }, () => document.getElementById("$id-shareButton").innerHTML = `<button class="btn btn-dark btn-sm" type="button" onclick="share_$id();" style="width: 100%;">Share</button>`);
+            };
+            const share_$id = () => {
+                const animationID = "$id";
+                const username = "$user->username";
+                const fps = document.getElementById("$id-inputFPS").value;
+                $.post("Utils/Forms/shareAnimation.php", { animationID, username, fps }, () => document.getElementById("$id-shareButton").innerHTML = `<button class="btn btn-dark btn-sm" type="button" onclick="unShare_$id();" style="width: 100%;">Unshare</button>`);
+            };
+            const delete_$id = () => {
+                document.getElementById("$id-deleteButton").innerHTML = `<button class="btn btn-danger btn-sm" type="button" onclick="deleteConfirm_$id();" style="width: 100%;">Confirm</button>`;
+            };
+            const deleteConfirm_$id = () => {
+                const animationID = "$id";
+                $.post("Utils/Forms/deleteAnimation.php", { animationID }, () => document.getElementById("$id-container").style.display = "none");
+            };
+        </script>
+    HTML;
+    $shareButton = $shareButton . ($postExists
+        ? <<<HTML
+            <button class="btn btn-dark btn-sm" type="button" onclick="unShare_$id();" style="width: 100%;">Unshare</button>
+        HTML
+        : <<<HTML
+            <button class="btn btn-dark btn-sm" type="button" onclick="share_$id();" style="width: 100%;">Share</button>
+        HTML);
     echo <<<HTML
-        <div class="col">
-            <div class="card text-white bg-dark">
-                <div id="$i-card" class="icon">
-                    <img src="$firstIcon" class="card-img-top" id="$i-icon">
-                    <div id="$i-buttons" class="buttons">
-                        <button class="btn btn-secondary btn-lg" data-toggle="tooltip" data-placement="top" title="Play the animation" onclick='playback($i, $jsonIcons);'>Play</button>
+        <div class="col" id="$id-container">
+            <script>
+                const _$id = (frames) => {
+                    const img = document.getElementById("$id-icon");
+                    const buttons = document.getElementById("$id-buttons");
+                    const fps = document.getElementById("$id-inputFPS")?.value || 1;
+                    let i = 0;
+                    buttons.style.display = "none";
+                    const interval = setInterval(() => img.src = frames[i++], 1000 / fps);
+                    setTimeout(() => {
+                        clearInterval(interval);
+                        img.src = frames[0];
+                        buttons.style.display = "block";
+                    }, 1000 * (frames.length + 1) / fps);
+                };
+            </script>
+            <div class="card text-white bg-dark animation">
+                <div id="$id-card" class="icon">
+                    <img src="$firstIcon" class="card-img-top" id="$id-icon">
+                    <div id="$id-buttons" class="buttons">
+                        <button class="btn btn-secondary btn-lg" data-toggle="tooltip" data-placement="top" title="Play the animation" onclick='_$id($jsonIcons);'>Play</button>
                     </div>
                 </div>
                 <div class="card-body">
                     <h5 class="card-title">$name</h5>
                     <div style="display: flex;">
-                        <form method="post" style="width: 50%;">
-                            <input style="display: none;" name="deleteAnimation" type="text" value="$id">
-                            <button class="btn btn-danger btn-sm" type="submit" style="width: 100%;">Delete</button>
-                        </form>
+                        <div id="$id-deleteButton" style="display: flex; width: 50%;">
+                            <button class="btn btn-danger btn-sm" type="button" onclick="delete_$id();" style="width: 100%;">Delete</button>
+                        </div>
                         <form method="post" action="editor" style="width: 50%;">
                             <input style="display: none;" name="preMade" type="text" value="$id">
                             <button class="btn btn-dark btn-sm" type="submit" style="width: 100%;">Edit</button>
                         </form>
                     </div>
-                    $shareButton
+                    <div style="display: flex; width: 100%;">
+                        <div id="$id-shareButton" style="display: flex; width: 50%;">
+                            $shareButton
+                        </div>
+                        <div class="form-floating" style="width: 50%;">
+                            <input type="number" class="form-control bg-dark text-light border-dark" id="$id-inputFPS" name="fps" placeholder="FPS" min=1 max=60 value=1 required>
+                            <label for="$id-inputFPS" class="form-label">FPS</label>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     HTML;
 }
 echo <<<HTML
-        </div>
+        <style>.animation { display: block; }</style>
     </div>
 HTML;
