@@ -95,16 +95,17 @@ class Post
         // Generate HTML.
         $likeButton = $postLikedByUser
             ? <<<HTML
-            <form method="post">
-                <input style="display: none;" type="text" name="unLikePost" value="$postID">
-                <button type="submit" class="btn btn-danger">❤</button>
-            </form>
-        HTML : <<<HTML
-            <form method="post">
-                <input style="display: none;" type="text" name="likePost" value="$postID">
-                <button type="submit" class="btn btn-secondary">❤</button>
-            </form>
-        HTML;
+                <form method="post">
+                    <input style="display: none;" type="text" name="unLikePost" value="$postID">
+                    <button type="submit" class="btn btn-danger">❤</button>
+                </form>
+            HTML
+            : <<<HTML
+                <form method="post">
+                    <input style="display: none;" type="text" name="likePost" value="$postID">
+                    <button type="submit" class="btn btn-secondary">❤</button>
+                </form>
+            HTML;
         $commentButton = <<<HTML
             <form method="post">
                 <input style="display: none;" type="text" name="commentOnPost" value="$postID">
