@@ -114,9 +114,9 @@ class Post
         return <<<HTML
         <div class="card text-white bg-dark">
             <script>
-                const playback = (frames, fps) => {
-                    const img = document.getElementById($postID + "-icon");
-                    const buttons = document.getElementById($postID + "-buttons");
+                const _$postID = (frames, fps) => {
+                    const img = document.getElementById("$postID-icon");
+                    const buttons = document.getElementById("$postID-buttons");
                     let i = 0;
                     buttons.style.display = "none";
                     const interval = setInterval(() => img.src = frames[i++], 1000 / fps);
@@ -133,7 +133,7 @@ class Post
             <div id="$postID-card" class="icon">
                 <img src="$postAnimationFirstIcon" loading="lazy" class="card-img-top" id="$postID-icon">
                 <div id="$postID-buttons" class="buttons">
-                    <button class="btn btn-secondary btn-lg" data-toggle="tooltip" data-placement="top" title="Play the animation" onclick='playback($postAnimationIconsJSON, $postFps);'>▶</button>
+                    <button class="btn btn-secondary btn-lg" data-toggle="tooltip" data-placement="top" title="Play the animation" onclick='_$postID($postAnimationIconsJSON, $postFps);'>▶</button>
                 </div>
             </div>
             <div class="card-body">
