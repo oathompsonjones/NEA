@@ -28,9 +28,100 @@ class Animation
                 $frames = $db->select("FrameID", "Frame", "AnimationID = '$id'", "FramePosition ASC");
                 if (is_null($frames)) return NULL;
                 return array_map("mapToFrameObject", array_map("mapToFirstItem", $frames));
+            case "user":
+                return new User($db->select("Username", "Animation", "AnimationID = '$id'")[0][0]);
             default:
                 throw new Exception("Property $name does not exist on type Animation.");
         }
+    }
+
+    public function render()
+    {
+        $id = $this->id;
+        $name = $this->name;
+        $icons = array_map("mapBase64ToImageSrc", $this->generateFrameIcons());
+        $jsonIcons = json_encode($icons);
+        $firstIcon = $icons[0];
+        $user = $this->user;
+        $posts = $user->posts;
+        $postedAnimationIDs = array_map("mapToAnimationID", $posts);
+        $postExists = in_array($id, $postedAnimationIDs);
+        $shareButton = <<<HTML
+            <script>
+                const unShare_$id = () => {
+                    const animationID = "$id";
+                    $.post("Utils/Forms/unShareAnimation.php", { animationID }, () => document.getElementById("$id-shareButton").innerHTML = `<button class="btn btn-dark btn-sm" type="button" onclick="share_$id();" style="width: 100%;">Share</button>`);
+                };
+                const share_$id = () => {
+                    const animationID = "$id";
+                    const username = "$user->username";
+                    const fps = document.getElementById("$id-inputFPS").value;
+                    $.post("Utils/Forms/shareAnimation.php", { animationID, username, fps }, () => document.getElementById("$id-shareButton").innerHTML = `<button class="btn btn-dark btn-sm" type="button" onclick="unShare_$id();" style="width: 100%;">Unshare</button>`);
+                };
+                const delete_$id = () => {
+                    document.getElementById("$id-deleteButton").innerHTML = `<button class="btn btn-danger btn-sm" type="button" onclick="deleteConfirm_$id();" style="width: 100%;">Confirm</button>`;
+                };
+                const deleteConfirm_$id = () => {
+                    const animationID = "$id";
+                    $.post("Utils/Forms/deleteAnimation.php", { animationID }, () => document.getElementById("$id-container").style.display = "none");
+                };
+            </script>
+        HTML;
+        $shareButton = $shareButton . ($postExists
+            ? <<<HTML
+                <button class="btn btn-dark btn-sm" type="button" onclick="unShare_$id();" style="width: 100%;">Unshare</button>
+            HTML
+            : <<<HTML
+                <button class="btn btn-dark btn-sm" type="button" onclick="share_$id();" style="width: 100%;">Share</button>
+            HTML);
+        return <<<HTML
+            <div class="col" id="$id-container">
+                <script>
+                    const _$id = (frames) => {
+                        const img = document.getElementById("$id-icon");
+                        const buttons = document.getElementById("$id-buttons");
+                        const fps = document.getElementById("$id-inputFPS")?.value || 1;
+                        let i = 0;
+                        buttons.style.display = "none";
+                        const interval = setInterval(() => img.src = frames[i++], 1000 / fps);
+                        setTimeout(() => {
+                            clearInterval(interval);
+                            img.src = frames[0];
+                            buttons.style.display = "block";
+                        }, 1000 * (frames.length + 1) / fps);
+                    };
+                </script>
+                <div class="card text-white bg-dark animation">
+                    <div id="$id-card" class="icon">
+                        <img src="$firstIcon" class="card-img-top" id="$id-icon">
+                        <div id="$id-buttons" class="buttons">
+                            <button class="btn btn-secondary btn-lg" data-toggle="tooltip" data-placement="top" title="Play the animation" onclick='_$id($jsonIcons);'>Play</button>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <h5 class="card-title">$name</h5>
+                        <div style="display: flex;">
+                            <div id="$id-deleteButton" style="display: flex; width: 50%;">
+                                <button class="btn btn-danger btn-sm" type="button" onclick="delete_$id();" style="width: 100%;">Delete</button>
+                            </div>
+                            <form method="post" action="editor" style="width: 50%;">
+                                <input style="display: none;" name="preMade" type="text" value="$id">
+                                <button class="btn btn-dark btn-sm" type="submit" style="width: 100%;">Edit</button>
+                            </form>
+                        </div>
+                        <div style="display: flex; width: 100%;">
+                            <div id="$id-shareButton" style="display: flex; width: 50%;">
+                                $shareButton
+                            </div>
+                            <div class="form-floating" style="width: 50%;">
+                                <input type="number" class="form-control bg-dark text-light border-dark" id="$id-inputFPS" name="fps" placeholder="FPS" min=1 max=60 value=1 required>
+                                <label for="$id-inputFPS" class="form-label">FPS</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        HTML;
     }
 
     public function delete()
