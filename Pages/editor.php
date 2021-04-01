@@ -15,7 +15,7 @@ if (isset($_POST["saveToDB"]) && $_POST["saveToDB"] === "true") {
     $frames = isset($_SESSION["editor"]["data"]) && !is_null($_SESSION["editor"]["data"]) ? json_decode($_SESSION["editor"]["data"]) : [];
     $username = unserialize($_SESSION["user"])->username;
     // Get a list of the currently saved animations.
-    $currentIDs = array_map("flattenIDs", $db->select("AnimationID", "Animation"));
+    $currentIDs = array_map("mapToFirstItem", $db->select("AnimationID", "Animation"));
     // Check if the current animation already exists in the database.
     $animationExists = $currentIDs ? in_array($id, $currentIDs) : FALSE;
     // If it does, delete the saved frames.
