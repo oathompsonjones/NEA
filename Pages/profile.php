@@ -3,7 +3,7 @@ $db = $_SESSION["database"];
 $user = unserialize($_SESSION["user"]);
 if (isset($_GET["searchUser"]) && !is_null($_GET["searchUser"]) && strlen($_GET["searchUser"]) > 0) {
     $getUser = $_GET["searchUser"];
-    $allUsernames = array_map("mapToFirstValue", $db->Select("Username", "User", "NOT Type = 0"));
+    $allUsernames = array_map("mapToFirstItem", $db->Select("Username", "User", "NOT Type = 0"));
     function searchForUsernames($value)
     {
         return strpos(strtolower($value), strtolower($_GET["searchUser"])) !== false;
