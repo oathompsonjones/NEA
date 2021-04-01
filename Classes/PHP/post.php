@@ -1,9 +1,4 @@
 <?php
-function mapLikes($value)
-{
-    return new User($value[0]);
-}
-
 class Post
 {
     private $id;
@@ -32,7 +27,7 @@ class Post
             case "likedBy":
                 $likes = $db->select("Username", "PostLike", "PostID = '$id'");
                 if (is_null($likes)) return NULL;
-                return array_map("mapLikes", $likes);
+                return array_map("mapToUserObject", array_map("mapToFirstItem", $likes));
             default:
                 throw new Exception("Property $name does not exist on type Post.");
         }

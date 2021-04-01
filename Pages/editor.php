@@ -38,11 +38,7 @@ if (isset($_POST["preMade"]) && $_POST["preMade"] !== "New") {
     $_SESSION["matrix"]["name"] = $animation->name;
     $_SESSION["matrix"]["id"] = $animation->id;
     $frames = is_null($animation->frames) ? [] : $animation->frames;
-    function mapFrames($value)
-    {
-        return $value->binary;
-    }
-    $_SESSION["editor"]["data"] = json_encode(array_map("mapFrames", $frames));
+    $_SESSION["editor"]["data"] = json_encode(array_map("mapToBinary", $frames));
 } else if (isset($_POST["setup"]) && isset($_POST["name"]) && !is_null($_POST["name"])) {
     $_SESSION["matrix"]["name"] = $_POST["name"];
     $_SESSION["matrix"]["id"] = $_POST["id"];

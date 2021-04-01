@@ -63,11 +63,7 @@ if (isset($_POST["makeAdmin"]) && !is_null($_POST["makeAdmin"])) {
 
 switch ($user->type) {
     case "admin":
-        function mapUsers($value)
-        {
-            return new User($value[0]);
-        }
-        $users = array_map("mapUsers", $db->select("Username", "User", NULL, "Username"));
+        $users = array_map("mapToUserObject", array_map("mapToFirstItem", $db->select("Username", "User", NULL, "Username")));
         echo <<<HTML
             <h1>Microcontroller Animations</h1>
             <h3>Users</h3>

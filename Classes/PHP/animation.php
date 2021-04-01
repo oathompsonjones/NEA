@@ -1,17 +1,4 @@
 <?php
-function mapFrame($value)
-{
-    return new Frame($value[0]);
-}
-function mapFramesToBinary($value)
-{
-    return $value->binary;
-}
-function mapBinaryToIntegers($value)
-{
-    return bindec($value);
-}
-
 class Animation
 {
     private $id;
@@ -40,7 +27,7 @@ class Animation
             case "frames":
                 $frames = $db->select("FrameID", "Frame", "AnimationID = '$id'", "FramePosition ASC");
                 if (is_null($frames)) return NULL;
-                return array_map("mapFrame", $frames);
+                return array_map("mapToFrameObject", array_map("mapToFirstItem", $frames));
             default:
                 throw new Exception("Property $name does not exist on type Animation.");
         }
@@ -58,17 +45,13 @@ class Animation
 
     public function getFramesAs32BitIntegersJSON()
     {
-        function mapBinary($val)
-        {
-            return "0b" . $val;
-        }
         function frameToBinaryArray($value)
         {
             $num = strlen($value->binary) + 32 - strlen($value->binary) % 32;
             $binary = str_pad($value->binary, $num, "0", STR_PAD_LEFT);
             $smallerBinaries = [];
             preg_match_all("/.{1,32}/", $binary, $smallerBinaries);
-            return array_map("mapBinary", $smallerBinaries[0]);
+            return array_map("mapToJsonBinary", $smallerBinaries[0]);
         }
         $frames = array_map("frameToBinaryArray", $this->frames);
         return str_replace('"', "", json_encode($frames, JSON_PRETTY_PRINT));
@@ -79,7 +62,7 @@ class Animation
         $frames = $this->frames;
         $ledWidth = 1024 / $this->width;
         $ledHeight = 1024 / $this->height;
-        $binary = array_map("mapFramesToBinary", $frames);
+        $binary = array_map("mapToBinary", $frames);
         $images = [];
         for ($i = 0; $i < count($binary); ++$i) {
             $image = imagecreatetruecolor(1024, 1024);
@@ -128,11 +111,6 @@ class Animation
             $images[$i] = base64_encode($contents);
         }
         return $images;
-    }
-
-    public function generateGIF()
-    {
-        $framePNGs = $this->generateFrameIcons();
     }
 
     // BBC Micro:Bit

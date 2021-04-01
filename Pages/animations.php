@@ -40,11 +40,7 @@ if (isset($_POST["unShareAnimation"]) && !is_null($_POST["unShareAnimation"])) {
 
 $animations = $user->animations;
 $posts = $user->posts;
-function postAnimationIDs($val)
-{
-    return $val->animationID;
-}
-$postedAnimationIDs = array_map("postAnimationIDs", $posts);
+$postedAnimationIDs = array_map("mapToAnimationID", $posts);
 
 echo <<<HTML
     <h1>My Animations</h1>

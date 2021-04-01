@@ -1,19 +1,4 @@
 <?php
-function mapAnimation($value)
-{
-    return new Animation($value[0]);
-}
-
-function mapPosts($value)
-{
-    return new Post($value[0]);
-}
-
-function mapUsers($value)
-{
-    return new User($value[0]);
-}
-
 class User
 {
     private $username;
@@ -45,19 +30,19 @@ class User
             case "following":
                 $users = $db->select("FollowingUsername", "UserFollowing", "Username = '$username'");
                 if (is_null($users)) return NULL;
-                return array_map("mapUsers", $users);
+                return array_map("mapToUserObject", array_map("mapToFirstItem", $users));
             case "followers":
                 $users = $db->select("Username", "UserFollowing", "FollowingUsername = '$username'");
                 if (is_null($users)) return NULL;
-                return array_map("mapUsers", $users);
+                return array_map("mapToUserObject", array_map("mapToFirstItem", $users));
             case "animations":
                 $animations = $db->select("AnimationID", "Animation", "Username = '$username'");
                 if (is_null($animations)) return NULL;
-                return array_map("mapAnimation", $animations);
+                return array_map("mapToAnimationObject", array_map("mapToFirstItem", $animations));
             case "posts":
                 $posts = $db->select("PostID", "Post", "Username = '$username'", "CreatedAt DESC");
                 if (is_null($posts)) return NULL;
-                return array_map("mapPosts", $posts);
+                return array_map("mapToPostObject", array_map("mapToFirstItem", $posts));
             default:
                 throw new Exception("Property $name does not exist on type User.");
         }
