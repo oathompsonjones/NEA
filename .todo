@@ -48,11 +48,13 @@
     - Feed - just DB retrieval and updating with some CSS                           √
     - Posting - just DB retrieval and updating with some CSS and some forms         √
     - Comments - just DB retrieval and updating with some CSS and some forms
-    - Likes - just DB retrieval and updating with some CSS and some forms
+    - Likes - just DB retrieval and updating with some CSS and some forms           √
     - Classes
         - Assignments
         - Chat Room
 - Other
     - Editor
         - Add more config options                                                   √
+    - UX
+        - Submit forms without refreshing page by using AJAX requests.
 - Update documentation (algorithms were way too over complicated)
