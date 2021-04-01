@@ -168,7 +168,7 @@ switch ($user->type) {
                     <h1>Microcontroller Animations</h1>
                     <div class="card-group" style="display: block; overflow: auto; height: 95%;">
         HTML;
-        for ($i = 0; $i < min(count($feedPosts), 100); ++$i) echo generatePost($feedPosts[$i]->id, $i);
+        for ($i = 0; $i < min(count($feedPosts), 100); ++$i) echo $feedPosts[$i]->render();
         echo <<<HTML
                     </div>
                 </div>

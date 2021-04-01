@@ -16,7 +16,6 @@ require_once "Classes/PHP/post.php";
 // Import useful functions.
 require_once "Utils/arrayMappers.php";
 require_once "Utils/arraySorters.php";
-require_once "Utils/componentGenerators.php";
 
 // Check which page the user is looking for.
 $page = explode("?", str_replace("/", "", $_SERVER["REQUEST_URI"]), 2)[0];

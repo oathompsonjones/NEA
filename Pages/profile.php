@@ -265,7 +265,7 @@ if (isset($_POST["editProfile"]) && $_POST["editProfile"] === "true" && $isLogge
         <div class="row row-cols-1 row-cols-md-5 g-4">
     HTML;
     for ($i = 0; $i < count($posts); ++$i) {
-        $html = generatePost($posts[$i]->id, $i);
+        $html = $posts[$i]->render();
         echo <<<HTML
             <div class="col">$html</div>
         HTML;
