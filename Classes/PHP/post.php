@@ -106,58 +106,58 @@ class Post
             </form>
         HTML;
         $commentButton = <<<HTML
-        <form method="post">
-            <input style="display: none;" type="text" name="commentOnPost" value="$postID">
-            <button type="submit" class="btn btn-secondary">Comment</button>
-        </form>
-    HTML;
+            <form method="post">
+                <input style="display: none;" type="text" name="commentOnPost" value="$postID">
+                <button type="submit" class="btn btn-secondary">Comment</button>
+            </form>
+        HTML;
         return <<<HTML
-        <div class="card text-white bg-dark">
-            <script>
-                const _$postID = (frames, fps) => {
-                    const img = document.getElementById("$postID-icon");
-                    const buttons = document.getElementById("$postID-buttons");
-                    let i = 0;
-                    buttons.style.display = "none";
-                    const interval = setInterval(() => img.src = frames[i++], 1000 / fps);
-                    setTimeout(() => {
-                        clearInterval(interval);
-                        img.src = frames[0];
-                        buttons.style.display = "block";
-                    }, 1000 * (frames.length + 1) / fps);
-                };
-            </script>
-            <div class="card-header">
-                $postUserUsername
-            </div>
-            <div id="$postID-card" class="icon">
-                <img src="$postAnimationFirstIcon" loading="lazy" class="card-img-top" id="$postID-icon">
-                <div id="$postID-buttons" class="buttons">
-                    <button class="btn btn-secondary btn-lg" data-toggle="tooltip" data-placement="top" title="Play the animation" onclick='_$postID($postAnimationIconsJSON, $postFps);'>▶</button>
+            <div class="card text-white bg-dark post">
+                <script>
+                    const _$postID = (frames, fps) => {
+                        const img = document.getElementById("$postID-icon");
+                        const buttons = document.getElementById("$postID-buttons");
+                        let i = 0;
+                        buttons.style.display = "none";
+                        const interval = setInterval(() => img.src = frames[i++], 1000 / fps);
+                        setTimeout(() => {
+                            clearInterval(interval);
+                            img.src = frames[0];
+                            buttons.style.display = "block";
+                        }, 1000 * (frames.length + 1) / fps);
+                    };
+                </script>
+                <div class="card-header">
+                    $postUserUsername
+                </div>
+                <div class="icon">
+                    <img src="$postAnimationFirstIcon" loading="lazy" class="card-img-top" id="$postID-icon">
+                    <div id="$postID-buttons" class="buttons">
+                        <button class="btn btn-secondary btn-lg" data-toggle="tooltip" data-placement="top" title="Play the animation" onclick='_$postID($postAnimationIconsJSON, $postFps);'>▶</button>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <h5 class="card-title">$postAnimationName</h5>
+                    <p>
+                        <strong>Type:</strong> $postAnimationType
+                        <br>
+                        <strong>Frames:</strong> $postAnimationIconCount
+                        <br>
+                        <strong>FPS:</strong> $postFps
+                        <br>
+                        <strong>Dimensions:</strong> $postAnimationWidth x $postAnimationHeight
+                        <br>
+                        <strong>Likes:</strong> $postLikedByCount
+                    </p>
+                    <div style="display: flex;">
+                        $likeButton
+                        $commentButton
+                    </div>
+                </div>
+                <div class="card-footer text-muted">
+                    <script>document.write(new Date($postCreatedAt * 1000).toGMTString());</script>
                 </div>
             </div>
-            <div class="card-body">
-                <h5 class="card-title">$postAnimationName</h5>
-                <p>
-                    <strong>Type:</strong> $postAnimationType
-                    <br>
-                    <strong>Frames:</strong> $postAnimationIconCount
-                    <br>
-                    <strong>FPS:</strong> $postFps
-                    <br>
-                    <strong>Dimensions:</strong> $postAnimationWidth x $postAnimationHeight
-                    <br>
-                    <strong>Likes:</strong> $postLikedByCount
-                </p>
-                <div style="display: flex;">
-                    $likeButton
-                    $commentButton
-                </div>
-            </div>
-            <div class="card-footer text-muted">
-                <script>document.write(new Date($postCreatedAt * 1000).toGMTString());</script>
-            </div>
-        </div>
-    HTML;
+        HTML;
     }
 }
