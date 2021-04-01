@@ -4,4 +4,3 @@ echo <<<HTML
         window.location.assign("/");
     </script>
 HTML;
-?>
