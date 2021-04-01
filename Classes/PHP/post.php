@@ -45,4 +45,30 @@ class Post
         $db->delete("PostLike", "PostID = '$this->id'");
         $db->delete("Comment", "PostID = '$this->id'");
     }
+
+    public function like($username)
+    {
+        $db = $_SESSION["database"];
+        $db->insert("PostLike", "PostID, Username", "'$this->id', '$username'");
+    }
+
+    public function unlike($username)
+    {
+        $db = $_SESSION["database"];
+        $db->delete("PostLike", "PostID = '$this->id' AND Username = '$username'");
+    }
+
+    public function comment($username, $content)
+    {
+        $db = $_SESSION["database"];
+        $timestamp = time();
+        $id = md5("$timestamp-$this->id");
+        $db->insert("Comment", "CommentID, PostID, Username, Content, CreatedAt", "'$id', '$this->id', '$username', '$content', $timestamp");
+    }
+
+    public function uncomment($id)
+    {
+        $db = $_SESSION["database"];
+        $db->delete("Comment", "CommentID = '$id'");
+    }
 }
