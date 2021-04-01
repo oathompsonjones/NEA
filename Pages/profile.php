@@ -1,17 +1,9 @@
 <?php
-function mapIconsSrc($value)
-{
-    return "data:image/png;base64,$value";
-}
-function flattenUsernamesArray($value)
-{
-    return $value[0];
-}
 $db = $_SESSION["database"];
 $user = unserialize($_SESSION["user"]);
 if (isset($_GET["searchUser"]) && !is_null($_GET["searchUser"]) && strlen($_GET["searchUser"]) > 0) {
     $getUser = $_GET["searchUser"];
-    $allUsernames = array_map("flattenUsernamesArray", $db->Select("Username", "User", "NOT Type = 0"));
+    $allUsernames = array_map("mapToFirstValue", $db->Select("Username", "User", "NOT Type = 0"));
     function searchForUsernames($value)
     {
         return strpos(strtolower($value), strtolower($_GET["searchUser"])) !== false;
@@ -58,8 +50,7 @@ if ($isLoggedInUser && (isset($_GET["user"]) || isset($_GET["searchUser"])) || i
     <script>window.location.replace("/profile");</script>
 HTML;
 
-$saveProfile = isset($_POST["saveProfile"]) && $_POST["saveProfile"] === "true";
-if ($saveProfile) {
+if (isset($_POST["saveProfile"]) && $_POST["saveProfile"] === "true") {
     $bio = isset($_POST["Bio"]) ? $_POST["Bio"] : $bio;
     $oldPasswordHashed = isset($_POST["OldPassword"]) && strlen($_POST["OldPassword"]) > 0 ? md5($_POST["OldPassword"]) : NULL;
     $newPasswordHashed = isset($_POST["NewPassword"]) && strlen($_POST["NewPassword"]) > 0 ? md5($_POST["NewPassword"]) : NULL;
@@ -93,24 +84,17 @@ if ($saveProfile) {
     $db->update("User", ["PasswordHash", "Bio"], [$newHash, $bio], "Username = '$username'");
 }
 
-$followUser = isset($_POST["followUser"]) && $_POST["followUser"] === "true";
-if ($followUser) {
+if (isset($_POST["followUser"]) && $_POST["followUser"] === "true") {
     $loggedInUser->followUser($user->username);
     require "Include/clearPost.inc";
 }
 
-$unFollowUser = isset($_POST["unFollowUser"]) && $_POST["unFollowUser"] === "true";
-if ($unFollowUser) {
+if (isset($_POST["unFollowUser"]) && $_POST["unFollowUser"] === "true") {
     $loggedInUser->unfollowUser($user->username);
     require "Include/clearPost.inc";
 }
 
-$editProfile = isset($_POST["editProfile"]) && $_POST["editProfile"] === "true" && $isLoggedInUser;
-$deleteProfile = isset($_POST["deleteProfile"]) && $_POST["deleteProfile"] === "true" && $isLoggedInUser;
-$deleteProfileConfirm = isset($_POST["deleteProfileConfirm"]) && $_POST["deleteProfileConfirm"] === "true" && $isLoggedInUser;
-$displayFollowers = isset($_POST["displayFollowers"]) && $_POST["displayFollowers"] === "true";
-$displayFollowing = isset($_POST["displayFollowing"]) && $_POST["displayFollowing"] === "true";
-if ($editProfile) {
+if (isset($_POST["editProfile"]) && $_POST["editProfile"] === "true" && $isLoggedInUser) {
     echo <<<HTML
         <form method="post">
             <div class="form-floating">
@@ -153,8 +137,8 @@ if ($editProfile) {
             <button class="btn btn-danger btn-sm" type="submit">Delete Account</button>
         </form>
     HTML;
-} else if ($deleteProfile) {
-    if ($deleteProfileConfirm) {
+} else if (isset($_POST["deleteProfile"]) && $_POST["deleteProfile"] === "true" && $isLoggedInUser) {
+    if (isset($_POST["deleteProfileConfirm"]) && $_POST["deleteProfileConfirm"] === "true" && $isLoggedInUser) {
         $user->delete();
         require_once "Pages/logout.php";
     } else {
@@ -172,7 +156,7 @@ if ($editProfile) {
             </div>
         HTML;
     }
-} else if ($displayFollowers) {
+} else if (isset($_POST["displayFollowers"]) && $_POST["displayFollowers"] === "true") {
     $followers = is_null($user->followers) ? [] : $user->followers;
     if (count($followers) > 0) echo <<<HTML
         <h2><a href="$profile?user=r->username">$user->username</a>'s followers...</h2>
@@ -196,7 +180,7 @@ if ($editProfile) {
             <br>
         HTML;
     }
-} else if ($displayFollowing) {
+} else if (isset($_POST["displayFollowing"]) && $_POST["displayFollowing"] === "true") {
     $following = is_null($user->following) ? [] : $user->following;
     if (count($following) > 0) echo <<<HTML
         <h2><a href="profile?user=$user->username">$user->username</a> follows...</h2>
@@ -223,11 +207,7 @@ if ($editProfile) {
 } else {
     $followButton = "";
     if (!$isLoggedInUser) {
-        function mapUsernames($value)
-        {
-            return $value->username;
-        }
-        $isFollowing = in_array($loggedInUser->username, array_map("mapUsernames", $user->followers));
+        $isFollowing = in_array($loggedInUser->username, array_map("mapToUsernames", $user->followers));
         if ($isFollowing) {
             $followButton = <<<HTML
                 <form method="post" style="padding-left: 10px;">
@@ -283,53 +263,11 @@ if ($editProfile) {
     HTML;
     echo <<<HTML
         <div class="row row-cols-1 row-cols-md-5 g-4">
-            <script>
-                const playback = (index, frames, fps) => {
-                    const img = document.getElementById(index.toString() + "-icon");
-                    const buttons = document.getElementById(index.toString() + "-buttons");
-                    let i = 0;
-                    buttons.style.display = "none";
-                    const interval = setInterval(() => img.src = frames[i++], 1000 / fps);
-                    setTimeout(() => {
-                        clearInterval(interval);
-                        img.src = frames[0];
-                        buttons.style.display = "block";
-                    }, 1000 * (frames.length + 1) / fps);
-                };
-            </script>
     HTML;
     for ($i = 0; $i < count($posts); ++$i) {
-        $post = $posts[$i];
-        $name = $post->animation->name;
-        $type = $post->animation->typeString;
-        $timestamp = $post->createdAt;
-        $fps = $post->fps;
-        $title = !is_null($name)
-            ? <<<HTML
-                $name<br><span class='badge rounded-pill bg-secondary'>$type - $fps FPS</span>
-            HTML : "";
-        $icons = !is_null($post)
-            ? array_map("mapIconsSrc", $post->animation->generateFrameIcons())
-            : [];
-        $jsonIcons = json_encode($icons);
-        $firstIcon = $icons[0];
+        $html = generatePost($posts[$i]->id, $i);
         echo <<<HTML
-            <div class="col">
-                <div class="card text-white bg-dark">
-                    <div id="$i-card" class="icon">
-                        <img src="$firstIcon" class="card-img-top" id="$i-icon">
-                        <div id="$i-buttons" class="buttons">
-                            <button class="btn btn-secondary btn-lg" data-toggle="tooltip" data-placement="top" title="Play the animation" onclick='playback($i, $jsonIcons, $fps);'>Play</button>
-                        </div>
-                    </div>
-                    <div class="card-body">
-                        <h5 class="card-title">$title</h5>
-                    </div>
-                    <div class="card-footer text-muted">
-                        <script>document.write(new Date($timestamp * 1000).toGMTString());</script>
-                    </div>
-                </div>
-            </div>
+            <div class="col">$html</div>
         HTML;
     }
     echo <<<HTML

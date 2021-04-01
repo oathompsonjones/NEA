@@ -1,9 +1,4 @@
 <?php
-function mapIconsSrc($value)
-{
-    return "data:image/png;base64,$value";
-}
-
 $db = $_SESSION["database"];
 $user = unserialize($_SESSION["user"]);
 
@@ -77,7 +72,7 @@ for ($i = 0; $i < count($animations); ++$i) {
     $name = $animation->name;
     $frameCount = count($animation->frames);
     $type = $animation->typeString;
-    $icons = array_map("mapIconsSrc", $animation->generateFrameIcons());
+    $icons = array_map("mapBase64ToImageSrc", $animation->generateFrameIcons());
     $jsonIcons = json_encode($icons);
     $firstIcon = $icons[0];
 

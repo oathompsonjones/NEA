@@ -1,8 +1,4 @@
 <?php
-function flattenIDs($value)
-{
-    return $value[0];
-}
 if (isset($_POST["createNew"]) && $_POST["createNew"] === "true") {
     unset($_SESSION["matrix"]);
     unset($_SESSION["editor"]);
@@ -85,13 +81,14 @@ if (isset($_POST["preMade"]) && $_POST["preMade"] !== "New") {
     }
 }
 
-if (
-    !isset($_SESSION["matrix"]["width"])
-    || !isset($_SESSION["matrix"]["height"])
-    || !isset($_SESSION["matrix"]["type"])
-    || !isset($_SESSION["matrix"]["name"])
-    || !isset($_SESSION["matrix"]["id"])
-) {
+// Check for the required variables that allow you to edit an animation.
+$widthSet = isset($_SESSION["matrix"]["width"]);
+$heightSet = isset($_SESSION["matrix"]["height"]);
+$typeSet = isset($_SESSION["matrix"]["type"]);
+$nameSet = isset($_SESSION["matrix"]["name"]);
+$idSet = isset($_SESSION["matrix"]["id"]);
+// If any required variables aren't set, render the forms to set them.
+if (!$widthSet || !$heightSet || !$typeSet || !$nameSet || !$idSet) {
     $timestamp = time();
     echo <<<HTML
         <h1>Animation Settings</h1>
@@ -170,7 +167,9 @@ if (
             });
         </script>
     HTML;
-} else {
+}
+// Once all variables are set, render the editor.
+else {
     $type = $_SESSION["matrix"]["type"];
     $width = $_SESSION["matrix"]["width"];
     $height = $_SESSION["matrix"]["height"];

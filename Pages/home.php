@@ -153,7 +153,6 @@ switch ($user->type) {
         break;
     case "teacher":
     case "student":
-        $user = unserialize($_SESSION["user"]);
         $feedPosts = [];
         $feedUsers = $user->following;
         array_push($feedUsers, $user);
@@ -162,70 +161,14 @@ switch ($user->type) {
             $thisPosts = $thisUser->posts;
             for ($j = 0; $j < count($thisPosts); ++$j) array_push($feedPosts, $thisPosts[$j]);
         }
-        function sortPostsByTimestamp($a, $b)
-        {
-            return intval($b->createdAt) - intval($a->createdAt);
-        }
-        function mapIconsSrc($value)
-        {
-            return "data:image/png;base64,$value";
-        }
-        usort($feedPosts, "sortPostsByTimestamp");
+        usort($feedPosts, "sortByCreatedAt");
         echo <<<HTML
             <div style="display: flex; height: 100%;">
                 <div style="flex: 40%; max-width: 40%; word-wrap: break-word;">
                     <h1>Microcontroller Animations</h1>
-                    <script>
-                        const playback = (index, frames, fps) => {
-                            const img = document.getElementById(index.toString() + "-icon");
-                            const buttons = document.getElementById(index.toString() + "-buttons");
-                            let i = 0;
-                            buttons.style.display = "none";
-                            const interval = setInterval(() => img.src = frames[i++], 1000 / fps);
-                            setTimeout(() => {
-                                clearInterval(interval);
-                                img.src = frames[0];
-                                buttons.style.display = "block";
-                            }, 1000 * (frames.length + 1) / fps);
-                        };
-                    </script>
                     <div class="card-group" style="display: block; overflow: auto; height: 95%;">
         HTML;
-        for ($i = 0; $i < min(count($feedPosts), 100); ++$i) {
-            $post = $feedPosts[$i];
-            $username = $post->user->username;
-            $name = $post->animation->name;
-            $type = $post->animation->typeString;
-            $timestamp = $post->createdAt;
-            $fps = $post->fps;
-            $icons = !is_null($post)
-                ? array_map("mapIconsSrc", $post->animation->generateFrameIcons())
-                : [];
-            $iconCount = count($icons);
-            $jsonIcons = json_encode($icons);
-            $firstIcon = $icons[0];
-            echo <<<HTML
-                <div class="card text-white bg-dark">
-                    <div class="card-header">
-                        $username
-                    </div>
-                    <div id="$i-card" class="icon">
-                        <img src="$firstIcon" class="card-img-top" id="$i-icon">
-                        <div id="$i-buttons" class="buttons">
-                            <button class="btn btn-secondary btn-lg" data-toggle="tooltip" data-placement="top" title="Play the animation" onclick='playback($i, $jsonIcons, $fps);'>Play</button>
-                        </div>
-                    </div>
-                    <div class="card-body">
-                        <h5 class="card-title">$name</h5>
-                        <p>$type - $iconCount Frames - $fps FPS</p>
-                    </div>
-                    <div class="card-footer text-muted">
-                        <script>document.write(new Date($timestamp * 1000).toGMTString());</script>
-                    </div>
-                </div>
-                <hr>
-            HTML;
-        }
+        for ($i = 0; $i < min(count($feedPosts), 100); ++$i) echo generatePost($feedPosts[$i]->id, $i);
         echo <<<HTML
                     </div>
                 </div>

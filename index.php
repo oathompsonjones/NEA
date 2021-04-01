@@ -2,15 +2,21 @@
 // Start the session.
 session_start();
 
+// Create instance of database class and store in session.
+require_once "Database/database.php";
+$_SESSION["database"] = new Database();
+$db = $_SESSION["database"];
 
 // Import all classes.
 require_once "Classes/PHP/user.php";
 require_once "Classes/PHP/animation.php";
 require_once "Classes/PHP/frame.php";
 require_once "Classes/PHP/post.php";
-require_once "Database/database.php";
-// Create new instance of the database handling class.
-$_SESSION["database"] = new Database();
+
+// Import useful functions.
+require_once "Utils/arrayMappers.php";
+require_once "Utils/arraySorters.php";
+require_once "Utils/componentGenerators.php";
 
 // Check which page the user is looking for.
 $page = explode("?", str_replace("/", "", $_SERVER["REQUEST_URI"]), 2)[0];
