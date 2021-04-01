@@ -101,10 +101,10 @@ switch ($user->type) {
             HTML;
             if ($username === $user->username) {
                 echo <<<HTML
-                        <td>
-                            <button class="btn btn-sm btn-danger disabled">Delete</button>
-                        </td>
-                    HTML;
+                    <td>
+                        <button class="btn btn-sm btn-danger disabled">Delete</button>
+                    </td>
+                HTML;
             } else {
                 echo <<<HTML
                     <td>
@@ -125,10 +125,10 @@ switch ($user->type) {
             HTML;
             if ($type === "admin") {
                 echo <<<HTML
-                        <td>
-                            <button class="btn btn-sm btn-dark disabled">Make Admin</button>
-                        </td>
-                    HTML;
+                    <td>
+                        <button class="btn btn-sm btn-dark disabled">Make Admin</button>
+                    </td>
+                HTML;
             } else {
                 echo <<<HTML
                     <td>
