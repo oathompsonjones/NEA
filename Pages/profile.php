@@ -263,6 +263,7 @@ if (isset($_POST["editProfile"]) && $_POST["editProfile"] === "true" && $isLogge
     HTML;
     echo <<<HTML
         <div class="row row-cols-1 row-cols-md-5 g-4">
+            <style>.post { display: none; }</style>
     HTML;
     for ($i = 0; $i < count($posts); ++$i) {
         $html = $posts[$i]->render();
@@ -271,6 +272,7 @@ if (isset($_POST["editProfile"]) && $_POST["editProfile"] === "true" && $isLogge
         HTML;
     }
     echo <<<HTML
+            <style>.post { display: block; }</style>
         </div>
     HTML;
 }

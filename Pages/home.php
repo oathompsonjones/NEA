@@ -163,9 +163,11 @@ switch ($user->type) {
                 <div style="flex: 40%; max-width: 40%; word-wrap: break-word;">
                     <h1>Microcontroller Animations</h1>
                     <div class="card-group" style="display: block; overflow: auto; height: 95%;">
+                        <style>.post { display: none; }</style>
         HTML;
         for ($i = 0; $i < min(count($feedPosts), 100); ++$i) echo $feedPosts[$i]->render();
         echo <<<HTML
+                        <style>.post { display: block; }</style>
                     </div>
                 </div>
                 <div style="flex: 60%; max-width: 60%; word-wrap: break-word;">
