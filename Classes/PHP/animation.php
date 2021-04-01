@@ -43,6 +43,14 @@ class Animation
         $db->delete("AssignmentWork", "AnimationID = '$this->id'");
     }
 
+    public function share($username, $fps)
+    {
+        $db = $_SESSION["database"];
+        $timestamp = time();
+        $id = md5($username . $timestamp);
+        $db->insert("Post", "PostID, Username, AnimationID, CreatedAt, FPS", "'$id', '$username', '$this->id', '$timestamp', $fps");
+    }
+
     public function getFramesAs32BitIntegersJSON()
     {
         function frameToBinaryArray($value)
