@@ -51,9 +51,13 @@ abstract class AnimationEditor {
         if (val === false) this.shiftedLEDs = [];
         this.displayShiftState();
     }
+    public get typeInt(): number {
+        if (this instanceof RGBAnimationEditor) return 2;
+        if (this instanceof VariableBrightnessAnimationEditor) return 1;
+        return 0;
+    }
 
     public abstract defaultOnColour: string;
-
     public abstract get onColour(): string;
 
     protected constructor(protected matrixWidth: number, protected matrixHeight: number, data: string[], public LEDBitLength: number) {
@@ -293,18 +297,14 @@ abstract class AnimationEditor {
     }
 
     public save(): void {
-        // @ts-ignore
-        const width = SESSION.matrix.width;
-        // @ts-ignore
-        const height = SESSION.matrix.height;
-        // @ts-ignore
-        const type = SESSION.matrix.type;
+        const width = this.matrixWidth;
+        const height = this.matrixHeight;
+        const type = this.typeInt;
+        const data = JSON.stringify(this.frames);
         // @ts-ignore
         const id = SESSION.matrix.id;
         // @ts-ignore
         const name = SESSION.matrix.name;
-        // @ts-ignore
-        const data = SESSION.editor.data;
         // @ts-ignore
         const username = SESSION.username;
         

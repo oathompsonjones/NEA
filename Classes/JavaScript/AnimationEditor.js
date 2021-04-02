@@ -51,6 +51,13 @@ class AnimationEditor {
             this.shiftedLEDs = [];
         this.displayShiftState();
     }
+    get typeInt() {
+        if (this instanceof RGBAnimationEditor)
+            return 2;
+        if (this instanceof VariableBrightnessAnimationEditor)
+            return 1;
+        return 0;
+    }
     defaultOnColour;
     constructor(matrixWidth, matrixHeight, data, LEDBitLength) {
         this.matrixWidth = matrixWidth;
@@ -272,12 +279,12 @@ class AnimationEditor {
         this.binaryString = this.convertMatrixToString(this.matrix.rotate(angle));
     }
     save() {
-        const width = SESSION.matrix.width;
-        const height = SESSION.matrix.height;
-        const type = SESSION.matrix.type;
+        const width = this.matrixWidth;
+        const height = this.matrixHeight;
+        const type = this.typeInt;
+        const data = JSON.stringify(this.frames);
         const id = SESSION.matrix.id;
         const name = SESSION.matrix.name;
-        const data = SESSION.editor.data;
         const username = SESSION.username;
         $.post("Utils/Forms/saveAnimation", { width, height, type, id, name, data, username }, () => document.getElementById("saveAlert").innerHTML = `
             <div class="alert alert-success alert-dismissible fade show" role="alert">
