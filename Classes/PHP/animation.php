@@ -37,6 +37,7 @@ class Animation
 
     public function render()
     {
+        $db = $_SESSION["database"];
         $id = $this->id;
         $name = $this->name;
         $icons = array_map("mapBase64ToImageSrc", $this->generateFrameIcons());
@@ -74,6 +75,7 @@ class Animation
             : <<<HTML
                 <button class="btn btn-dark btn-sm" type="button" onclick="share_$id();" style="width: 100%;">Share</button>
             HTML);
+        $fps = $postExists ? (new Post($db->select("PostID", "Post", "AnimationID = '$id'")[0][0]))->fps : 1;
         return <<<HTML
             <div class="col" id="$id-container">
                 <script>
@@ -114,7 +116,7 @@ class Animation
                                 $shareButton
                             </div>
                             <div class="form-floating" style="width: 50%;">
-                                <input type="number" class="form-control bg-dark text-light border-dark" id="$id-inputFPS" name="fps" placeholder="FPS" min=1 max=60 value=1 required>
+                                <input type="number" class="form-control bg-dark text-light border-dark" id="$id-inputFPS" name="fps" placeholder="FPS" min=1 max=60 value=$fps required>
                                 <label for="$id-inputFPS" class="form-label">FPS</label>
                             </div>
                         </div>
