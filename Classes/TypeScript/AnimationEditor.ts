@@ -347,32 +347,36 @@ abstract class AnimationEditor {
             <br>
             <div class="input-group">
         `;
-        if (this instanceof MonochromaticAnimationEditor) {
-            html += /*html*/`
-                <div class="form-floating bg-dark text-white border-dark">
-                    <input type="number" class="form-control bg-dark text-white border-dark" id="fps" name="fps" placeholder="FPS" min=1 max=60 value=1>
-                    <label for="fps">FPS</label>
-                </div>
-            `;
-        } else if (this instanceof VariableBrightnessAnimationEditor) {
-            html += /*html*/`
-                <div class="form-floating bg-dark text-white border-dark">
-                    <input type="number" class="form-control bg-dark text-white border-dark" id="fps" name="fps" placeholder="FPS" min=1 max=60 value=1>
-                    <label for="fps">FPS</label>
-                </div>
-                <div class="form-floating bg-dark text-white border-dark" style="width: 7%">
-                    <input type="number" class="form-control bg-dark text-white border-dark" id="colourInput" name="colour" placeholder="Brightness" min=1 max=255 value=${this.defaultOnColour}>
-                    <label for="colourInput">Brightness</label>
-                </div>
-            `;
-        } else if (this instanceof RGBAnimationEditor) {
-            html += /*html*/`
-                <div class="form-floating bg-dark text-white border-dark">
-                    <input type="number" class="form-control bg-dark text-white border-dark" id="fps" name="fps" placeholder="FPS" min=1 max=60 value=1>
-                    <label for="fps">FPS</label>
-                </div>
-                <input id="colourInput" class="form-control form-control-color bg-dark border-dark" type="color" name="colour" value="${this.defaultOnColour}">
-            `;
+        switch (this.typeInt) {
+            case 0:
+                html += /*html*/`
+                    <div class="form-floating bg-dark text-white border-dark">
+                        <input type="number" class="form-control bg-dark text-white border-dark" id="fps" name="fps" placeholder="FPS" min=1 max=60 value=1>
+                        <label for="fps">FPS</label>
+                    </div>
+                `;
+                break; 
+            case 1:
+                html += /*html*/`
+                    <div class="form-floating bg-dark text-white border-dark">
+                        <input type="number" class="form-control bg-dark text-white border-dark" id="fps" name="fps" placeholder="FPS" min=1 max=60 value=1>
+                        <label for="fps">FPS</label>
+                    </div>
+                    <div class="form-floating bg-dark text-white border-dark" style="width: 7%">
+                        <input type="number" class="form-control bg-dark text-white border-dark" id="colourInput" name="colour" placeholder="Brightness" min=1 max=255 value=${this.defaultOnColour}>
+                        <label for="colourInput">Brightness</label>
+                    </div>
+                `;
+                break;
+            case 2: 
+                html += /*html*/`
+                    <div class="form-floating bg-dark text-white border-dark">
+                        <input type="number" class="form-control bg-dark text-white border-dark" id="fps" name="fps" placeholder="FPS" min=1 max=60 value=1>
+                        <label for="fps">FPS</label>
+                    </div>
+                    <input id="colourInput" class="form-control form-control-color bg-dark border-dark" type="color" name="colour" value="${this.defaultOnColour}">
+                `;
+                break;
         }
         html += /*html*/`
             </div>
