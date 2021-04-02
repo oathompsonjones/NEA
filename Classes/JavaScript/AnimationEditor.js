@@ -126,7 +126,7 @@ class AnimationEditor {
     displayIcons() {
         const frameIconsDiv = document.getElementById("frameIcons");
         frameIconsDiv.innerHTML = this.makeFrameIcons().map((icon, i) => `
-            <div class="icon">
+            <div class="icon firstIcon">
                 <img src="${icon.image}">
                 <div class="buttons">
                     <button class="btn btn-secondary btn-sm" data-toggle="tooltip" data-placement="top" title="Copy this frame to the editor" onclick="editor.onFrameCopy('${icon.binary}')">Copy</button><br>
