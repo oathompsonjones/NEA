@@ -272,16 +272,19 @@ class AnimationEditor {
         this.binaryString = this.convertMatrixToString(this.matrix.rotate(angle));
     }
     save() {
-        const form = document.createElement("form");
-        form.style.display = "none";
-        form.setAttribute("method", "post");
-        const input = document.createElement("input");
-        input.setAttribute("type", "text");
-        input.setAttribute("name", "saveToDB");
-        input.setAttribute("value", "true");
-        form.appendChild(input);
-        document.getElementsByTagName("body")[0].appendChild(form);
-        form.submit();
+        const width = SESSION.matrix.width;
+        const height = SESSION.matrix.height;
+        const type = SESSION.matrix.type;
+        const id = SESSION.matrix.id;
+        const name = SESSION.matrix.name;
+        const data = SESSION.editor.data;
+        const username = SESSION.username;
+        $.post("Utils/Forms/saveAnimation", { width, height, type, id, name, data, username }, () => document.getElementById("saveAlert").innerHTML = `
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                Animation Saved!
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        `);
     }
     setControls(fps, colour) {
         const controlsDiv = document.getElementById("controls");

@@ -293,16 +293,28 @@ abstract class AnimationEditor {
     }
 
     public save(): void {
-        const form: HTMLFormElement = document.createElement("form");
-        form.style.display = "none";
-        form.setAttribute("method", "post");
-        const input: HTMLInputElement = document.createElement("input");
-        input.setAttribute("type", "text");
-        input.setAttribute("name", "saveToDB");
-        input.setAttribute("value", "true");
-        form.appendChild(input);
-        document.getElementsByTagName("body")[0].appendChild(form);
-        form.submit();
+        // @ts-ignore
+        const width = SESSION.matrix.width;
+        // @ts-ignore
+        const height = SESSION.matrix.height;
+        // @ts-ignore
+        const type = SESSION.matrix.type;
+        // @ts-ignore
+        const id = SESSION.matrix.id;
+        // @ts-ignore
+        const name = SESSION.matrix.name;
+        // @ts-ignore
+        const data = SESSION.editor.data;
+        // @ts-ignore
+        const username = SESSION.username;
+        
+        // @ts-ignore
+        $.post("Utils/Forms/saveAnimation", { width, height, type, id, name, data, username }, () => document.getElementById("saveAlert").innerHTML = `
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                Animation Saved!
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        `);
     }
 
     public setControls(fps: number, colour: string | null): void {

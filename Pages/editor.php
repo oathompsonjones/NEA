@@ -4,28 +4,6 @@ if (isset($_POST["createNew"]) && $_POST["createNew"] === "true") {
     unset($_SESSION["editor"]);
 }
 
-if (isset($_POST["saveToDB"]) && $_POST["saveToDB"] === "true") {
-    // Get session variables.
-    $db = $_SESSION["database"];
-    $width = $_SESSION["matrix"]["width"];
-    $height = $_SESSION["matrix"]["height"];
-    $type = $_SESSION["matrix"]["type"];
-    $id = $_SESSION["matrix"]["id"];
-    $name = $_SESSION["matrix"]["name"];
-    $frames = isset($_SESSION["editor"]["data"]) && !is_null($_SESSION["editor"]["data"]) ? json_decode($_SESSION["editor"]["data"]) : [];
-    $username = unserialize($_SESSION["user"])->username;
-    // Get a list of the currently saved animations.
-    $currentIDs = array_map("mapToFirstItem", $db->select("AnimationID", "Animation"));
-    // Check if the current animation already exists in the database.
-    $animationExists = $currentIDs ? in_array($id, $currentIDs) : FALSE;
-    // If it does, delete the saved frames.
-    if ($animationExists) $db->delete("Frame", "AnimationID = '$id'");
-    // If it doesn't add it.
-    else $db->insert("Animation", "AnimationID, Name, Username, Width, Height, Type", "'$id', '$name', '$username', $width, $height, $type");
-    // Get all of the current frames.
-    for ($i = 0; $i < count($frames); ++$i) $db->insert("Frame", "FrameID, AnimationID, FramePosition, BinaryString", "'$id$i', '$id', $i, '$frames[$i]'");
-}
-
 if (isset($_POST["preMade"]) && $_POST["preMade"] !== "New") {
     function findAnimation($value)
     {
@@ -231,23 +209,16 @@ else {
         </style>
     HTML;
 
-    // Alert box
-    if (isset($_POST["saveToDB"]) && $_POST["saveToDB"] === "true") {
-        echo <<<HTML
-            <div class="alert alert-success alert-dismissible fade show" role="alert">
-                Animation Saved!
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>
-        HTML;
-    }
-
     // JS
+    $jsonSession = json_encode($_SESSION);
+    $username = unserialize($_SESSION["user"])->username;
     echo <<<HTML
         <script>
             const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
             const tooltipList = tooltipTriggerList.map((tooltipTriggerEl) => new bootstrap.Tooltip(tooltipTriggerEl));
         </script>
         <script src="Classes/JavaScript/Matrix.js"></script>
+        <script>const SESSION = { ...$jsonSession, username: '$username' };</script>
         <script src="Classes/JavaScript/AnimationEditor.js"></script>
         <script>
             const editor = createAnimationEditor($type, $width, $height, $data);
@@ -257,6 +228,7 @@ else {
     HTML;
 
     echo <<<HTML
+        <div id="saveAlert"></div>
         <div id="playback"><img></div>
         <div class="grid">
     HTML;
