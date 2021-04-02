@@ -41,11 +41,11 @@ a {
 .icon .buttons button {
     padding: 2px;
 }
-.icon:hover img {
+.firstIcon:hover img {
     background-color: rgba(0, 0, 0, 0.5);
     filter: brightness(50%);
 }
-.icon:hover .buttons {
+.firstIcon:hover .buttons {
     opacity: 1;
 }
 

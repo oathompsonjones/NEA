@@ -128,21 +128,21 @@ class Post
                 <script>
                     const _$postID = (frames, fps) => {
                         const img = document.getElementById("$postID-icon");
-                        const buttons = document.getElementById("$postID-buttons");
+                        const div = document.getElementById("$postID-div");
                         let i = 0;
-                        buttons.style.display = "none";
+                        div.className = "icon";
                         const interval = setInterval(() => img.src = frames[i++], 1000 / fps);
                         setTimeout(() => {
                             clearInterval(interval);
                             img.src = frames[0];
-                            buttons.style.display = "block";
+                            div.className = "icon firstIcon";
                         }, 1000 * (frames.length + 1) / fps);
                     };
                 </script>
                 <div class="card-header">
                     $postUserUsername
                 </div>
-                <div class="icon">
+                <div class="icon firstIcon" id="$postID-div">
                     <img src="$postAnimationFirstIcon" loading="lazy" class="card-img-top" id="$postID-icon">
                     <div id="$postID-buttons" class="buttons">
                         <button class="btn btn-secondary btn-lg" data-toggle="tooltip" data-placement="top" title="Play the animation" onclick='_$postID($postAnimationIconsJSON, $postFps);'>▶</button>
