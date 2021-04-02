@@ -93,24 +93,35 @@ class Post
         $postUser = $this->user;
         $postUserUsername = $postUser->username;
         // Generate HTML.
-        $likeButton = $postLikedByUser
+        $likeButton = <<<HTML
+            <script>
+                const like_$postID = () => {
+                    const postID = "$postID";
+                    const username = "$user->username";
+                    $.post("Utils/Forms/likePost.php", { postID, username }, () => {
+                        document.getElementById("$postID-likeButton").innerHTML = `<button type="button" onclick="unLike_$postID()" class="btn btn-danger">❤</button>`
+                        document.getElementById("$postID-likeCount").innerHTML = "<strong>Likes:</strong> " + (parseInt(document.getElementById("$postID-likeCount").innerHTML.split(" ")[1]) + 1).toString();
+                    });
+                };
+                const unLike_$postID = () => {
+                    const postID = "$postID";
+                    const username = "$user->username";
+                    $.post("Utils/Forms/unLikePost.php", { postID, username }, () => {
+                        document.getElementById("$postID-likeButton").innerHTML = `<button type="button" onclick="like_$postID()" class="btn btn-secondary">❤</button>`
+                        document.getElementById("$postID-likeCount").innerHTML = "<strong>Likes:</strong> " + (parseInt(document.getElementById("$postID-likeCount").innerHTML.split(" ")[1]) - 1).toString();
+                    });
+                };
+            </script>
+        HTML;
+        $likeButton = $likeButton . ($postLikedByUser
             ? <<<HTML
-                <form method="post">
-                    <input style="display: none;" type="text" name="unLikePost" value="$postID">
-                    <button type="submit" class="btn btn-danger">❤</button>
-                </form>
+                <button type="button" onclick="unLike_$postID()" class="btn btn-danger">❤</button>
             HTML
             : <<<HTML
-                <form method="post">
-                    <input style="display: none;" type="text" name="likePost" value="$postID">
-                    <button type="submit" class="btn btn-secondary">❤</button>
-                </form>
-            HTML;
+                <button type="button" onclick="like_$postID()" class="btn btn-secondary">❤</button>
+            HTML);
         $commentButton = <<<HTML
-            <form method="post">
-                <input style="display: none;" type="text" name="commentOnPost" value="$postID">
-                <button type="submit" class="btn btn-secondary">Comment</button>
-            </form>
+            <button type="button" class="btn btn-secondary">Comment</button>
         HTML;
         return <<<HTML
             <div class="card text-white bg-dark post">
@@ -139,20 +150,14 @@ class Post
                 </div>
                 <div class="card-body">
                     <h5 class="card-title">$postAnimationName</h5>
-                    <p>
-                        <strong>Type:</strong> $postAnimationType
-                        <br>
-                        <strong>Frames:</strong> $postAnimationIconCount
-                        <br>
-                        <strong>FPS:</strong> $postFps
-                        <br>
-                        <strong>Dimensions:</strong> $postAnimationWidth x $postAnimationHeight
-                        <br>
-                        <strong>Likes:</strong> $postLikedByCount
-                    </p>
+                    <p><strong>Type:</strong> $postAnimationType</p>
+                    <p><strong>Frames:</strong> $postAnimationIconCount</p>
+                    <p><strong>FPS:</strong> $postFps</p>
+                    <p><strong>Dimensions:</strong> $postAnimationWidth x $postAnimationHeight</p>
+                    <p id="$postID-likeCount"><strong>Likes:</strong> $postLikedByCount</p>
                     <div style="display: flex;">
-                        $likeButton
-                        $commentButton
+                        <div id="$postID-likeButton">$likeButton</div>
+                        <div id="$postID-commentButton">$commentButton</div>
                     </div>
                 </div>
                 <div class="card-footer text-muted">

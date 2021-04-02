@@ -55,5 +55,5 @@
 - Editor
     - Add more config options                                                       √
 - UX
-    - Submit forms without refreshing page by using AJAX requests.
+    - Submit forms without refreshing page by using AJAX requests.                  -
 - Update documentation (algorithms were way too over complicated)
