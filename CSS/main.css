@@ -35,7 +35,7 @@ a {
     left: 50%;
     transform: translate(-50%, -50%);
     -ms-transform: translate(-50%, -50%);
-    opacity: 0;
+    display: none;
     text-align: center;
 }
 .icon .buttons button {
@@ -46,7 +46,7 @@ a {
     filter: brightness(50%);
 }
 .firstIcon:hover .buttons {
-    opacity: 1;
+    display: block;
 }
 
 ::-webkit-scrollbar {

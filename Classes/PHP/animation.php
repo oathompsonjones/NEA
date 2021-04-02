@@ -79,23 +79,23 @@ class Animation
                 <script>
                     const _$id = (frames) => {
                         const img = document.getElementById("$id-icon");
-                        const buttons = document.getElementById("$id-buttons");
+                        const div = document.getElementById("$id-div");
                         const fps = document.getElementById("$id-inputFPS")?.value || 1;
                         let i = 0;
-                        buttons.style.display = "none";
+                        div.className = "icon";
                         const interval = setInterval(() => img.src = frames[i++], 1000 / fps);
                         setTimeout(() => {
                             clearInterval(interval);
                             img.src = frames[0];
-                            buttons.style.display = "block";
+                            div.className = "icon firstIcon";
                         }, 1000 * (frames.length + 1) / fps);
                     };
                 </script>
-                <div class="card text-white bg-dark animation">
-                    <div id="$id-card" class="icon">
+                <div id="$id-card" class="card text-white bg-dark animation">
+                    <div id="$id-div" class="icon firstIcon">
                         <img src="$firstIcon" class="card-img-top" id="$id-icon">
                         <div id="$id-buttons" class="buttons">
-                            <button class="btn btn-secondary btn-lg" data-toggle="tooltip" data-placement="top" title="Play the animation" onclick='_$id($jsonIcons);'>Play</button>
+                            <button class="btn btn-secondary btn-lg" data-toggle="tooltip" data-placement="top" title="Play the animation" onclick='_$id($jsonIcons);'>▶</button>
                         </div>
                     </div>
                     <div class="card-body">
