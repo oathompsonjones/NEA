@@ -84,16 +84,6 @@ if (isset($_POST["saveProfile"]) && $_POST["saveProfile"] === "true") {
     $db->update("User", ["PasswordHash", "Bio"], [$newHash, $bio], "Username = '$username'");
 }
 
-if (isset($_POST["followUser"]) && $_POST["followUser"] === "true") {
-    $loggedInUser->followUser($user->username);
-    require "Include/clearPost.inc";
-}
-
-if (isset($_POST["unFollowUser"]) && $_POST["unFollowUser"] === "true") {
-    $loggedInUser->unfollowUser($user->username);
-    require "Include/clearPost.inc";
-}
-
 if (isset($_POST["editProfile"]) && $_POST["editProfile"] === "true" && $isLoggedInUser) {
     echo <<<HTML
         <form method="post">
@@ -208,20 +198,36 @@ if (isset($_POST["editProfile"]) && $_POST["editProfile"] === "true" && $isLogge
     $followButton = "";
     if (!$isLoggedInUser) {
         $isFollowing = in_array($loggedInUser->username, array_map("mapToUsernames", $user->followers));
+        $followButton = <<<HTML
+            <script>
+                const unFollowUser = () => {
+                    const loggedInUsername = '$loggedInUser->username';
+                    const username = '$username';
+                    $.post("Utils/Forms/unFollowUser.php", { loggedInUsername, username }, () => {
+                        document.getElementById("followUserButton").innerHTML = `<button onclick="followUser();" class="btn btn-dark btn-sm" type="button" style="padding-left: 10px;">Follow</button>`;
+                        document.getElementById("followersCount").innerHTML = (parseInt(document.getElementById("followersCount").innerHTML.split(" ")[0]) - 1) + " Followers";
+                    });
+                };
+                const followUser = () => {
+                    const loggedInUsername = '$loggedInUser->username';
+                    const username = '$username';
+                    $.post("Utils/Forms/followUser.php", { loggedInUsername, username }, () => {
+                        document.getElementById("followUserButton").innerHTML = `<button onclick="unFollowUser();" class="btn btn-dark btn-sm" type="button" style="padding-left: 10px;">Unfollow</button>`;
+                        document.getElementById("followersCount").innerHTML = (parseInt(document.getElementById("followersCount").innerHTML.split(" ")[0]) + 1) + " Followers";
+                    });
+                };
+            </script>
+        HTML;
         if ($isFollowing) {
-            $followButton = <<<HTML
-                <form method="post" style="padding-left: 10px;">
-                    <input name="unFollowUser" type="boolean" style="display: none;" value="true">
-                    <button class="btn btn-dark btn-sm" type="submit">Unfollow</button>
-                </form>
-            HTML;
-        } else {
-            $followButton = <<<HTML
-                <form method="post" style="padding-left: 10px;">
-                    <input name="followUser" type="boolean" style="display: none;" value="true">
-                    <button class="btn btn-dark btn-sm" type="submit">Follow</button>
-                </form>
-            HTML;
+            $followButton = $followButton . ($isFollowing ? <<<HTML
+                <div id="followUserButton">
+                    <button onclick="unFollowUser();" class="btn btn-dark btn-sm" type="button" style="padding-left: 10px;">Unfollow</button>
+                </div>
+            HTML : <<<HTML
+                <div id="followUserButton">
+                    <button onclick="followUser();" class="btn btn-dark btn-sm" type="button" style="padding-left: 10px;">Follow</button>
+                </div>
+            HTML);
         }
     }
     echo <<<HTML
@@ -234,18 +240,14 @@ if (isset($_POST["editProfile"]) && $_POST["editProfile"] === "true" && $isLogge
                 <h3 style="display: flex;">
                     <form method="post" id="followersForm">
                         <input style="display: none;" type="text" name="displayFollowers" value="true">
-                        <a href="javascript:{}" onclick="document.getElementById('followersForm').submit();">
-                            $followersCount Followers
-                        </a>
+                        <a id="followersCount" href="javascript:{}" onclick="document.getElementById('followersForm').submit();">$followersCount Followers</a>
                     </form>
                     $followButton
                 </h3>
                 <h3>
                     <form method="post" id="followingForm">
                         <input style="display: none;" type="text" name="displayFollowing" value="true">
-                        <a href="javascript:{}" onclick="document.getElementById('followingForm').submit();">
-                            $followingCount Following
-                        </a>
+                        <a id="followingCount" href="javascript:{}" onclick="document.getElementById('followingForm').submit();">$followingCount Following</a>
                     </form>
                 </h3>
                 <h3>$postsCount Posts</h3>
