@@ -51,16 +51,16 @@ class Animation
             <script>
                 const unShare_$id = () => {
                     const animationID = "$id";
-                    $.post("Utils/Forms/unShareAnimation.php", { animationID }, () => document.getElementById("$id-shareButton").innerHTML = `<button class="btn btn-dark btn-sm" type="button" onClick="share_$id();" style="width: 100%;">Share</button>`);
+                    $.post("Utils/Forms/unShareAnimation.php", { animationID }, () => document.getElementById("$id-shareButton").innerHTML = `<button class="btn btn-dark btn-sm" type="button" onclick="share_$id();" style="width: 100%;">Share</button>`);
                 };
                 const share_$id = () => {
                     const animationID = "$id";
                     const username = "$user->username";
                     const fps = document.getElementById("$id-inputFPS").value;
-                    $.post("Utils/Forms/shareAnimation.php", { animationID, username, fps }, () => document.getElementById("$id-shareButton").innerHTML = `<button class="btn btn-dark btn-sm" type="button" onClick="unShare_$id();" style="width: 100%;">Unshare</button>`);
+                    $.post("Utils/Forms/shareAnimation.php", { animationID, username, fps }, () => document.getElementById("$id-shareButton").innerHTML = `<button class="btn btn-dark btn-sm" type="button" onclick="unShare_$id();" style="width: 100%;">Unshare</button>`);
                 };
                 const delete_$id = () => {
-                    document.getElementById("$id-deleteButton").innerHTML = `<button class="btn btn-danger btn-sm" type="button" onClick="deleteConfirm_$id();" style="width: 100%;">Confirm</button>`;
+                    document.getElementById("$id-deleteButton").innerHTML = `<button class="btn btn-danger btn-sm" type="button" onclick="deleteConfirm_$id();" style="width: 100%;">Confirm</button>`;
                 };
                 const deleteConfirm_$id = () => {
                     const animationID = "$id";
@@ -70,10 +70,10 @@ class Animation
         HTML;
         $shareButton = $shareButton . ($postExists
             ? <<<HTML
-                <button class="btn btn-dark btn-sm" type="button" onClick="unShare_$id();" style="width: 100%;">Unshare</button>
+                <button class="btn btn-dark btn-sm" type="button" onclick="unShare_$id();" style="width: 100%;">Unshare</button>
             HTML
             : <<<HTML
-                <button class="btn btn-dark btn-sm" type="button" onClick="share_$id();" style="width: 100%;">Share</button>
+                <button class="btn btn-dark btn-sm" type="button" onclick="share_$id();" style="width: 100%;">Share</button>
             HTML);
         $fps = $postExists ? (new Post($db->select("PostID", "Post", "AnimationID = '$id'")[0][0]))->fps : 1;
         return <<<HTML
@@ -97,14 +97,14 @@ class Animation
                     <div id="$id-div" class="icon firstIcon">
                         <img src="$firstIcon" class="card-img-top" id="$id-icon">
                         <div id="$id-buttons" class="buttons">
-                            <button class="btn btn-secondary btn-lg" data-toggle="tooltip" data-placement="top" title="Play the animation" onClick='_$id($jsonIcons);'>▶</button>
+                            <button class="btn btn-secondary btn-lg" data-toggle="tooltip" data-placement="top" title="Play the animation" onclick='_$id($jsonIcons);'>▶</button>
                         </div>
                     </div>
                     <div class="card-body">
                         <h5 class="card-title">$name</h5>
                         <div style="display: flex;">
                             <div id="$id-deleteButton" style="display: flex; width: 50%;">
-                                <button class="btn btn-danger btn-sm" type="button" onClick="delete_$id();" style="width: 100%;">Delete</button>
+                                <button class="btn btn-danger btn-sm" type="button" onclick="delete_$id();" style="width: 100%;">Delete</button>
                             </div>
                             <form method="post" action="editor" style="width: 50%;">
                                 <input style="display: none;" name="preMade" type="text" value="$id">

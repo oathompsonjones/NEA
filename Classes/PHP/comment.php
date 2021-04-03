@@ -53,7 +53,7 @@ class Comment
                         document.getElementById("delete-$commentID").onclick = deleteConfirm_$commentID;
                     };
                 </script>
-                <button onClick="delete_$commentID();" class="btn btn-danger btn-sm" type="button" id="delete-$commentID" style="float: right;">Delete</button>
+                <button onclick="delete_$commentID();" class="btn btn-danger btn-sm" type="button" id="delete-$commentID" style="float: right;">Delete</button>
             </div>
         HTML;
         return <<<HTML

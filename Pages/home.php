@@ -51,36 +51,36 @@ switch ($user->type) {
                 echo <<<HTML
                     <script>
                         const delete_$username = () => {
-                            document.getElementById("$username-delete").innerHTML = `<button onClick="deleteConfirm_$username();" class="btn btn-sm btn-danger">Confirm</button>`;
+                            document.getElementById("$username-delete").innerHTML = `<button onclick="deleteConfirm_$username();" class="btn btn-sm btn-danger">Confirm</button>`;
                         };
                         const deleteConfirm_$username = () => {
                             const username = "$username";
                             $.post("Utils/Forms/deleteUser.php", { username }, () => {
                                 document.getElementById("$username-row").style.display = "none";
-                                document.getElementById("$username-delete").innerHTML = `<button onClick="delete_$username();" class="btn btn-sm btn-danger">Delete</button>`;
+                                document.getElementById("$username-delete").innerHTML = `<button onclick="delete_$username();" class="btn btn-sm btn-danger">Delete</button>`;
                             });
                         };
                     </script>
                     <td id="$username-delete">
-                        <button onClick="delete_$username();" class="btn btn-sm btn-danger">Delete</button>
+                        <button onclick="delete_$username();" class="btn btn-sm btn-danger">Delete</button>
                     </td>
                 HTML;
             }
             echo <<<HTML
                 <script>
                     const resetPassword_$username = () => {
-                        document.getElementById("$username-resetPassword").innerHTML = `<button onClick="resetPasswordConfirm_$username();" class="btn btn-sm btn-warning">Confirm</button>`;
+                        document.getElementById("$username-resetPassword").innerHTML = `<button onclick="resetPasswordConfirm_$username();" class="btn btn-sm btn-warning">Confirm</button>`;
                     };
                     const resetPasswordConfirm_$username = () => {
                         const username = "$username";
                         $.post("Utils/Forms/resetPassword.php", { username }, () => {
                             document.getElementById("$username-password").innerHTML = "$resetPasswordHash";
-                            document.getElementById("$username-resetPassword").innerHTML = `<button onClick="resetPassword_$username();" class="btn btn-sm btn-warning">Reset Password</button>`;
+                            document.getElementById("$username-resetPassword").innerHTML = `<button onclick="resetPassword_$username();" class="btn btn-sm btn-warning">Reset Password</button>`;
                         });
                     };
                 </script>
                 <td id="$username-resetPassword">
-                    <button onClick="resetPassword_$username();" class="btn btn-sm btn-warning">Reset Password</button>
+                    <button onclick="resetPassword_$username();" class="btn btn-sm btn-warning">Reset Password</button>
                 </td>
             HTML;
             if ($type === "admin") {
@@ -93,7 +93,7 @@ switch ($user->type) {
                 echo <<<HTML
                     <script>
                         const makeAdmin_$username = () => {
-                            document.getElementById("$username-makeAdmin").innerHTML = `<button onClick="makeAdminConfirm_$username();" class="btn btn-sm btn-dark">Confirm</button>`;
+                            document.getElementById("$username-makeAdmin").innerHTML = `<button onclick="makeAdminConfirm_$username();" class="btn btn-sm btn-dark">Confirm</button>`;
                         };
                         const makeAdminConfirm_$username = () => {
                             const username = "$username";
@@ -104,7 +104,7 @@ switch ($user->type) {
                         };
                     </script>
                     <td id="$username-makeAdmin">
-                        <button onClick="makeAdmin_$username();" class="btn btn-sm btn-dark">Make Admin</button>
+                        <button onclick="makeAdmin_$username();" class="btn btn-sm btn-dark">Make Admin</button>
                     </td>
                 HTML;
             }

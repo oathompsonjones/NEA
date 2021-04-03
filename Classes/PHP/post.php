@@ -99,7 +99,7 @@ class Post
                     const postID = "$postID";
                     const username = "$user->username";
                     $.post("Utils/Forms/likePost.php", { postID, username }, () => {
-                        document.getElementById("$postID-likeButton").innerHTML = `<button type="button" onClick="unLike_$postID()" class="btn btn-danger">❤</button>`
+                        document.getElementById("$postID-likeButton").innerHTML = `<button type="button" onclick="unLike_$postID()" class="btn btn-danger">❤</button>`
                         document.getElementById("$postID-likeCount").innerHTML = "<strong>Likes:</strong> " + (parseInt(document.getElementById("$postID-likeCount").innerHTML.split(" ")[1]) + 1).toString();
                     });
                 };
@@ -107,7 +107,7 @@ class Post
                     const postID = "$postID";
                     const username = "$user->username";
                     $.post("Utils/Forms/unLikePost.php", { postID, username }, () => {
-                        document.getElementById("$postID-likeButton").innerHTML = `<button type="button" onClick="like_$postID()" class="btn btn-secondary">❤</button>`
+                        document.getElementById("$postID-likeButton").innerHTML = `<button type="button" onclick="like_$postID()" class="btn btn-secondary">❤</button>`
                         document.getElementById("$postID-likeCount").innerHTML = "<strong>Likes:</strong> " + (parseInt(document.getElementById("$postID-likeCount").innerHTML.split(" ")[1]) - 1).toString();
                     });
                 };
@@ -115,10 +115,10 @@ class Post
         HTML;
         $likeButton = $likeButton . ($postLikedByUser
             ? <<<HTML
-                <button type="button" onClick="unLike_$postID()" class="btn btn-danger">❤</button>
+                <button type="button" onclick="unLike_$postID()" class="btn btn-danger">❤</button>
             HTML
             : <<<HTML
-                <button type="button" onClick="like_$postID()" class="btn btn-secondary">❤</button>
+                <button type="button" onclick="like_$postID()" class="btn btn-secondary">❤</button>
             HTML);
         $loggedInUser = unserialize($_SESSION["user"]);
         $commentButton = <<<HTML
@@ -142,12 +142,12 @@ class Post
                     });
                 };
             </script>
-            <button type="button" onClick="comment_$postID();" class="btn btn-secondary">Comment</button>
+            <button type="button" onclick="comment_$postID();" class="btn btn-secondary">Comment</button>
         HTML;
         $commentInput = <<<HTML
             <div id="commentInput-$postID" style="display: none;">
                 <textarea class="form-control bg-dark text-light" id="commentInputText-$postID"></textarea>
-                <button style="float: right;" onClick="submitComment_$postID();" class="btn btn-dark btn-sm">Submit</button>
+                <button style="float: right;" onclick="submitComment_$postID();" class="btn btn-dark btn-sm">Submit</button>
                 <br>
             </div>
         HTML;
@@ -175,7 +175,7 @@ class Post
                 <div class="icon firstIcon" id="$postID-div">
                     <img src="$postAnimationFirstIcon" loading="lazy" class="card-img-top" id="$postID-icon">
                     <div id="$postID-buttons" class="buttons">
-                        <button class="btn btn-secondary btn-lg" data-toggle="tooltip" data-placement="top" title="Play the animation" onClick='_$postID($postAnimationIconsJSON, $postFps);'>▶</button>
+                        <button class="btn btn-secondary btn-lg" data-toggle="tooltip" data-placement="top" title="Play the animation" onclick='_$postID($postAnimationIconsJSON, $postFps);'>▶</button>
                     </div>
                 </div>
                 <div class="card-body">
