@@ -235,7 +235,7 @@ else {
 
     for ($i = 0; $i < $width * $height; ++$i) {
         echo <<<HTML
-            <button class="cell" id="grid-cell-$i" onclick="editor.onLEDClicked($i);">
+            <button class="cell" id="grid-cell-$i" onClick="editor.onLEDClicked($i);">
             <script>editor.LEDs.push(document.getElementById("grid-cell-$i"));</script>
         HTML;
     }

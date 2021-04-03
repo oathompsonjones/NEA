@@ -121,12 +121,12 @@ if (isset($_POST["editProfile"]) && $_POST["editProfile"] === "true" && $isLogge
             $("#inputNewPassword").change(updateRequired);
             $("#inputConfirmPassword").change(updateRequired);
             
-            const deleteProfile = () => document.getElementById("deleteProfile").innerHTML = `<button class="btn btn-danger btn-sm" type="button" onclick="deleteProfileConfirm();">Confirm</button>`;
+            const deleteProfile = () => document.getElementById("deleteProfile").innerHTML = `<button class="btn btn-danger btn-sm" type="button" onClick="deleteProfileConfirm();">Confirm</button>`;
             const deleteProfileConfirm = () => $.post("Utils/Forms/deleteUser.php", { username: "$username" }, () => window.location.replace("/logout"));
         </script>
         <br>
         <div id="deleteProfile">
-            <button class="btn btn-danger btn-sm" type="button" onclick="deleteProfile();">Delete Account</button>
+            <button class="btn btn-danger btn-sm" type="button" onClick="deleteProfile();">Delete Account</button>
         </div>
     HTML;
 } else if (isset($_POST["deleteProfile"]) && $_POST["deleteProfile"] === "true" && $isLoggedInUser) {
@@ -206,7 +206,7 @@ if (isset($_POST["editProfile"]) && $_POST["editProfile"] === "true" && $isLogge
                     const loggedInUsername = '$loggedInUser->username';
                     const username = '$username';
                     $.post("Utils/Forms/unFollowUser.php", { loggedInUsername, username }, () => {
-                        document.getElementById("followUserButton").innerHTML = `<button onclick="followUser();" class="btn btn-dark btn-sm" type="button" style="padding-left: 10px;">Follow</button>`;
+                        document.getElementById("followUserButton").innerHTML = `<button onClick="followUser();" class="btn btn-dark btn-sm" type="button" style="padding-left: 10px;">Follow</button>`;
                         document.getElementById("followersCount").innerHTML = (parseInt(document.getElementById("followersCount").innerHTML.split(" ")[0]) - 1) + " Followers";
                     });
                 };
@@ -214,7 +214,7 @@ if (isset($_POST["editProfile"]) && $_POST["editProfile"] === "true" && $isLogge
                     const loggedInUsername = '$loggedInUser->username';
                     const username = '$username';
                     $.post("Utils/Forms/followUser.php", { loggedInUsername, username }, () => {
-                        document.getElementById("followUserButton").innerHTML = `<button onclick="unFollowUser();" class="btn btn-dark btn-sm" type="button" style="padding-left: 10px;">Unfollow</button>`;
+                        document.getElementById("followUserButton").innerHTML = `<button onClick="unFollowUser();" class="btn btn-dark btn-sm" type="button" style="padding-left: 10px;">Unfollow</button>`;
                         document.getElementById("followersCount").innerHTML = (parseInt(document.getElementById("followersCount").innerHTML.split(" ")[0]) + 1) + " Followers";
                     });
                 };
@@ -223,11 +223,11 @@ if (isset($_POST["editProfile"]) && $_POST["editProfile"] === "true" && $isLogge
         if ($isFollowing) {
             $followButton = $followButton . ($isFollowing ? <<<HTML
                 <div id="followUserButton">
-                    <button onclick="unFollowUser();" class="btn btn-dark btn-sm" type="button" style="padding-left: 10px;">Unfollow</button>
+                    <button onClick="unFollowUser();" class="btn btn-dark btn-sm" type="button" style="padding-left: 10px;">Unfollow</button>
                 </div>
             HTML : <<<HTML
                 <div id="followUserButton">
-                    <button onclick="followUser();" class="btn btn-dark btn-sm" type="button" style="padding-left: 10px;">Follow</button>
+                    <button onClick="followUser();" class="btn btn-dark btn-sm" type="button" style="padding-left: 10px;">Follow</button>
                 </div>
             HTML);
         }
@@ -242,14 +242,14 @@ if (isset($_POST["editProfile"]) && $_POST["editProfile"] === "true" && $isLogge
                 <h3 style="display: flex;">
                     <form method="post" id="followersForm">
                         <input style="display: none;" type="text" name="displayFollowers" value="true">
-                        <a id="followersCount" href="javascript:{}" onclick="document.getElementById('followersForm').submit();">$followersCount Followers</a>
+                        <a id="followersCount" href="javascript:{}" onClick="document.getElementById('followersForm').submit();">$followersCount Followers</a>
                     </form>
                     $followButton
                 </h3>
                 <h3>
                     <form method="post" id="followingForm">
                         <input style="display: none;" type="text" name="displayFollowing" value="true">
-                        <a id="followingCount" href="javascript:{}" onclick="document.getElementById('followingForm').submit();">$followingCount Following</a>
+                        <a id="followingCount" href="javascript:{}" onClick="document.getElementById('followingForm').submit();">$followingCount Following</a>
                     </form>
                 </h3>
                 <h3>$postsCount Posts</h3>
