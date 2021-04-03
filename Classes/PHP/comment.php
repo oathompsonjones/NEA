@@ -42,7 +42,7 @@ class Comment
         $loggedInUser = unserialize($_SESSION["user"]);
         $deleteButton = "";
         if ($loggedInUser->username === $username) $deleteButton = <<<HTML
-            <div>
+            <div style="float: right;">
                 <script>
                     const deleteConfirm_$commentID = () => {
                         const commentID = "$commentID";
@@ -53,7 +53,7 @@ class Comment
                         document.getElementById("delete-$commentID").onclick = deleteConfirm_$commentID;
                     };
                 </script>
-                <button onclick="delete_$commentID();" class="btn btn-danger btn-sm" type="button" id="delete-$commentID" style="float: right;">Delete</button>
+                <button onclick="delete_$commentID();" class="btn btn-danger btn-sm" type="button" id="delete-$commentID">Delete</button>
             </div>
         HTML;
         return <<<HTML
