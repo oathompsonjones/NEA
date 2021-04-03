@@ -120,12 +120,14 @@ if (isset($_POST["editProfile"]) && $_POST["editProfile"] === "true" && $isLogge
             $("#inputOldPassword").change(updateRequired);
             $("#inputNewPassword").change(updateRequired);
             $("#inputConfirmPassword").change(updateRequired);
+            
+            const deleteProfile = () => document.getElementById("deleteProfile").innerHTML = `<button class="btn btn-danger btn-sm" type="button" onclick="deleteProfileConfirm();">Confirm</button>`;
+            const deleteProfileConfirm = () => $.post("Utils/Forms/deleteUser.php", { username: "$username" }, () => window.location.replace("/"));
         </script>
         <br>
-        <form method="post">
-            <input name="deleteProfile" type="text" style="display: none;" value="true">
-            <button class="btn btn-danger btn-sm" type="submit">Delete Account</button>
-        </form>
+        <div id="deleteProfile">
+            <button class="btn btn-danger btn-sm" type="button" onclick="deleteProfile();">Delete Account</button>
+        </div>
     HTML;
 } else if (isset($_POST["deleteProfile"]) && $_POST["deleteProfile"] === "true" && $isLoggedInUser) {
     if (isset($_POST["deleteProfileConfirm"]) && $_POST["deleteProfileConfirm"] === "true" && $isLoggedInUser) {
