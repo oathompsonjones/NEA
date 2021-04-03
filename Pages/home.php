@@ -2,65 +2,6 @@
 $db = $_SESSION["database"];
 $user = unserialize($_SESSION["user"]);
 
-if (isset($_POST["deleteUser"]) && !is_null($_POST["deleteUser"])) {
-    $tmp = $_POST["deleteUser"];
-    echo <<<HTML
-        <div class="alert alert-danger" role="alert" style="display: flex;">
-            <p>Are you sure you want to permanently delete $tmp's account? This can <strong>not</strong> be undone. All data will be erased.</p>
-            <form method="post" style="padding-left: 5px;">
-                <input style="display: none;" name="deleteUserConfirmed" type="text" value="$tmp">
-                <button class="btn btn-danger btn-sm" type="submit">Yes</button>
-            </form>
-            <form method="post" style="padding-left: 5px;">
-                <button class="btn btn-danger btn-sm" type="submit">No</button>
-            </form>
-        </div>
-    HTML;
-} else if (isset($_POST["deleteUserConfirmed"]) && !is_null($_POST["deleteUserConfirmed"])) {
-    (new User($_POST["deleteUserConfirmed"]))->delete();
-    require "Include/clearPost.inc";
-}
-
-if (isset($_POST["resetPassword"]) && !is_null($_POST["resetPassword"])) {
-    $tmp = $_POST["resetPassword"];
-    echo <<<HTML
-        <div class="alert alert-danger" role="alert" style="display: flex;">
-            <p>Are you sure you want to reset $tmp's password? This can <strong>not</strong> be undone.</p>
-            <form method="post" style="padding-left: 5px;">
-                <input style="display: none;" name="resetPasswordConfirmed" type="text" value="$tmp">
-                <button class="btn btn-danger btn-sm" type="submit">Yes</button>
-            </form>
-            <form method="post" style="padding-left: 5px;">
-                <button class="btn btn-danger btn-sm" type="submit">No</button>
-            </form>
-        </div>
-    HTML;
-} else if (isset($_POST["resetPasswordConfirmed"]) && !is_null($_POST["resetPasswordConfirmed"])) {
-    $tmp = $_POST["resetPasswordConfirmed"];
-    $db->update("User", ["PasswordHash"], [md5($tmp)], "Username = '$tmp'");
-    require "Include/clearPost.inc";
-}
-
-if (isset($_POST["makeAdmin"]) && !is_null($_POST["makeAdmin"])) {
-    $tmp = $_POST["makeAdmin"];
-    echo <<<HTML
-        <div class="alert alert-danger" role="alert" style="display: flex;">
-            <p>Are you sure you want to make $tmp an admin? This can <strong>not</strong> be undone.</p>
-            <form method="post" style="padding-left: 5px;">
-                <input style="display: none;" name="makeAdminConfirmed" type="text" value="$tmp">
-                <button class="btn btn-danger btn-sm" type="submit">Yes</button>
-            </form>
-            <form method="post" style="padding-left: 5px;">
-                <button class="btn btn-danger btn-sm" type="submit">No</button>
-            </form>
-        </div>
-    HTML;
-} else if (isset($_POST["makeAdminConfirmed"]) && !is_null($_POST["makeAdminConfirmed"])) {
-    $tmp = $_POST["makeAdminConfirmed"];
-    $db->update("User", ["type"], [0], "Username = '$tmp'");
-    require "Include/clearPost.inc";
-}
-
 switch ($user->type) {
     case "admin":
         $users = array_map("mapToUserObject", array_map("mapToFirstItem", $db->select("Username", "User", NULL, "Username")));
@@ -84,16 +25,17 @@ switch ($user->type) {
         for ($i = 0; $i < count($users); ++$i) {
             $username = $users[$i]->username;
             $passwordHash = $users[$i]->passwordHash;
+            $resetPasswordHash = md5($username);
             $type = $users[$i]->type;
             $animations = count($users[$i]->animations);
             $posts = count($users[$i]->posts);
             $followers = count($users[$i]->followers);
             $following = count($users[$i]->following);
             echo <<<HTML
-                <tr>
+                <tr id="$username-row">
                     <td>$username</td>
-                    <td>$passwordHash</td>
-                    <td>$type</td>
+                    <td id="$username-password">$passwordHash</td>
+                    <td id="$username-type">$type</td>
                     <td>$animations</td>
                     <td>$posts</td>
                     <td>$followers</td>
@@ -107,20 +49,38 @@ switch ($user->type) {
                 HTML;
             } else {
                 echo <<<HTML
-                    <td>
-                        <form method="post">
-                            <input style="display: none;" type="text" name="deleteUser" value="$username">
-                            <button class="btn btn-sm btn-danger">Delete</button>
-                        </form>
+                    <script>
+                        const delete_$username = () => {
+                            document.getElementById("$username-delete").innerHTML = `<button onclick="deleteConfirm_$username();" class="btn btn-sm btn-danger">Confirm</button>`;
+                        };
+                        const deleteConfirm_$username = () => {
+                            const username = "$username";
+                            $.post("Utils/Forms/deleteUser.php", { username }, () => {
+                                document.getElementById("$username-row").style.display = "none";
+                                document.getElementById("$username-delete").innerHTML = `<button onclick="delete_$username();" class="btn btn-sm btn-danger">Delete</button>`;
+                            });
+                        };
+                    </script>
+                    <td id="$username-delete">
+                        <button onclick="delete_$username();" class="btn btn-sm btn-danger">Delete</button>
                     </td>
                 HTML;
             }
             echo <<<HTML
-                <td>
-                    <form method="post">
-                        <input style="display: none;" type="text" name="resetPassword" value="$username">
-                        <button class="btn btn-sm btn-warning">Reset Password</button>
-                    </form>
+                <script>
+                    const resetPassword_$username = () => {
+                        document.getElementById("$username-resetPassword").innerHTML = `<button onclick="resetPasswordConfirm_$username();" class="btn btn-sm btn-warning">Confirm</button>`;
+                    };
+                    const resetPasswordConfirm_$username = () => {
+                        const username = "$username";
+                        $.post("Utils/Forms/resetPassword.php", { username }, () => {
+                            document.getElementById("$username-password").innerHTML = "$resetPasswordHash";
+                            document.getElementById("$username-resetPassword").innerHTML = `<button onclick="resetPassword_$username();" class="btn btn-sm btn-warning">Reset Password</button>`;
+                        });
+                    };
+                </script>
+                <td id="$username-resetPassword">
+                    <button onclick="resetPassword_$username();" class="btn btn-sm btn-warning">Reset Password</button>
                 </td>
             HTML;
             if ($type === "admin") {
@@ -131,11 +91,20 @@ switch ($user->type) {
                 HTML;
             } else {
                 echo <<<HTML
-                    <td>
-                        <form method="post">
-                            <input style="display: none;" type="text" name="makeAdmin" value="$username">
-                            <button class="btn btn-sm btn-dark">Make Admin</button>
-                        </form>
+                    <script>
+                        const makeAdmin_$username = () => {
+                            document.getElementById("$username-makeAdmin").innerHTML = `<button onclick="makeAdminConfirm_$username();" class="btn btn-sm btn-dark">Confirm</button>`;
+                        };
+                        const makeAdminConfirm_$username = () => {
+                            const username = "$username";
+                            $.post("Utils/Forms/makeAdmin.php", { username }, () => {
+                                document.getElementById("$username-type").innerHTML = "admin";
+                                document.getElementById("$username-makeAdmin").innerHTML = `<button class="btn btn-sm btn-dark disabled">Make Admin</button>`;
+                            });
+                        };
+                    </script>
+                    <td id="$username-makeAdmin">
+                        <button onclick="makeAdmin_$username();" class="btn btn-sm btn-dark">Make Admin</button>
                     </td>
                 HTML;
             }

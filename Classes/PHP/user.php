@@ -62,6 +62,18 @@ class User
         $db->delete("AssignmentWork", "Username = '$this->username'");
     }
 
+    public function resetPassword()
+    {
+        $db = $_SESSION["database"];
+        $db->update("User", ["PasswordHash"], [md5($this->username)], "Username = '$this->username'");
+    }
+
+    public function makeAdmin()
+    {
+        $db = $_SESSION["database"];
+        $db->update("User", ["type"], [0], "Username = '$this->username'");
+    }
+
     public function followUser($username)
     {
         $db = $_SESSION["database"];
