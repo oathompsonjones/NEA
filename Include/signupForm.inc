@@ -7,7 +7,8 @@
     </div>
     <script>
         $("#inputUsername").on("keypress", (e) => {
-            if (e.which === 32) return false;
+            const isValid = (n) => (/[0-9A-Za-z]/).test(String.fromCharCode(n));
+            if (!isValid(e.which)) return false;
         });
     </script>
     <br>
