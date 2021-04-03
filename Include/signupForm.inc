@@ -5,6 +5,11 @@
         <input type="text" class="form-control bg-dark text-light border-dark" id="inputUsername" aria-describedby="usernameHelp" name="username" placeholder="Username" required>
         <label for="inputUsername">Username</label>
     </div>
+    <script>
+        $("#inputUsername").on("keypress", (e) => {
+            if (e.which === 32) return false;
+        });
+    </script>
     <br>
     <div class="form-floating">
         <input type="password" class="form-control bg-dark text-light border-dark" id="inputPassword" name="password" placeholder="Password" required>
