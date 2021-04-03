@@ -404,7 +404,14 @@ abstract class AnimationEditor {
     }
 
     public updateIcons(): void {
-        const form: HTMLFormElement = document.createElement("form");
+        this.displayIcons();
+        // @ts-ignore
+        setCookie("data", JSON.stringify(this.frames));
+        // @ts-ignore
+        setCookie("fps", this.playbackFPS.toString());
+        // @ts-ignore
+        setCookie("colour", this.onColour.toString());
+        /* const form: HTMLFormElement = document.createElement("form");
         form.style.display = "none";
         form.setAttribute("method", "post");
         const data: HTMLInputElement = document.createElement("input");
@@ -423,7 +430,7 @@ abstract class AnimationEditor {
         colour.setAttribute("value", this.onColour);
         form.appendChild(colour);
         document.getElementsByTagName("body")[0].appendChild(form);
-        form.submit();
+        form.submit(); */
     }
 }
 

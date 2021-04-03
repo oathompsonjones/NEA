@@ -30,6 +30,12 @@ $loggingInOrOut = $page === "login" || $page === "signup" || $page === "logout";
 
 // Render page header.
 require_once "Include/header.inc";
+echo <<<HTML
+    <script>
+        const setCookie = (name, value) => document.cookie = name + "=" + value + ";";
+        const getCookie = (name) => document.cookie.match(/(firstName=)([^;]*)(;\s)/g)?.[0].split("=")[1].replace("; ", "");
+    </script>
+HTML;
 
 // Render a message telling the user they need to log in.
 if (!$loggedIn && !$loggingInOrOut) {

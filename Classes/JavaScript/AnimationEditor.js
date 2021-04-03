@@ -380,26 +380,10 @@ class AnimationEditor {
         this.shiftIsDown = !this.shiftIsDown;
     }
     updateIcons() {
-        const form = document.createElement("form");
-        form.style.display = "none";
-        form.setAttribute("method", "post");
-        const data = document.createElement("input");
-        data.setAttribute("type", "text");
-        data.setAttribute("name", "data");
-        data.setAttribute("value", JSON.stringify(this.frames));
-        form.appendChild(data);
-        const fps = document.createElement("input");
-        fps.setAttribute("type", "text");
-        fps.setAttribute("name", "fps");
-        fps.setAttribute("value", this.playbackFPS.toString());
-        form.appendChild(fps);
-        const colour = document.createElement("input");
-        colour.setAttribute("type", "text");
-        colour.setAttribute("name", "colour");
-        colour.setAttribute("value", this.onColour);
-        form.appendChild(colour);
-        document.getElementsByTagName("body")[0].appendChild(form);
-        form.submit();
+        this.displayIcons();
+        setCookie("data", JSON.stringify(this.frames));
+        setCookie("fps", this.playbackFPS.toString());
+        setCookie("colour", this.onColour.toString());
     }
 }
 class RGBAnimationEditor extends AnimationEditor {

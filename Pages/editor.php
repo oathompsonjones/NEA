@@ -148,15 +148,15 @@ else {
     $width = $_SESSION["matrix"]["width"];
     $height = $_SESSION["matrix"]["height"];
 
-    if (isset($_POST["data"])) $_SESSION["editor"]["data"] = $_POST["data"];
+    if (isset($_COOKIE["data"])) $_SESSION["editor"]["data"] = $_COOKIE["data"];
     if (is_null($_SESSION["editor"]["data"])) $_SESSION["editor"]["data"] = "[]";
     $data = $_SESSION["editor"]["data"];
 
-    if (isset($_POST["fps"])) $_SESSION["editor"]["fps"] = $_POST["fps"];
+    if (isset($_COOKIE["fps"])) $_SESSION["editor"]["fps"] = $_COOKIE["fps"];
     if (is_null($_SESSION["editor"]["fps"])) $_SESSION["editor"]["fps"] = 1;
     $fps = $_SESSION["editor"]["fps"];
 
-    if (isset($_POST["colour"])) $_SESSION["editor"]["colour"] = $_POST["colour"];
+    if (isset($_COOKIE["colour"])) $_SESSION["editor"]["colour"] = $_COOKIE["colour"];
     if (is_null($_SESSION["editor"]["colour"])) $_SESSION["editor"]["colour"] = "";
     $colour = $_SESSION["editor"]["colour"];
 
