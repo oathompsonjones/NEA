@@ -411,26 +411,6 @@ abstract class AnimationEditor {
         setCookie("fps", this.playbackFPS.toString());
         // @ts-ignore
         setCookie("colour", this.onColour.toString());
-        /* const form: HTMLFormElement = document.createElement("form");
-        form.style.display = "none";
-        form.setAttribute("method", "post");
-        const data: HTMLInputElement = document.createElement("input");
-        data.setAttribute("type", "text");
-        data.setAttribute("name", "data");
-        data.setAttribute("value", JSON.stringify(this.frames));
-        form.appendChild(data);
-        const fps: HTMLInputElement = document.createElement("input");
-        fps.setAttribute("type", "text");
-        fps.setAttribute("name", "fps");
-        fps.setAttribute("value", this.playbackFPS.toString());
-        form.appendChild(fps);
-        const colour: HTMLInputElement = document.createElement("input");
-        colour.setAttribute("type", "text");
-        colour.setAttribute("name", "colour");
-        colour.setAttribute("value", this.onColour);
-        form.appendChild(colour);
-        document.getElementsByTagName("body")[0].appendChild(form);
-        form.submit(); */
     }
 }
 
