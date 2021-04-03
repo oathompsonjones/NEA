@@ -38,9 +38,27 @@ class Comment
         $username = $this->user->username;
         $content = $this->content;
         $createdAt = $this->createdAt;
+        $commentID = $this->id;
+        $loggedInUser = unserialize($_SESSION["user"]);
+        $deleteButton = "";
+        if ($loggedInUser->username === $username) $deleteButton = <<<HTML
+            <div>
+                <script>
+                    const deleteConfirm_$commentID = () => {
+                        const commentID = "$commentID";
+                        $.post("Utils/Forms/deleteComment.php", { commentID }, () => document.getElementById(commentID).style.display = "none");
+                    };
+                    const delete_$commentID = () => {
+                        document.getElementById("delete-$commentID").innerHTML = "Confirm";
+                        document.getElementById("delete-$commentID").onclick = deleteConfirm_$commentID;
+                    };
+                </script>
+                <button onClick="delete_$commentID();" class="btn btn-danger btn-sm" type="button" id="delete-$commentID" style="float: right;">Delete</button>
+            </div>
+        HTML;
         return <<<HTML
-            <div class="card bg-dark text-light" style="width: 100%; padding: 0; margin: 0;">
-                <div class="card-header">$username</div>
+            <div class="card bg-dark text-light" id="$commentID">
+                <div class="card-header">$username $deleteButton</div>
                 <div class="card-body">$content</div>
                 <div class="card-footer text-muted"><script>document.write(new Date($createdAt * 1000).toGMTString());</script></div>
             </div>

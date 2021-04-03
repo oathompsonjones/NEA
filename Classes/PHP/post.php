@@ -25,7 +25,7 @@ class Post
             case "fps":
                 return $db->select("FPS", "Post", "PostID = '$id'")[0][0];
             case "comments":
-                $comments = $db->select("CommentID", "Comment", "PostID = '$id'", "CreatedAt ASC");
+                $comments = $db->select("CommentID", "Comment", "PostID = '$id'", "CreatedAt DESC");
                 if (is_null($comments)) return NULL;
                 return array_map("mapToCommentObject", array_map("mapToFirstItem", $comments));
             case "likedBy":
@@ -73,6 +73,7 @@ class Post
         $postID = $this->id;
         $postCreatedAt = $this->createdAt;
         $postComments = $this->comments;
+        usort($postComments, "sortByCreatedAt");
         $postFps = $this->fps;
         $postLikedBy = $this->likedBy;
         $postLikedByUsernames = array_map("mapToUsernames", $this->likedBy);
@@ -119,8 +120,36 @@ class Post
             : <<<HTML
                 <button type="button" onClick="like_$postID()" class="btn btn-secondary">❤</button>
             HTML);
+        $loggedInUser = unserialize($_SESSION["user"]);
         $commentButton = <<<HTML
-            <button type="button" class="btn btn-secondary">Comment</button>
+            <script>
+                const comment_$postID = () => document.getElementById("commentInput-$postID").style.display = document.getElementById("commentInput-$postID").style.display === "block" ? "none" : "block";
+                const submitComment_$postID = () => {
+                    const content = document.getElementById("commentInputText-$postID").value;
+                    if (content.length === 0) return;
+                    const username = "$loggedInUser->username";
+                    const postID = "$postID";
+                    $.post("Utils/Forms/postComment.php", { postID, content, username }, () => {
+                        document.getElementById("commentInputText-$postID").value = "";
+                        document.getElementById("commentInput-$postID").style.display = "none";
+                        const commentsList = document.getElementById("commentsList-$postID");
+                        commentsList.innerHTML = `<div class="card bg-dark text-light">`
+                            + `<div class="card-header">` + username + `</div>`
+                            + `<div class="card-body">` + content + `</div>`
+                            + `<div class="card-footer text-muted">` + new Date().toGMTString() + `</div>`
+                            + `</div>`
+                            + commentsList.innerHTML;
+                    });
+                };
+            </script>
+            <button type="button" onClick="comment_$postID();" class="btn btn-secondary">Comment</button>
+        HTML;
+        $commentInput = <<<HTML
+            <div id="commentInput-$postID" style="display: none;">
+                <textarea class="form-control bg-dark text-light" id="commentInputText-$postID"></textarea>
+                <button style="float: right;" onClick="submitComment_$postID();" class="btn btn-dark btn-sm">Submit</button>
+                <br>
+            </div>
         HTML;
         $comments = "";
         for ($i = 0; $i < count($postComments); ++$i) $comments = $comments . $postComments[$i]->render();
@@ -160,6 +189,7 @@ class Post
                         <div id="$postID-likeButton">$likeButton</div>
                         <div id="$postID-commentButton">$commentButton</div>
                     </div>
+                    $commentInput
                 </div>
                 <div class="card-footer text-muted">
                     <script>document.write(new Date($postCreatedAt * 1000).toGMTString());</script>
@@ -172,7 +202,7 @@ class Post
                             </button>
                         </h2>
                         <div id="commentCollapse-$postID" class="accordion-collapse collapse" aria-labelledby="commentHeader-$postID" data-bs-parent="#comments-$postID">
-                            <div class="accordion-body">$comments</div>
+                            <div class="accordion-body" id="commentsList-$postID">$comments</div>
                         </div>
                     </div>
                 </div>
