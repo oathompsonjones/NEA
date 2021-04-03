@@ -122,7 +122,7 @@ if (isset($_POST["editProfile"]) && $_POST["editProfile"] === "true" && $isLogge
             $("#inputConfirmPassword").change(updateRequired);
             
             const deleteProfile = () => document.getElementById("deleteProfile").innerHTML = `<button class="btn btn-danger btn-sm" type="button" onclick="deleteProfileConfirm();">Confirm</button>`;
-            const deleteProfileConfirm = () => $.post("Utils/Forms/deleteUser.php", { username: "$username" }, () => window.location.replace("/"));
+            const deleteProfileConfirm = () => $.post("Utils/Forms/deleteUser.php", { username: "$username" }, () => window.location.replace("/logout"));
         </script>
         <br>
         <div id="deleteProfile">
