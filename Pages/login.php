@@ -12,24 +12,8 @@ if (isset($_SESSION["auth"]) && $_SESSION["auth"]) {
     // Get form data.
     $username = $_POST["username"];
     $password = $_POST["password"];
-    // Tell user if username wasn't provided.
-    if (!strlen($username)) {
-        echo <<<HTML
-            <div class="alert alert-danger" role="alert">
-                No username was given.
-            </div>
-        HTML;
-    }
-    // Tell user if password wasn't provided.
-    else if (!strlen($password)) {
-        echo <<<HTML
-            <div class="alert alert-danger" role="alert">
-                No password was given.
-            </div>
-        HTML;
-    }
     // Tell user if username or password are incorrect.
-    else if ($credentials[$username] !== md5($password)) {
+    if ($credentials[$username] !== md5($password)) {
         echo <<<HTML
             <div class="alert alert-danger" role="alert">
                 Incorrect username or password.
