@@ -266,7 +266,7 @@ if (isset($_POST["editProfile"]) && $_POST["editProfile"] === "true" && $isLogge
         <hr>
     HTML;
     echo <<<HTML
-        <div class="row row-cols-1 row-cols-md-5 g-4">
+        <div class="row row-cols-1 row-cols-md-3 g-4">
             <style>.post { display: none; }</style>
     HTML;
     for ($i = 0; $i < count($posts); ++$i) {

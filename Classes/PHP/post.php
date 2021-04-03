@@ -24,6 +24,10 @@ class Post
                 return $db->select("AnimationID", "Post", "PostID = '$id'")[0][0];
             case "fps":
                 return $db->select("FPS", "Post", "PostID = '$id'")[0][0];
+            case "comments":
+                $comments = $db->select("CommentID", "Comment", "PostID = '$id'", "CreatedAt ASC");
+                if (is_null($comments)) return NULL;
+                return array_map("mapToCommentObject", array_map("mapToFirstItem", $comments));
             case "likedBy":
                 $likes = $db->select("Username", "PostLike", "PostID = '$id'");
                 if (is_null($likes)) return NULL;
@@ -61,12 +65,6 @@ class Post
         $db->insert("Comment", "CommentID, PostID, Username, Content, CreatedAt", "'$id', '$this->id', '$username', '$content', $timestamp");
     }
 
-    public function uncomment($id)
-    {
-        $db = $_SESSION["database"];
-        $db->delete("Comment", "CommentID = '$id'");
-    }
-
     public function render()
     {
         // Get the current user.
@@ -74,6 +72,7 @@ class Post
         // Get post variables.
         $postID = $this->id;
         $postCreatedAt = $this->createdAt;
+        $postComments = $this->comments;
         $postFps = $this->fps;
         $postLikedBy = $this->likedBy;
         $postLikedByUsernames = array_map("mapToUsernames", $this->likedBy);
@@ -123,6 +122,8 @@ class Post
         $commentButton = <<<HTML
             <button type="button" class="btn btn-secondary">Comment</button>
         HTML;
+        $comments = "";
+        for ($i = 0; $i < count($postComments); ++$i) $comments = $comments . $postComments[$i]->render();
         return <<<HTML
             <div class="card text-white bg-dark post">
                 <script>
@@ -162,6 +163,18 @@ class Post
                 </div>
                 <div class="card-footer text-muted">
                     <script>document.write(new Date($postCreatedAt * 1000).toGMTString());</script>
+                </div>
+                <div class="accordion-flush" id="comments-$postID">
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="commentHeader-$postID">
+                            <button class="accordion-button collapsed bg-dark text-light" type="button" data-bs-toggle="collapse" data-bs-target="#commentCollapse-$postID" aria-expanded="true" aria-controls="commentCollapse-$postID">
+                                Comments
+                            </button>
+                        </h2>
+                        <div id="commentCollapse-$postID" class="accordion-collapse collapse" aria-labelledby="commentHeader-$postID" data-bs-parent="#comments-$postID">
+                            <div class="accordion-body">$comments</div>
+                        </div>
+                    </div>
                 </div>
             </div>
         HTML;

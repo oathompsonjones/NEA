@@ -12,6 +12,7 @@ require_once "Classes/PHP/user.php";
 require_once "Classes/PHP/animation.php";
 require_once "Classes/PHP/frame.php";
 require_once "Classes/PHP/post.php";
+require_once "Classes/PHP/comment.php";
 
 // Import useful functions.
 require_once "Utils/Functions/arrayMappers.php";

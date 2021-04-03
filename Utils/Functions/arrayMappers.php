@@ -23,6 +23,10 @@ function mapToPostObject($value)
 {
     return new Post($value);
 }
+function mapToCommentObject($value)
+{
+    return new Comment($value);
+}
 function mapToAnimationObject($value)
 {
     return new Animation($value);

@@ -134,7 +134,7 @@ switch ($user->type) {
                     <div class="card-group" style="display: block; overflow: auto; height: 95%;">
                         <style>.post { display: none; }</style>
         HTML;
-        for ($i = 0; $i < min(count($feedPosts), 100); ++$i) echo $feedPosts[$i]->render();
+        for ($i = 0; $i < min(count($feedPosts), 100); ++$i) echo $feedPosts[$i]->render() . "<br>";
         echo <<<HTML
                         <style>.post { display: block; }</style>
                     </div>
