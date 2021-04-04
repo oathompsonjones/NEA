@@ -38,7 +38,9 @@
     - Admin controls
         - Delete/Add users                                                          √
         - Reset Passwords                                                           √
-        - Delete Posts
+        - Delete Animations                                                         √
+        - Delete Posts                                                              √
+        - Delete Comments                                                           √
         - Delete Classes
 - Social Network
     - Profile page - just DB retrieval and updating with some CSS                   √
