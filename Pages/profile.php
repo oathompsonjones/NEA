@@ -85,11 +85,13 @@ if (isset($_POST["saveProfile"]) && $_POST["saveProfile"] === "true") {
 }
 
 if (isset($_POST["editProfile"]) && $_POST["editProfile"] === "true" && $isLoggedInUser) {
+    $bioValue = str_replace('"', '\"', $bio);
     echo <<<HTML
         <form method="post">
             <div class="form-floating">
-                <input id="inputBio" name="Bio" type="text" class="form-control bg-dark text-light border-dark" placeholder="Bio" aria-label="Bio" aria-describedby="basic-addon1" value="$bio">
+                <input id="inputBio" name="Bio" type="text" class="form-control bg-dark text-light border-dark" placeholder="Bio" aria-label="Bio" aria-describedby="basic-addon1">
                 <label for="inputBio">Bio</label>
+                <script>document.getElementById("inputBio").value = "$bioValue";</script>
             </div>
             <br>
             <br>
