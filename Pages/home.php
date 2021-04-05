@@ -325,7 +325,7 @@ switch ($user->type) {
             <div class="col">
                 <div class="card bg-dark text-light" style="height: 100%; min-height: 150px">
                     <div class="card-body" style="display: flex; height: 100%">
-                        <form method="post" action="editor" style="width: 100%; height: 100%;">
+                        <form action="editor" style="width: 100%; height: 100%;">
                             <button type="submit" class="btn btn-lg btn-dark" style="width: 100%; height: 100%;">New</button>
                         </form>
                     </div>
@@ -345,7 +345,7 @@ switch ($user->type) {
             <div class="col">
                 <div class="card bg-dark text-light" style="height: 100%; min-height: 150px">
                     <div class="card-body" style="display: flex; height: 100%">
-                        <form method="post" action="class" style="width: 100%; height: 100%;">
+                        <form action="class" style="width: 100%; height: 100%;">
                             <button type="submit" class="btn btn-lg btn-dark" style="width: 100%; height: 100%;">New</button>
                         </form>
                     </div>
