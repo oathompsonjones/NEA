@@ -123,7 +123,7 @@ class Post
         $loggedInUser = unserialize($_SESSION["user"]);
         $commentButton = <<<HTML
             <script>
-                const comment_$postID = () => document.getElementById("commentInput-$postID").style.display = document.getElementById("commentInput-$postID").style.display === "block" ? "none" : "block";
+                const comment_$postID = () => document.getElementById("commentInput-$postID").style.display = document.getElementById("commentInput-$postID").style.display === "none" ? "" : "none";
                 const submitComment_$postID = () => {
                     const content = document.getElementById("commentInputText-$postID").value;
                     if (content.length === 0) return;
@@ -145,10 +145,12 @@ class Post
             <button type="button" onclick="comment_$postID();" class="btn btn-secondary">Comment</button>
         HTML;
         $commentInput = <<<HTML
-            <div id="commentInput-$postID" style="display: none;">
-                <textarea class="form-control bg-dark text-light" id="commentInputText-$postID"></textarea>
-                <button style="float: right;" onclick="submitComment_$postID();" class="btn btn-dark btn-sm">Submit</button>
-                <br>
+            <div id="commentInput-$postID" style="display: none;" class="input-group mb-3">
+                <div class="form-floating">
+                    <input type="text" class="form-control bg-dark text-light" id="commentInputText-$postID" name="content" placeholder="Content" required>
+                    <label for="commentInputText-$postID">Content</label>
+                </div>
+                <button type="button" onclick="submitComment_$postID();" class="btn btn-dark btn-sm btn-outline-light">Submit</button>
             </div>
         HTML;
         $comments = "";
