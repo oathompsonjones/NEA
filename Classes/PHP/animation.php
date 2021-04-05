@@ -77,7 +77,7 @@ class Animation
             HTML);
         $fps = $postExists ? (new Post($db->select("PostID", "Post", "AnimationID = '$id'")[0][0]))->fps : 1;
         return <<<HTML
-            <div class="col" id="$id-container">
+            <div id="$id-container">
                 <script>
                     const _$id = (frames) => {
                         const img = document.getElementById("$id-icon");

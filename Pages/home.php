@@ -315,16 +315,42 @@ switch ($user->type) {
 
         $allAnimations = is_null($user->animations) ? [] : $user->animations;
         $animations = "";
-        for ($i = 0; $i < min(3, count($allAnimations)); ++$i) $animations = $animations . $allAnimations[$i]->render(false);
-        if (count($allAnimations) === 0) $animations = <<<HTML
-            <p>You have not created any animations yet. Click <a href="editor">here</a> to create one.</p>
+        for ($i = 0; $i < min(3, count($allAnimations)); ++$i) {
+            $html = $allAnimations[$i]->render(false);
+            $animations = $animations . <<<HTML
+                <div class="col">$html</div>
+            HTML;
+        }
+        if (count($allAnimations) < 3) $animations = $animations . <<<HTML
+            <div class="col">
+                <div class="card bg-dark text-light" style="height: 100%; min-height: 150px">
+                    <div class="card-body" style="display: flex; height: 100%">
+                        <form method="post" action="editor" style="width: 100%; height: 100%;">
+                            <button type="submit" class="btn btn-lg btn-dark" style="width: 100%; height: 100%;">New</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
         HTML;
 
         $allClasses = is_null($user->classes) ? [] : $user->classes;
         $classes = "";
-        for ($i = 0; $i < min(3, count($allClasses)); ++$i) $classes = $classes . $allClasses[$i]->render();
-        if (count($allClasses) === 0) $classes = <<<HTML
-            <p>You have not joined any classes yet. Click <a href="class">here</a> to join one.</p>
+        for ($i = 0; $i < min(3, count($allClasses)); ++$i) {
+            $html = $allClasses[$i]->render();
+            $classes = $classes . <<<HTML
+                <div class="col">$html</div>
+            HTML;
+        }
+        if (count($allClasses) < 3) $classes = $classes . <<<HTML
+            <div class="col">
+                <div class="card bg-dark text-light" style="height: 100%; min-height: 150px">
+                    <div class="card-body" style="display: flex; height: 100%">
+                        <form method="post" action="class" style="width: 100%; height: 100%;">
+                            <button type="submit" class="btn btn-lg btn-dark" style="width: 100%; height: 100%;">New</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
         HTML;
 
         echo <<<HTML
@@ -337,12 +363,12 @@ switch ($user->type) {
                     <hr>
                     <div>
                         <h2><a href="class">Classes</a></h2>
-                        <div style="display: flex;">$classes</div>
+                        <div class="row row-cols-3" style="width: 100%;">$classes</div>
                     </div>
                     <hr>
                     <div>
                         <h2><a href="animations">Animations</a></h2>
-                        <div style="display: flex;">$animations</div>
+                        <div class="row row-cols-3" style="width: 100%;">$animations</div>
                     </div>
                 </div>
             </div>
