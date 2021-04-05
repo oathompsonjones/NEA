@@ -35,7 +35,7 @@ class Animation
         }
     }
 
-    public function render()
+    public function render($showImages = true)
     {
         $db = $_SESSION["database"];
         $id = $this->id;
@@ -94,12 +94,14 @@ class Animation
                     };
                 </script>
                 <div id="$id-card" class="card text-white bg-dark animation">
-                    <div id="$id-div" class="icon firstIcon">
-                        <img src="$firstIcon" class="card-img-top" id="$id-icon">
-                        <div id="$id-buttons" class="buttons">
-                            <button class="btn btn-secondary btn-lg" data-toggle="tooltip" data-placement="top" title="Play the animation" onclick='_$id($jsonIcons);'>▶</button>
-                        </div>
-                    </div>
+        HTML . ($showImages ? <<<HTML
+            <div id="$id-div" class="icon firstIcon">
+                <img src="$firstIcon" class="card-img-top" id="$id-icon">
+                <div id="$id-buttons" class="buttons">
+                    <button class="btn btn-secondary btn-lg" data-toggle="tooltip" data-placement="top" title="Play the animation" onclick='_$id($jsonIcons);'>▶</button>
+                </div>
+            </div>
+        HTML : "") . <<<HTML
                     <div class="card-body">
                         <h5 class="card-title">$name</h5>
                         <div style="display: flex;">

@@ -302,8 +302,7 @@ switch ($user->type) {
         echo <<<HTML
             <div style="display: flex; height: 100%;">
                 <div style="flex: 40%; max-width: 40%; word-wrap: break-word;">
-                    <h1>Microcontroller Animations</h1>
-                    <div class="card-group" style="display: block; overflow: auto; height: 95%;">
+                    <div class="card-group" style="display: block; overflow: auto; height: 100%;">
                         <style>.post { display: none; }</style>
         HTML;
         for ($i = 0; $i < min(count($feedPosts), 100); ++$i) echo $feedPosts[$i]->render() . "<br>";
@@ -311,8 +310,40 @@ switch ($user->type) {
                         <style>.post { display: block; }</style>
                     </div>
                 </div>
-                <div style="flex: 60%; max-width: 60%; word-wrap: break-word;">
-                    Other stuff goes here...
+                <div style="flex: 3%; max-width: 3%;"></div>
+        HTML;
+
+        $allAnimations = is_null($user->animations) ? [] : $user->animations;
+        $animations = "";
+        for ($i = 0; $i < min(3, count($allAnimations)); ++$i) $animations = $animations . $allAnimations[$i]->render(false);
+        if (count($allAnimations) === 0) $animations = <<<HTML
+            <p>You have not created any animations yet. Click <a href="editor">here</a> to create one.</p>
+        HTML;
+
+        $allClasses = is_null($user->classes) ? [] : $user->classes;
+        $classes = "";
+        for ($i = 0; $i < min(3, count($allClasses)); ++$i) $classes = $classes . $allClasses[$i]->render();
+        if (count($allClasses) === 0) $classes = <<<HTML
+            <p>You have not joined any classes yet. Click <a href="class">here</a> to join one.</p>
+        HTML;
+
+        echo <<<HTML
+                <div style="flex: 57%; max-width: 57%; word-wrap: break-word;">
+                    <h1>Microcontroller Animations</h1>
+                    <div style="height: 15%; overflow: hidden;">
+                        <h2><a href="profile">$user->username</a></h2>
+                        <p>$user->bio</p>
+                    </div>
+                    <hr>
+                    <div>
+                        <h2><a href="class">Classes</a></h2>
+                        <div style="display: flex;">$classes</div>
+                    </div>
+                    <hr>
+                    <div>
+                        <h2><a href="animations">Animations</a></h2>
+                        <div style="display: flex;">$animations</div>
+                    </div>
                 </div>
             </div>
         HTML;

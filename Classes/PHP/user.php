@@ -36,13 +36,15 @@ class User
                 if (is_null($users)) return NULL;
                 return array_map("mapToUserObject", array_map("mapToFirstItem", $users));
             case "animations":
-                $animations = $db->select("AnimationID", "Animation", "Username = '$username'");
+                $animations = $db->select("AnimationID", "Animation", "Username = '$username'", "AnimationID");
                 if (is_null($animations)) return NULL;
                 return array_map("mapToAnimationObject", array_map("mapToFirstItem", $animations));
             case "posts":
                 $posts = $db->select("PostID", "Post", "Username = '$username'", "CreatedAt DESC");
                 if (is_null($posts)) return NULL;
                 return array_map("mapToPostObject", array_map("mapToFirstItem", $posts));
+            case "classes":
+                return [];
             default:
                 throw new Exception("Property $name does not exist on type User.");
         }
