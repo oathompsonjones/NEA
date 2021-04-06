@@ -31,6 +31,14 @@ function mapToAnimationObject($value)
 {
     return new Animation($value);
 }
+function mapToGroupObject($value)
+{
+    return new Group($value);
+}
+function mapToMessageObject($value)
+{
+    return new Message($value);
+}
 function mapToAnimationID($value)
 {
     return $value->animationID;

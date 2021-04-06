@@ -44,9 +44,10 @@
                             case "admin":
                                 // Render the navbar for admins.
                                 echo <<<HTML
-                                    <li class="nav-item">
-                                        <a class="nav-link" href="logout">Log Out</a>
-                                    </li>
+                                        <li class="nav-item">
+                                            <a class="nav-link" href="logout">Log Out</a>
+                                        </li>
+                                    </ul>
                                 HTML;
                                 break;
                             case "teacher":
@@ -62,14 +63,8 @@
                                         <li class="nav-item">
                                             <a class="nav-link" href="editor">Editor</a>
                                         </li>
-                                        <li class="nav-item dropdown">
-                                            <a class="nav-link dropdown-toggle" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">Classes</a>
-                                            <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-                                                <li><a class="dropdown-item" href="class?classID=1">Class 1</a></li>
-                                                <li><a class="dropdown-item" href="class?classID=2">Class 2</a></li>
-                                                <li><hr class="dropdown-divider"></li>
-                                                <li><a class="dropdown-item" href="class">Join new class</a></li>
-                                            </ul>
+                                        <li class="nav-item">
+                                            <a class="nav-link" href="class">Classes</a>
                                         </li>
                                         <li class="nav-item">
                                             <a class="nav-link" href="logout">Log Out</a>
@@ -94,6 +89,13 @@
                             </ul>
                         HTML;
                     }
+                    echo <<<HTML
+                        <ul class="navbar-nav">
+                            <li class="nav-item">
+                                <a class="nav-link disabled">$user->username</a>
+                            </li>
+                        </ul>
+                    HTML;
                     ?>
             </div>
         </div>

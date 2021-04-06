@@ -23,7 +23,7 @@ class Comment
             case "content":
                 return $db->select("Content", "Comment", "CommentID = '$id'")[0][0];
             default:
-                throw new Exception("Property $name does not exist on type Post.");
+                throw new Exception("Property $name does not exist on type Comment.");
         }
     }
 

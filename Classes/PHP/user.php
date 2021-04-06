@@ -44,7 +44,9 @@ class User
                 if (is_null($posts)) return NULL;
                 return array_map("mapToPostObject", array_map("mapToFirstItem", $posts));
             case "classes":
-                return [];
+                $classes = $db->select("ClassID", "ClassMember", "Username = '$username'");
+                if (is_null($classes)) return NULL;
+                return array_map("mapToGroupObject", array_map("mapToFirstItem", $classes));
             default:
                 throw new Exception("Property $name does not exist on type User.");
         }

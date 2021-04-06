@@ -12,9 +12,10 @@ class Database
         $this->mysqli = new mysqli($this->dbHost, $this->dbUser, $this->dbPassword, $this->dbName);
     }
 
-    public function select($fields, $table, $condition = NULL, $orderBy = NULL)
+    public function select($fields, $table, $condition = NULL, $orderBy = NULL, $innerJoin = NULL, $innerJoinOn = NULL)
     {
         $query = "SELECT $fields FROM $table";
+        if (!is_null($innerJoin) && !is_null($innerJoinOn)) $query = $query . " INNER JOIN $innerJoin ON $innerJoinOn";
         if (!is_null($condition)) $query = $query . " WHERE $condition";
         if (!is_null($orderBy)) $query = $query . " ORDER BY $orderBy";
         $query = $query . ";";
@@ -35,12 +36,12 @@ class Database
         $query = "UPDATE $table SET";
         for ($i = 0; $i < count($columns); ++$i)
             $query = $query . " $columns[$i] = '$values[$i]'" . ($i !== count($columns) - 1 ? "," : "");
-        $query = $query . " WHERE $condition";
-        $this->mysqli->query($query);
+        $query = $query . " WHERE $condition;";
+        return $this->mysqli->query($query);
     }
 
     public function delete($table, $condition)
     {
-        $this->mysqli->query("DELETE FROM $table WHERE $condition;");
+        return $this->mysqli->query("DELETE FROM $table WHERE $condition;");
     }
 }

@@ -235,12 +235,12 @@ if (isset($_POST["editProfile"]) && $_POST["editProfile"] === "true" && $isLogge
         }
     }
     echo <<<HTML
-        <div style="display: flex;">
-            <div style="flex: 50%; max-width: 50%; word-wrap: break-word;">
+        <div class="row row-cols-2">
+            <div class="col">
                 <h3>$username</h3>
                 <p>$bio</p>
             </div>
-            <div style="flex: 50%; max-width: 50%; word-wrap: break-word;">
+            <div class="col">
                 <h3 style="display: flex;">
                     <form method="post" id="followersForm">
                         <input style="display: none;" type="text" name="displayFollowers" value="true">

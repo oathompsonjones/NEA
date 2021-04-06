@@ -52,6 +52,7 @@ a {
     display: block;
 }
 
+/* Scrollbar Settings */
 ::-webkit-scrollbar {
     width: 3px;
     height: 3px;
@@ -64,4 +65,20 @@ a {
 }
 ::-webkit-scrollbar-thumb:hover {
     background: #555555; 
+}
+
+/* Mobile settings */
+@media only screen and (max-width: 600px) {
+    .homeNotFeed {
+        display: none;
+    }
+    .homeFeed {
+        width: 100%;
+        flex: 100%;
+    }
+    .homeWrapper {
+        display: block;
+        height: auto;
+        width: 100%;
+    }
 }
