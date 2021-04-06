@@ -168,7 +168,12 @@ if (!isset($_GET["classID"]) || is_null($_GET["classID"])) {
                     </script>
                     <div class="input-group mb-3">
                         <input id="messageInput" class="form-control bg-dark border-dark text-light" type="text" placeholder="Message $class->name">
-                        <button type="button" class="btn btn-dark" onclick="sendMessage()">Send</button>
+                        <button id="messageSend" type="button" class="btn btn-dark" onclick="sendMessage()">Send</button>
+                        <script>
+                            $("#messageInput").keydown((event) => {
+                                if (event.keyCode === 13) $("#messageSend").click();
+                            });
+                        </script>
                     </div>
                 </div>
             </div>
