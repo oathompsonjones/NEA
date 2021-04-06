@@ -43,8 +43,9 @@ class Message
                         <h6>$user->username</h6>
                         <p class="text-muted" style="flex: 25%; text-align: right;">$createdAt GMT</p>
                     </div>
-                    <p class="card-body">$this->content</p>
+                    <p class="card-body" style="word-break: break-all;">$this->content</p>
             </div>
+            <br>
         HTML;
     }
 }
