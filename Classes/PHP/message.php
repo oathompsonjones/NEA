@@ -33,19 +33,31 @@ class Message
         $db->delete("ChatMessage", "MessageID = '$this->id'");
     }
 
-    public function render()
+    public function render($loggedInUser)
     {
+        $id = $this->id;
         $user = $this->user;
         $createdAt = gmdate("D, d M Y H:i:s", $this->createdAt);
-        return <<<HTML
+        $html = <<<HTML
             <div class="card bg-dark text-light">
-                    <div class="card-header" style="display: flex;">
-                        <h6>$user->username</h6>
-                        <p class="text-muted" style="flex: 25%; text-align: right;">$createdAt GMT</p>
-                    </div>
-                    <p class="card-body" style="word-break: break-all;">$this->content</p>
+                <div class="card-header" style="display: flex;">
+                    <h6>$user->username</h6>
+                    <p class="text-muted" style="flex: 25%; text-align: right;">$createdAt GMT</p>
+                </div>
+                <div class="card-body" style="display: flex; word-break: break-all;">
+                    <p style="flex: 100%;">$this->content</p>
+        HTML;
+        if ($loggedInUser->username === $user->username || $user->type === "teacher") $html = $html . <<<HTML
+            <div id="buttons-$id" style="flex: 10%; text-align: right; display: none;">
+                <a id="delete-$id" class="btn btn-sm btn-danger">Delete</a>
+            </div>
+            <a id="$id" style="flex: 5%; text-align: right;" class="btn btn-sm btn-dark menu">☰</a>
+        HTML;
+        $html = $html . <<<HTML
+                </div>
             </div>
             <br>
         HTML;
+        return $html;
     }
 }

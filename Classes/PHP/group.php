@@ -30,9 +30,10 @@ class Group
                 $messages = $db->select("MessageID", "ChatMessage", "ClassID = '$id'", "CreatedAt");
                 if (is_null($messages)) return NULL;
                 return array_map("mapToMessageObject", array_map("mapToFirstItem", $messages));
-                return [];
             case "mutedUsers":
-                return [];
+                $users = $db->select("Username", "MutedUser", "ClassID = '$id'");
+                if (is_null($users)) return NULL;
+                return array_map("mapToUserObject", array_map("mapToFirstItem", $users));
             case "assignments":
                 return [];
             default:
@@ -57,6 +58,24 @@ class Group
         $teachers = $this->teachers;
         if (in_array($username, array_map("mapToUsernames", $students)) || in_array($username, array_map("mapToUsernames", $teachers))) return;
         $db->insert("ClassMember", "Username, ClassID", "'$username', '$this->id'");
+    }
+
+    public function muteUser($username)
+    {
+        $db = $_SESSION["database"];
+        $db->insert("MutedUser", "ClassID, Username", "'$this->id', '$username'");
+    }
+
+    public function unMuteUser($username)
+    {
+        $db = $_SESSION["database"];
+        $db->delete("MutedUser", "ClassID = '$this->id' AND Username = '$username'");
+    }
+
+    public function kickUser($username)
+    {
+        $db = $_SESSION["database"];
+        $db->delete("ClassMember", "ClassID = '$this->id' AND Username = '$username'");
     }
 
     public function render()
