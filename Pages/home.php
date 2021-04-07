@@ -278,6 +278,66 @@ function renderComments()
     return $html;
 }
 
+function renderClasses()
+{
+    $db = $_SESSION["database"];
+    $classes = array_map("mapToGroupObject", array_map("mapToFirstItem", $db->select("ClassID", "Class", NULL, "ClassID")));
+    $html = <<<HTML
+        <h3>Classes</h3>
+        <table style="width: 100%;">
+            <tr>
+                <th>Class ID</th>
+                <th>Name</th>
+                <th>Chat Enabled</th>
+                <th>Students</th>
+                <th>Teachers</th>
+                <th>Chat Messages</th>
+                <th>Muted Users</th>
+                <th>Assignments</th>
+                <th></th>
+            </tr>
+    HTML;
+    for ($i = 0; $i < count($classes); ++$i) {
+        $id = $classes[$i]->id;
+        $name = $classes[$i]->name;
+        $chatEnabled = $classes[$i]->chatEnabled;
+        $students = count($classes[$i]->students);
+        $teachers = count($classes[$i]->teachers);
+        $chatMessages = count($classes[$i]->chatMessages);
+        $mutedUsers = count($classes[$i]->mutedUsers);
+        $assignments = count($classes[$i]->assignments);
+        $html = $html . <<<HTML
+            <tr id="$id-row">
+                <td>$id</td>
+                <td style="max-width: 500px; word-wrap: break-word;">$name</td>
+                <td>$chatEnabled</td>
+                <td>$students</td>
+                <td>$teachers</td>
+                <td>$chatMessages</td>
+                <td>$mutedUsers</td>
+                <td>$assignments</td>
+                <script>
+                    const delete_$id = () => document.getElementById("$id-delete").innerHTML = `<button onclick="deleteConfirm_$id();" class="btn btn-sm btn-danger">Confirm</button>`;
+                    const deleteConfirm_$id = () => {
+                        const classID = "$id";
+                        $.post("Utils/Forms/deleteClass.php", { classID }, () => {
+                            document.getElementById("$id-row").style.display = "none";
+                            document.getElementById("$id-delete").innerHTML = `<button onclick="delete_$id();" class="btn btn-sm btn-danger">Delete</button>`;
+                        });
+                    };
+                </script>
+                <td id="$id-delete">
+                    <button onclick="delete_$id();" class="btn btn-sm btn-danger">Delete</button>
+                </td>
+            </tr>
+        HTML;
+    }
+    $html = $html . <<<HTML
+        </table>
+    HTML;
+    return $html;
+}
+
 switch ($user->type) {
     case "admin":
         echo <<<HTML
@@ -287,6 +347,7 @@ switch ($user->type) {
         echo renderAnimations();
         echo renderPosts();
         echo renderComments();
+        echo renderClasses();
         break;
     case "teacher":
     case "student":

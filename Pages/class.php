@@ -154,21 +154,28 @@ if (!isset($_GET["classID"]) || is_null($_GET["classID"])) {
                                 }
                             });
                         };
-                        setInterval(updateMessages, 500);
+                        const updateInput = () => {
+                            const classID = "$class->id";
+                            const username = "$user->username";
+                            $.post("Utils/Forms/updateClassChatInput.php", { classID, username }, (isMuted) => {
+                                if (isMuted === "true") $("#userInput").hide();
+                                else $("#userInput").show();
+                            });
+                        };      
+                        setInterval(() => {
+                            updateMessages();
+                            updateInput();
+                        }, 500);
                     </script>
-        HTML;
-        if (!in_array($user->username, array_map("mapToUsernames", $class->mutedUsers))) echo <<<HTML
-            <div class="input-group mb-3">
-                <input id="messageInput" class="form-control bg-dark border-dark text-light" type="text" placeholder="Message $class->name">
-                <button id="messageSend" type="button" class="btn btn-dark" onclick="sendMessage()">Send</button>
-                <script>
-                    $("#messageInput").keydown((event) => {
-                        if (event.keyCode === 13) $("#messageSend").click();
-                    });
-                </script>
-            </div>
-        HTML;
-        echo <<<HTML
+                    <div id="userInput" class="input-group mb-3">
+                        <input id="messageInput" class="form-control bg-dark border-dark text-light" type="text" placeholder="Message $class->name">
+                        <button id="messageSend" type="button" class="btn btn-dark" onclick="sendMessage()">Send</button>
+                        <script>
+                            $("#messageInput").keydown((event) => {
+                                if (event.keyCode === 13) $("#messageSend").click();
+                            });
+                        </script>
+                    </div>
                 </div>
             </div>
         HTML;
