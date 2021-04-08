@@ -41,7 +41,7 @@
         - Delete Animations                                                         √
         - Delete Posts                                                              √
         - Delete Comments                                                           √
-        - Delete Classes
+        - Delete Classes                                                            √
 - Social Network
     - Profile page - just DB retrieval and updating with some CSS                   √
     - Following/UnFollowing Users                                                   √
@@ -52,7 +52,7 @@
     - Comments - just DB retrieval and updating with some CSS and some forms        √
     - Likes - just DB retrieval and updating with some CSS and some forms           √
     - Classes
-        - Assignments
+        - Assignments                                                               √
         - Chat Room                                                                 √
 - Editor
     - Add more config options                                                       √

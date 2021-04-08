@@ -142,6 +142,7 @@ if (!isset($_GET["classID"]) || is_null($_GET["classID"])) {
                             const classID = "$class->id";
                             $.post("Utils/Forms/sendChatMessage.php", { message, username, classID }, () => document.getElementById("messageInput").value = "");
                         };
+                        const deleteMessage = (messageID) => $.post("Utils/Forms/deleteChatMessage.php", { messageID }, () => $("#" + messageID).hide());
                         const updateMessages = () => {
                             const classID = "$class->id";
                             const currentHTML = document.getElementById("messages").innerHTML;
@@ -218,6 +219,73 @@ if (!isset($_GET["classID"]) || is_null($_GET["classID"])) {
             </div>
         HTML;
     }
+    // Assignments Page
+    echo <<<HTML
+        <div id="assignments" style="height: 90%; overflow-y: auto;">
+    HTML;
+    if ($user->type === "teacher") echo <<<HTML
+        <script>
+            const deleteAssignment = (assignmentID) => $.post("Utils/Forms/deleteAssignment.php", { assignmentID }, () => $("#" + assignmentID).hide());
+            const createAssignment = (assignmentDescription, assignmentDueAt) => {
+                const dueAtInput = document.getElementById("assignmentDueAt");
+                if (assignmentDueAt.match(/\d\d\/\d\d\/\d\d\d\d/g) === null || new Date(assignmentDueAt = [assignmentDueAt.split("/")[1], assignmentDueAt.split("/")[0], assignmentDueAt.split("/")[2]].join("/")).valueOf() < Date.now() || new Date(assignmentDueAt).year > 2030) {
+                    dueAtInput.setCustomValidity("Invalid date.");
+                    dueAtInput.reportValidity();
+                } else {
+                    const classID = "$classID";
+                    $.post("Utils/Forms/createAssignment.php", { assignmentDescription, assignmentDueAt, classID }, () => window.location.replace("class?classID=$classID"));
+                }
+            };
+        </script>
+        <div>
+            <h4>Create New Assignment</h4>
+            <div class="form-floating">
+                <input class="form-control bg-dark border-dark text-light" type="text" name="Description" id="assignmentDesc" placeholder="Description">
+                <label for="assignmentDesc">Description</label>
+            </div>
+            <div class="form-floating">
+                <input class="form-control bg-dark border-dark text-light" type="date" name="Date Due" id="assignmentDueAt" placeholder="dd/mm/yyyy">
+                <label for="assignmentDueAt">Date Due (dd/mm/yyyy)</label>
+            </div>
+            <button class="btn btn-dark" type="button" onclick="createAssignment($('#assignmentDesc').val(), $('#assignmentDueAt').val());">Create</button>
+        </div>
+        <br>
+    HTML;
+    else echo <<<HTML
+        <script>
+            const handInAssignment = (assignmentID, animationID, animationName) => {
+                const username = '$user->username';
+                $.post("Utils/Forms/handInAssignment.php", { assignmentID, animationID, username }, () => {
+                    document.getElementById("work-" + assignmentID).innerHTML = `<div class="accordion-item">
+                        <h2 class="accordion-header" id="workHeader-` + assignmentID + `">
+                            <button class="accordion-button collapsed bg-dark text-light text-muted" type="button" data-bs-toggle="collapse" data-bs-target="#workCollapse-` + assignmentID + `" aria-expanded="true" aria-controls="workCollapse-` + assignmentID + `" disabled>
+                                Handed In - ` + animationName + `
+                            </button>
+                        </h2>
+                    </div>`;
+                });
+            };
+        </script>
+    HTML;
+    $assignments = $class->assignments;
+    $lastAssignmentWasPast = false;
+    for ($i = 0; $i < count($assignments); ++$i) {
+        $assignment = $assignments[$i];
+        if ($i === 0) echo <<<HTML
+            <h4>Upcoming Assignments</h4>
+        HTML;
+        if ($assignment->dueAt < time() && !$lastAssignmentWasPast) {
+            $lastAssignmentWasPast = true;
+            echo <<<HTML
+                <h4>Past Assignments</h4>
+            HTML;
+        }
+        echo $assignment->render($user);
+    }
+    echo <<<HTML
+            </div>
+        </div>
+    HTML;
     // Teacher List
     $teachers = $class->teachers;
     $teachersHTML = "";
@@ -225,7 +293,7 @@ if (!isset($_GET["classID"]) || is_null($_GET["classID"])) {
         $username = $teachers[$i]->username;
         $teachersHTML = $teachersHTML . <<<HTML
             <div id="$username" style="display: flex;">
-                <a href="profile?user=$username">$username</a>
+                <a class="btn btn-dark" href="profile?user=$username">$username</a>
         HTML;
         if ($user->type === "teacher" && $teachers[$i]->type === "student") {
             $teachersHTML = $teachersHTML . <<<HTML
@@ -255,7 +323,7 @@ if (!isset($_GET["classID"]) || is_null($_GET["classID"])) {
                 </script>
                 <div class="btn-group">
                     <button class="btn btn-sm btn-danger" onclick="kick_$username();">Kick</button>
-                    <div id="muteButton-$username">
+                    <div class="btn-group" id="muteButton-$username">
             HTML;
             if (in_array($username, array_map("mapToUsernames", $class->mutedUsers))) {
                 $teachersHTML = $teachersHTML . <<<HTML
@@ -283,7 +351,7 @@ if (!isset($_GET["classID"]) || is_null($_GET["classID"])) {
         $username = $students[$i]->username;
         $studentsHTML = $studentsHTML . <<<HTML
             <div id="$username" style="display: flex;">
-                <a href="profile?user=$username">$username</a>
+                <a class="btn btn-dark" href="profile?user=$username">$username</a>
         HTML;
         if ($user->type === "teacher" && $students[$i]->type === "student") {
             $studentsHTML = $studentsHTML . <<<HTML
@@ -313,7 +381,7 @@ if (!isset($_GET["classID"]) || is_null($_GET["classID"])) {
                 </script>
                 <div class="btn-group" role="group">
                     <button class="btn btn-sm btn-danger" onclick="kick_$username();">Kick</button>
-                    <div id="muteButton-$username">
+                    <div class="btn-group" id="muteButton-$username">
             HTML;
             if (in_array($username, array_map("mapToUsernames", $class->mutedUsers))) {
                 $studentsHTML = $studentsHTML . <<<HTML
@@ -334,13 +402,6 @@ if (!isset($_GET["classID"]) || is_null($_GET["classID"])) {
             <br>
         HTML;
     }
-    // Assignments Page
-    echo <<<HTML
-                <div id="assignments" style="height: 90%;">
-                    Assignments
-                </div>
-            </div>
-    HTML;
     // Side Bar
     echo <<<HTML
             <div class="bg-dark" style="

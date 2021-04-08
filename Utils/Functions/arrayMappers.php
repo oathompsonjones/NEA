@@ -3,6 +3,14 @@ function mapToUsernames($value)
 {
     return $value->username;
 }
+function mapToIDs($value)
+{
+    return $value->id;
+}
+function mapToNames($value)
+{
+    return $value->name;
+}
 function mapToFirstItem($value)
 {
     return $value[0];
@@ -38,6 +46,14 @@ function mapToGroupObject($value)
 function mapToMessageObject($value)
 {
     return new Message($value);
+}
+function mapToAssignmentObject($value)
+{
+    return new Assignment($value);
+}
+function mapToAssignmentWorkObject($value)
+{
+    return new AssignmentWork($value);
 }
 function mapToAnimationID($value)
 {

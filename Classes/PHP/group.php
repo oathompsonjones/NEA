@@ -35,7 +35,9 @@ class Group
                 if (is_null($users)) return NULL;
                 return array_map("mapToUserObject", array_map("mapToFirstItem", $users));
             case "assignments":
-                return [];
+                $assignments = $db->select("AssignmentID", "Assignment", "ClassID = '$id'", "DueAt DESC");
+                if (is_null($assignments)) return NULL;
+                return array_map("mapToAssignmentObject", array_map("mapToFirstItem", $assignments));
             default:
                 throw new Exception("Property $name does not exist on type Group.");
         }

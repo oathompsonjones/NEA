@@ -15,6 +15,8 @@ require_once "Classes/PHP/post.php";
 require_once "Classes/PHP/comment.php";
 require_once "Classes/PHP/group.php";
 require_once "Classes/PHP/message.php";
+require_once "Classes/PHP/assignment.php";
+require_once "Classes/PHP/assignmentWork.php";
 
 // Import useful functions.
 require_once "Utils/Functions/arrayMappers.php";
