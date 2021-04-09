@@ -59,7 +59,9 @@ class Assignment
                                         </button>
                                     </h2>
                                     <div id="workCollapse-$this->id" class="accordion-collapse collapse" aria-labelledby="workHeader-$this->id" data-bs-parent="#work-$this->id">
-                                        <div class="accordion-body" id="workList-$this->id">$work</div>
+                                        <div class="accordion-body" id="workList-$this->id">
+                                            <div class="row row-cols-4">$work</div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>

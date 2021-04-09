@@ -35,7 +35,7 @@ class Animation
         }
     }
 
-    public function render($showImages = true)
+    public function render($showImages = true, $showButtons = true)
     {
         $db = $_SESSION["database"];
         $id = $this->id;
@@ -104,24 +104,26 @@ class Animation
         HTML : "") . <<<HTML
                     <div class="card-body">
                         <h5 class="card-title">$name</h5>
-                        <div style="display: flex;">
-                            <div id="$id-deleteButton" style="display: flex; width: 50%;">
-                                <button class="btn btn-danger btn-sm" type="button" onclick="delete_$id();" style="width: 100%;">Delete</button>
-                            </div>
-                            <form method="post" action="editor" style="width: 50%;">
-                                <input style="display: none;" name="preMade" type="text" value="$id">
-                                <button class="btn btn-dark btn-sm" type="submit" style="width: 100%;">Edit</button>
-                            </form>
-                        </div>
-                        <div style="display: flex; width: 100%;">
-                            <div id="$id-shareButton" style="display: flex; width: 50%;">
-                                $shareButton
-                            </div>
-                            <div class="form-floating" style="width: 50%;">
-                                <input type="number" class="form-control bg-dark text-light border-dark" id="$id-inputFPS" name="fps" placeholder="FPS" min=1 max=60 value=$fps required>
-                                <label for="$id-inputFPS" class="form-label">FPS</label>
-                            </div>
-                        </div>
+        HTML . ($showButtons ? <<<HTML
+            <div style="display: flex;">
+                <div id="$id-deleteButton" style="display: flex; width: 50%;">
+                    <button class="btn btn-danger btn-sm" type="button" onclick="delete_$id();" style="width: 100%;">Delete</button>
+                </div>
+                <form method="post" action="editor" style="width: 50%;">
+                    <input style="display: none;" name="preMade" type="text" value="$id">
+                    <button class="btn btn-dark btn-sm" type="submit" style="width: 100%;">Edit</button>
+                </form>
+            </div>
+            <div style="display: flex; width: 100%;">
+                <div id="$id-shareButton" style="display: flex; width: 50%;">
+                    $shareButton
+                </div>
+                <div class="form-floating" style="width: 50%;">
+                    <input type="number" class="form-control bg-dark text-light border-dark" id="$id-inputFPS" name="fps" placeholder="FPS" min=1 max=60 value=$fps required>
+                    <label for="$id-inputFPS" class="form-label">FPS</label>
+                </div>
+            </div>
+    HTML : "") . <<<HTML
                     </div>
                 </div>
             </div>

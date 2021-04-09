@@ -31,8 +31,13 @@ class AssignmentWork
 
     public function render()
     {
-        $db = $_SESSION["database"];
-        return "";
+        $animationHTML = $this->animation->render(true, false);
+        return <<<HTML
+            <div class="col">
+                <h5 >$this->username</h5>
+                $animationHTML
+            </div>
+        HTML;
     }
 
     public function delete()
