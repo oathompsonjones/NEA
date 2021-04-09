@@ -11,7 +11,10 @@
         "elif",
         "microbit",
         "neopixel",
-        "toggler"
+        "scrollbit",
+        "stdlib",
+        "toggler",
+        "tscrollbit"
     ],
     "python.pythonPath": "/usr/bin/python",
 }

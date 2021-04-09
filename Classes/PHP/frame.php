@@ -18,6 +18,16 @@ class Frame
                 return $db->select("FramePosition", "Frame", "FrameID = '$id'")[0][0];
             case "binary":
                 return $db->select("BinaryString", "Frame", "FrameID = '$id'")[0][0];
+            case "width":
+                $animationID = $db->select("AnimationID", "Frame", "FrameID = '$id'")[0][0];
+                if (is_null($animationID)) return NULL;
+                $animation = new Animation($animationID);
+                return $animation->width;
+            case "height":
+                $animationID = $db->select("AnimationID", "Frame", "FrameID = '$id'")[0][0];
+                if (is_null($animationID)) return NULL;
+                $animation = new Animation($animationID);
+                return $animation->height;
             default:
                 throw new Exception("Property $name does not exist on type Frame.");
         }

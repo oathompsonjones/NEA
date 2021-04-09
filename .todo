@@ -2,38 +2,37 @@
     - Micro:Bit internal
         - MicroPython                                                               √
         - TypeScript                                                                √
-        - Hex file
     - Scroll Bit 17x7 for Micro:Bit
-        - MicroPython
-        - TypeScript
-        - Hex file
+        - MicroPython                                                               √
+        - TypeScript                                                                √
     - LOL Shield
         - Arduino                                                                   √
     - Pico 4x4 RGB Keypad
-        - MicroPython
-        - C++
-        - uf2 file
+        - MicroPython                                                               √
+        - C++                                                                       √
     - NeoPixel
         - Arduino
         - Micro:Bit MicroPython
         - Micro:Bit TypeScript
-        - Micro:Bit Hex file
     - 16x9
         - Arduino
         - Micro:Bit MicroPython
         - Micro:Bit TypeScript
-        - Micro:Bit Hex file
     - 8x8
         - With Control Board
             - Arduino
             - Micro:Bit MicroPython
             - Micro:Bit TypeScript
-            - Micro:Bit Hex file
         - Without Control Board
             - Arduino
             - Micro:Bit MicroPython
             - Micro:Bit TypeScript
-            - Micro:Bit Hex file
+    - Custom
+        - Arduino
+        - Micro:Bit MicroPython
+        - Micro:Bit TypeScript
+    - Hex Files
+    - UF2 Files
 - Backend
     - Admin controls
         - Delete/Add users                                                          √

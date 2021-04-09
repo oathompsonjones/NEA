@@ -159,7 +159,15 @@ class Animation
             preg_match_all("/.{1,32}/", $binary, $smallerBinaries);
             return array_map("mapToJsonBinary", $smallerBinaries[0]);
         }
-        $frames = array_map("frameToBinaryArray", $this->frames);
+        function frameToBinaryArrayRGB($value)
+        {
+            $binary = str_pad($value->binary, $value->width * $value->height * 24, "0", STR_PAD_LEFT);
+            $smallerBinaries = [];
+            preg_match_all("/.{1,24}/", $binary, $smallerBinaries);
+            return array_map("mapToJsonBinary", $smallerBinaries[0]);
+        }
+        if ($this->type == 2) $frames = array_map("frameToBinaryArrayRGB", $this->frames);
+        else $frames = array_map("frameToBinaryArray", $this->frames);
         return str_replace('"', "", json_encode($frames, JSON_PRETTY_PRINT));
     }
 
@@ -262,9 +270,9 @@ class MicroBitInternalAnimation extends Animation
 
     public function generateMicroBitMicroPythonCode($fps = 1)
     {
-        $animationJSON = $this->getFramesAs32BitIntegersJSON();
-        $frames = implode("\n", array_map("mapTabToStart", array_map("mapTabToStart", array_map("mapTabToStart", explode("\n", str_replace("    ", "\t", $animationJSON))))));
-        $code = "from microbit import *"
+        $frames = implode("\n", array_map("mapTabToStart", array_map("mapTabToStart", array_map("mapTabToStart", explode("\n", str_replace("    ", "\t", $this->getFramesAs32BitIntegersJSON()))))));
+        return "# https://python.microbit.org/v/2"
+            . "\nfrom microbit import *"
             . "\n"
             . "\ndef play(animation):"
             . "\n\tfor frame in animation:"
@@ -284,14 +292,15 @@ class MicroBitInternalAnimation extends Animation
             . "\n\t\tplay("
             . "\n$frames"
             . "\n\t\t)";
-        return $code;
     }
 
     public function generateMicroBitTypeScriptCode($fps = 1)
     {
-        $animationJSON = $this->getFramesAs32BitIntegersJSON();
-        $frames = implode("\n", array_map("mapTabToStart", array_map("mapTabToStart", explode("\n", str_replace("    ", "\t", $animationJSON)))));
-        $code = "const play = (animation: number[][]) => {"
+        $frames = implode("\n", array_map("mapTabToStart", array_map("mapTabToStart", explode("\n", str_replace("    ", "\t", $this->getFramesAs32BitIntegersJSON())))));
+        return "/**"
+            . "\n* https://makecode.microbit.org/#editor"
+            . "\n*/"
+            . "\nconst play = (animation: number[][]) => {"
             . "\n\tanimation.forEach((frame: number[]) => {"
             . "\n\t\tconst bits: number[] = [255 & frame[0]];"
             . "\n\t\tfor (let i = 0; i < frame.length - 1; ++i)"
@@ -312,7 +321,6 @@ class MicroBitInternalAnimation extends Animation
             . "\n$frames"
             . "\n\t);"
             . "\n});";
-        return $code;
     }
 
     public function generateMicroBitHexFile($fps = 1)
@@ -330,11 +338,11 @@ class LoLShieldAnimation extends Animation
 
     public function generateArduinoCppCode($fps = 1)
     {
-        $animationJSON = str_replace("]", "}", str_replace("[", "{", $this->getFramesAs32BitIntegersJSON()));
+        $frames = str_replace("]", "}", str_replace("[", "{", $this->getFramesAs32BitIntegersJSON()));
         $frameCount = count($this->frames);
-        $code = "#include <Charliplexing.h>"
+        return "#include <Charliplexing.h>"
             . "\n"
-            . "\nconst long animation[$frameCount][4] = $animationJSON;"
+            . "\nconst long animation[$frameCount][4] = $frames;"
             . "\n"
             . "\nvoid plot(int x, int y, int v)"
             . "\n{"
@@ -355,7 +363,7 @@ class LoLShieldAnimation extends Animation
             . "\n"
             . "\nvoid loop()"
             . "\n{"
-            . "\n\tfor (int i = 0; i < 3; ++i)"
+            . "\n\tfor (int i = 0; i < $frameCount; ++i)"
             . "\n\t{"
             . "\n\t\tint bits[14 * 9];"
             . "\n\t\tfor (int j = 0; j < 30; ++j)"
@@ -369,11 +377,95 @@ class LoLShieldAnimation extends Animation
             . "\n\t\t\tint y = j / 14;"
             . "\n\t\t\tplot(x, y, bits[j]);"
             . "\n\t\t}"
-            . "\n\t\tdelay(1000 / 1);"
+            . "\n\t\tdelay(1000 / $fps);"
             . "\n\t\tclearScreen();"
             . "\n\t}"
             . "\n}";
-        return $code;
+    }
+}
+
+class ScrollBitAnimation extends Animation
+{
+    public function __construct($id)
+    {
+        parent::__construct($id);
+    }
+
+    public function generateMicroBitMicroPythonCode($fps = 1)
+    {
+        $frames = implode("\n", array_map("mapTabToStart", array_map("mapTabToStart", array_map("mapTabToStart", explode("\n", str_replace("    ", "\t", $this->getFramesAs32BitIntegersJSON()))))));
+        return "# https://python.microbit.org/v/2"
+            . "\n# Download the scrollbit library from https://github.com/pimoroni/micropython-scrollbit/blob/master/library/scrollbit.py"
+            . "\n# Load/Save > Project Files > Add File"
+            . "\n"
+            . "\nimport scrollbit"
+            . "\nfrom microbit import *"
+            . "\n"
+            . "\ndef play(animation):"
+            . "\n\tfor frame in animation:"
+            . "\n\t\tbits = ["
+            . "\n\t\t\t255 & frame[0] >> 16,"
+            . "\n\t\t\t255 & frame[0] >> 8,"
+            . "\n\t\t\t255 & frame[0]"
+            . "\n\t\t]"
+            . "\n\t\tfor i in range(len(frame) - 1):"
+            . "\n\t\t\tfor j in range(4):"
+            . "\n\t\t\t\tbits.append(255 & frame[i + 1] >> 24 - j * 8)"
+            . "\n\t\tfor i in range(len(bits)):"
+            . "\n\t\t\tx = i % 17"
+            . "\n\t\t\ty = i // 17"
+            . "\n\t\t\tscrollbit.set_pixel(x, y, bits[i])"
+            . "\n\t\tscrollbit.show()"
+            . "\n\t\tsleep(1000 / $fps)"
+            . "\n\t\tscrollbit.clear()"
+            . "\n"
+            . "\nwhile True:"
+            . "\n\tif button_a.is_pressed():"
+            . "\n\t\tplay("
+            . "\n$frames"
+            . "\n\t\t)";
+    }
+
+    public function generateMicroBitTypeScriptCode($fps = 1)
+    {
+        $frames = implode("\n", array_map("mapTabToStart", array_map("mapTabToStart", explode("\n", str_replace("    ", "\t", $this->getFramesAs32BitIntegersJSON())))));
+        return "/**"
+            . "\n* https://makecode.microbit.org/#editor"
+            . "\n* You need to add the Scroll:Bit package."
+            . "\n* Advanced > Extensions > Scroll:Bit"
+            . "\n*/"
+            . "\n"
+            . "\nconst play = (animation: number[][]) => {"
+            . "\n\tanimation.forEach((frame: number[]) => {"
+            . "\n\t\tconst bits: number[] = ["
+            . "\n\t\t\t255 & frame[0] >> 16,"
+            . "\n\t\t\t255 & frame[0] >> 8,"
+            . "\n\t\t\t255 & frame[0]"
+            . "\n\t\t];"
+            . "\n\t\tfor (let i = 0; i < frame.length - 1; ++i)"
+            . "\n\t\t\tfor (let j = 0; j < 4; ++j)"
+            . "\n\t\t\t\tbits.push(255 & frame[i + 1] >> 24 - j * 8);"
+            . "\n\t\tfor (let i = 0; i < bits.length; ++i) {"
+            . "\n\t\t\tconst x = i % 17;"
+            . "\n\t\t\tconst y = Math.floor(i / 17);"
+            . "\n\t\t\tscrollbit.setPixel(x, y, bits[i]);"
+            . "\n\t\t}"
+            . "\n\t\tscrollbit.show();"
+            . "\n\t\tbasic.pause(1000 / $fps);"
+            . "\n\t\tscrollbit.clear();"
+            . "\n\t});"
+            . "\n}"
+            . "\n"
+            . "\ninput.onButtonPressed(Button.A, () => {"
+            . "\n\tplay("
+            . "\n$frames"
+            . "\n\t);"
+            . "\n});";
+    }
+
+    public function generateMicroBitHexFile($fps = 1)
+    {
+        return "Error: I haven't done this yet.";
     }
 }
 
@@ -383,17 +475,75 @@ class PicoRGBKeypadAnimation extends Animation
     {
         parent::__construct($id);
     }
-}
 
-class AdaFruitNeoPixelRGB8x8Animation extends Animation
-{
-    public function __construct($id)
+    public function generatePicoCppCode($fps = 1)
     {
-        parent::__construct($id);
+        $frames = str_replace("]", "}", str_replace("[", "{", $this->getFramesAs32BitIntegersJSON()));
+        $frameCount = count($this->frames);
+        return "#include \"pico/stdlib.h\""
+            . "\n#include \"pico_rgb_keypad.hpp\""
+            . "\n"
+            . "\nusing namespace pimoroni;"
+            . "\nPicoRGBKeypad keypad;"
+            . "\n"
+            . "\nconst long animation[$frameCount][16] = $frames;"
+            . "\n"
+            . "\nint main()"
+            . "\n{"
+            . "\n\tkeypad.init();"
+            . "\n\tkeypad.set_brightness(1.0f);"
+            . "\n"
+            . "\n\twhile (true)"
+            . "\n\t{"
+            . "\n\t\tfor (int i = 0; i < $frameCount; ++i)"
+            . "\n\t\t{"
+            . "\n\t\t\tint bits[16][3];"
+            . "\n\t\t\tfor (int j = 0; j < 16; ++j)"
+            . "\n\t\t\t{"
+            . "\n\t\t\t\tbits[j][0] = animation[i][j] >> 16 & 255;"
+            . "\n\t\t\t\tbits[j][1] = animation[i][j] >> 8 & 255;"
+            . "\n\t\t\t\tbits[j][2] = animation[i][j] & 255;"
+            . "\n\t\t\t}"
+            . "\n\t\t\tfor (int j = 0; j < 16; ++j)"
+            . "\n\t\t\t\tkeypad.illuminate(j, bits[j][0], bits[j][1], bits[j][2]);"
+            . "\n"
+            . "\n\t\t\tkeypad.update();"
+            . "\n\t\t\tsleep_ms(1000 / $fps);"
+            . "\n\t\t}"
+            . "\n\t}"
+            . "\n"
+            . "\n\treturn 0;"
+            . "\n}";
+    }
+
+    public function generatePicoMicroPythonCode($fps = 1)
+    {
+        $frames = implode("\n", explode("\n", str_replace("    ", "\t", $this->getFramesAs32BitIntegersJSON())));
+        return "# Install the MicroPython uf2 file from https://github.com/pimoroni/pimoroni-pico/releases"
+            . "\nimport time"
+            . "\nimport picokeypad as keypad"
+            . "\n"
+            . "\nanimation = $frames"
+            . "\n"
+            . "\nkeypad.init()"
+            . "\nkeypad.set_brightness(1.0)"
+            . "\n"
+            . "\nwhile True:"
+            . "\n\tfor frame in animation:"
+            . "\n\t\tbits = []"
+            . "\n\t\tfor i in range(16):"
+            . "\n\t\t\tbits.append([]);"
+            . "\n\t\t\tbits[i].append(frame[i] >> 16 & 255)"
+            . "\n\t\t\tbits[i].append(frame[i] >> 8 & 255)"
+            . "\n\t\t\tbits[i].append(frame[i] & 255)"
+            . "\n\t\tfor i in range(len(bits)):"
+            . "\n\t\t\tkeypad.illuminate(i, bits[i][0], bits[i][1], bits[i][2])"
+            . "\n\t\tkeypad.update()"
+            . "\n\t\ttime.sleep(1 / $fps)";
     }
 }
 
-class ScrollBitAnimation extends Animation
+class AdaFruitNeoPixelRGB8x8Animation extends Animation
 {
     public function __construct($id)
     {
