@@ -92,7 +92,7 @@ if (!$widthSet || !$heightSet || !$typeSet || !$nameSet || !$idSet) {
                         <option value="2">NeoPixel RGB 8x8 (8x8 RGB)</option>
                         <option value="3">Raspberry Pi Pico RGB Keypad Base (4x4 RGB)</option>
                         <option value="4">LoL Shield SMD (14x9 Monochromatic)</option>
-                        <option value="5">ScrollBit (17x7 VariableBrightness)</option>
+                        <option value="5">ScrollBit (17x7 Variable Brightness)</option>
                         <option value="0">Custom</option>
                     </select>
                     <label for="setupOptions">Matrix Setup</label>
