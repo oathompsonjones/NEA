@@ -71,3 +71,7 @@ function mapBinaryToIntegers($value)
 {
     return bindec($value);
 }
+function mapTabToStart($value)
+{
+    return "\t$value";
+}

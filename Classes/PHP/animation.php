@@ -263,6 +263,7 @@ class MicroBitInternalAnimation extends Animation
     public function generateMicroBitMicroPythonCode($fps = 1)
     {
         $animationJSON = $this->getFramesAs32BitIntegersJSON();
+        $frames = implode("\n", array_map("mapTabToStart", array_map("mapTabToStart", array_map("mapTabToStart", explode("\n", str_replace("    ", "\t", $animationJSON))))));
         $code = "from microbit import *"
             . "\n"
             . "\ndef play(animation):"
@@ -280,26 +281,16 @@ class MicroBitInternalAnimation extends Animation
             . "\n"
             . "\nwhile True:"
             . "\n\tif button_a.is_pressed():"
-            . "\n\t\tplay(";
-
-        $lines = explode("\n", $animationJSON);
-        for ($i = 0; $i < count($lines); ++$i) {
-            $line = trim($lines[$i]);
-            $nextLine = trim($lines[$i + 1]);
-            $nextNextLine = trim($lines[$i + 2]);
-            if (!$nextLine) $code = "$code$line";
-            else if (!$nextNextLine) $code = "$code$line\n\t\t";
-            else if ($nextLine[0] === "[" || $nextLine[0] === "]") $code = "$code$line\n\t\t\t";
-            else if ($nextLine[1] === "b") $code = "$code$line\n\t\t\t\t";
-        }
-
-        $code = "$code)";
+            . "\n\t\tplay("
+            . "\n$frames"
+            . "\n\t\t)";
         return $code;
     }
 
     public function generateMicroBitTypeScriptCode($fps = 1)
     {
         $animationJSON = $this->getFramesAs32BitIntegersJSON();
+        $frames = implode("\n", array_map("mapTabToStart", array_map("mapTabToStart", explode("\n", str_replace("    ", "\t", $animationJSON)))));
         $code = "const play = (animation: number[][]) => {"
             . "\n\tanimation.forEach((frame: number[]) => {"
             . "\n\t\tconst bits: number[] = [255 & frame[0]];"
@@ -317,20 +308,9 @@ class MicroBitInternalAnimation extends Animation
             . "\n}"
             . "\n"
             . "\ninput.onButtonPressed(Button.A, () => {"
-            . "\n\tplay(";
-
-        $lines = explode("\n", $animationJSON);
-        for ($i = 0; $i < count($lines); ++$i) {
-            $line = trim($lines[$i]);
-            $nextLine = trim($lines[$i + 1]);
-            $nextNextLine = trim($lines[$i + 2]);
-            if (!$nextLine) $code = "$code$line";
-            else if (!$nextNextLine) $code = "$code$line\n\t";
-            else if ($nextLine[0] === "[" || $nextLine[0] === "]") $code = "$code$line\n\t\t";
-            else if ($nextLine[1] === "b") $code = "$code$line\n\t\t\t";
-        }
-
-        $code = "$code);"
+            . "\n\tplay("
+            . "\n$frames"
+            . "\n\t);"
             . "\n});";
         return $code;
     }
@@ -346,6 +326,54 @@ class LoLShieldAnimation extends Animation
     public function __construct($id)
     {
         parent::__construct($id);
+    }
+
+    public function generateArduinoCppCode($fps = 1)
+    {
+        $animationJSON = str_replace("]", "}", str_replace("[", "{", $this->getFramesAs32BitIntegersJSON()));
+        $frameCount = count($this->frames);
+        $code = "#include <Charliplexing.h>"
+            . "\n"
+            . "\nconst long animation[$frameCount][4] = $animationJSON;"
+            . "\n"
+            . "\nvoid plot(int x, int y, int v)"
+            . "\n{"
+            . "\n\tLedSign::Set(x, y, v);"
+            . "\n}"
+            . "\n"
+            . "\nvoid clearScreen()"
+            . "\n{"
+            . "\n\tfor (int i = 0; i < 14; ++i)"
+            . "\n\t\tfor (int j = 0; j < 9; ++j)"
+            . "\n\t\t\tplot(i, j, 0);"
+            . "\n}"
+            . "\n"
+            . "\nvoid setup()"
+            . "\n{"
+            . "\n\tLedSign::Init();"
+            . "\n}"
+            . "\n"
+            . "\nvoid loop()"
+            . "\n{"
+            . "\n\tfor (int i = 0; i < 3; ++i)"
+            . "\n\t{"
+            . "\n\t\tint bits[14 * 9];"
+            . "\n\t\tfor (int j = 0; j < 30; ++j)"
+            . "\n\t\t\tbits[j] = animation[i][0] >> (29 - j) & 1;"
+            . "\n\t\tfor (int j = 0; j < 3; ++j)"
+            . "\n\t\t\tfor (int k = 0; k < 32; ++k)"
+            . "\n\t\t\t\tbits[30 + j * 32 + k] = animation[i][j + 1] >> (31 - k) & 1;"
+            . "\n\t\tfor (int j = 0; j < 14 * 9; ++j)"
+            . "\n\t\t{"
+            . "\n\t\t\tint x = j % 14;"
+            . "\n\t\t\tint y = j / 14;"
+            . "\n\t\t\tplot(x, y, bits[j]);"
+            . "\n\t\t}"
+            . "\n\t\tdelay(1000 / 1);"
+            . "\n\t\tclearScreen();"
+            . "\n\t}"
+            . "\n}";
+        return $code;
     }
 }
 
