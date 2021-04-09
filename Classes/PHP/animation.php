@@ -94,40 +94,41 @@ class Animation
                     };
                 </script>
                 <div id="$id-card" class="card text-white bg-dark animation">
-        HTML . ($showImages ? <<<HTML
-            <div id="$id-div" class="icon firstIcon">
-                <img src="$firstIcon" class="card-img-top" id="$id-icon">
-                <div id="$id-buttons" class="buttons">
-                    <button class="btn btn-secondary btn-lg" data-toggle="tooltip" data-placement="top" title="Play the animation" onclick='_$id($jsonIcons);'>▶</button>
-                </div>
-            </div>
-        HTML : "") . <<<HTML
-                    <div class="card-body">
-                        <h5 class="card-title">$name</h5>
-        HTML . ($showButtons ? <<<HTML
-            <div style="display: flex;">
-                <div id="$id-deleteButton" style="display: flex; width: 50%;">
-                    <button class="btn btn-danger btn-sm" type="button" onclick="delete_$id();" style="width: 100%;">Delete</button>
-                </div>
-                <form method="post" action="editor" style="width: 50%;">
-                    <input style="display: none;" name="preMade" type="text" value="$id">
-                    <button class="btn btn-dark btn-sm" type="submit" style="width: 100%;">Edit</button>
-                </form>
-            </div>
-            <div style="display: flex; width: 100%;">
-                <div id="$id-shareButton" style="display: flex; width: 50%;">
-                    $shareButton
-                </div>
-                <div class="form-floating" style="width: 50%;">
-                    <input type="number" class="form-control bg-dark text-light border-dark" id="$id-inputFPS" name="fps" placeholder="FPS" min=1 max=60 value=$fps required>
-                    <label for="$id-inputFPS" class="form-label">FPS</label>
-                </div>
-            </div>
-    HTML : "") . <<<HTML
+            HTML . ($showImages ? <<<HTML
+                <div id="$id-div" class="icon firstIcon">
+                    <img src="$firstIcon" class="card-img-top" id="$id-icon">
+                    <div id="$id-buttons" class="buttons">
+                        <button class="btn btn-secondary btn-lg" data-toggle="tooltip" data-placement="top" title="Play the animation" onclick='_$id($jsonIcons);'>▶</button>
                     </div>
                 </div>
-            </div>
-        HTML;
+            HTML : "") . <<<HTML
+                <div class="card-body">
+                    <h5 class="card-title">$name</h5>
+            HTML . ($showButtons ? <<<HTML
+                <div style="display: flex;">
+                    <div id="$id-deleteButton" style="display: flex; width: 50%;">
+                        <button class="btn btn-danger btn-sm" type="button" onclick="delete_$id();" style="width: 100%;">Delete</button>
+                    </div>
+                    <form method="post" action="editor" style="width: 50%;">
+                        <input style="display: none;" name="preMade" type="text" value="$id">
+                        <button class="btn btn-dark btn-sm" type="submit" style="width: 100%;">Edit</button>
+                    </form>
+                </div>
+                <div style="display: flex; width: 100%;">
+                    <div id="$id-shareButton" style="display: flex; width: 50%;">
+                        $shareButton
+                    </div>
+                    <div class="form-floating" style="width: 50%;">
+                        <input type="number" class="form-control bg-dark text-light border-dark" id="$id-inputFPS" name="fps" placeholder="FPS" min=1 max=60 value=$fps required>
+                        <label for="$id-inputFPS" class="form-label">FPS</label>
+                    </div>
+                </div>
+            HTML : "") . <<<HTML
+                            <a class="btn btn-dark" style="width: 100%;" href="generateCode?animationID=$id">Generate Code</a>
+                        </div>
+                    </div>
+                </div>
+            HTML;
     }
 
     public function delete()
@@ -219,38 +220,49 @@ class Animation
     }
 
     // BBC Micro:Bit
-    public function generateMicroPythonCode($animationJSON)
+    public function generateMicroBitMicroPythonCode($fps = 1)
     {
-        return "Error: MicroPython is only valid for the BBC Micro:Bit.";
+        return "Error: Only valid for the BBC Micro:Bit.";
     }
 
-    public function generateTypeScriptCode($animationJSON)
+    public function generateMicroBitTypeScriptCode($fps = 1)
     {
-        return "Error: TypeScript is only valid for the BBC MicroBit.";
+        return "Error: Only valid for the BBC MicroBit.";
     }
 
-    public function generateHexFile($animationJSON)
+    public function generateMicroBitHexFile($fps = 1)
     {
-        return "Error: Hex files are only valid for the BBC MicroBit.";
+        return "Error: Only valid for the BBC MicroBit.";
     }
 
     // Arduino
-    public function generateArduinoCode($animationJSON)
+    public function generateArduinoCppCode($fps = 1)
     {
-        return "Error: Arduino code is only valid for the Arduino.";
+        return "Error: Only valid for the Arduino.";
+    }
+
+    // Raspberry Pi Pico
+    public function generatePicoCppCode($fps = 1)
+    {
+        return "Error: Only valid for the Raspberry Pi Pico.";
+    }
+
+    public function generatePicoMicroPythonCode($fps = 1)
+    {
+        return "Error: Only valid for the Raspberry Pi Pico.";
     }
 }
 
-class MicroBitBuiltInAnimation extends Animation
+class MicroBitInternalAnimation extends Animation
 {
     public function __construct($id)
     {
         parent::__construct($id);
     }
 
-    public function generateMicroPythonCode($animationJSON)
+    public function generateMicroBitMicroPythonCode($fps = 1)
     {
-        $fps = 1;
+        $animationJSON = $this->getFramesAs32BitIntegersJSON();
         $code = "from microbit import *"
             . "\n"
             . "\ndef play(animation):"
@@ -285,9 +297,9 @@ class MicroBitBuiltInAnimation extends Animation
         return $code;
     }
 
-    public function generateTypeScriptCode($animationJSON)
+    public function generateMicroBitTypeScriptCode($fps = 1)
     {
-        $fps = 1;
+        $animationJSON = $this->getFramesAs32BitIntegersJSON();
         $code = "const play = (animation: number[][]) => {"
             . "\n\tanimation.forEach((frame: number[]) => {"
             . "\n\t\tconst bits: number[] = [255 & frame[0]];"
@@ -323,8 +335,64 @@ class MicroBitBuiltInAnimation extends Animation
         return $code;
     }
 
-    public function generateHexFile($animationJSON)
+    public function generateMicroBitHexFile($fps = 1)
     {
         return "Error: I haven't done this yet.";
+    }
+}
+
+class LoLShieldAnimation extends Animation
+{
+    public function __construct($id)
+    {
+        parent::__construct($id);
+    }
+}
+
+class PicoRGBKeypadAnimation extends Animation
+{
+    public function __construct($id)
+    {
+        parent::__construct($id);
+    }
+}
+
+class AdaFruitNeoPixelRGB8x8Animation extends Animation
+{
+    public function __construct($id)
+    {
+        parent::__construct($id);
+    }
+}
+
+class ScrollBitAnimation extends Animation
+{
+    public function __construct($id)
+    {
+        parent::__construct($id);
+    }
+}
+
+class HLM1388AR8x8Animation extends Animation
+{
+    public function __construct($id)
+    {
+        parent::__construct($id);
+    }
+}
+
+class AdaFruit9x16Animation extends Animation
+{
+    public function __construct($id)
+    {
+        parent::__construct($id);
+    }
+}
+
+class CustomAnimation extends Animation
+{
+    public function __construct($id)
+    {
+        parent::__construct($id);
     }
 }
