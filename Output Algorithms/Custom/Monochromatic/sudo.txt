@@ -1,0 +1,50 @@
+animation = [...]
+
+FUNCTION plot(x, y, value)
+    ...
+END FUNCTION
+
+FUNCTION clear()
+    // Insert your code here
+END FUNCTION
+
+FUNCTION sleep(ms)
+    // Insert your code here
+END FUNCTION
+
+IF width * height % 32 == 0 THEN
+    FOR i = 0; i < len(animation); ++i LOOP
+        bits = [width * height]
+        FOR j = 0; j < width * height / 32; ++j LOOP
+            FOR k = 0; k < 32; ++k LOOP
+                bits[j * 32 + k] = animation[i][j] >> 31 - k & 1
+            END FOR
+        END FOR
+        FOR j = 0; j < width * height; ++j LOOP
+            x = j % width
+            y = j // width
+            plot(x, y, bits[j])
+        END FOR
+        sleep(1000 / fps)
+        clear()
+    END FOR
+ELSE
+    FOR i = 0; i < len(animation); ++i LOOP
+        bits = [width * height]
+        FOR j = 0; j < width * height % 32; ++j LOOP
+            bits[j] = animation[i][0] >> width * height % 32 - 1 - j & 1
+        END FOR
+        FOR j = 0; j < (width * height - width * height % 32) / 32; ++j LOOP
+            FOR k = 0; k < 32; ++k LOOP
+                bits[width * height % 32 + j * 32 + k] = animation[i][j + 1] >> 31 - k & 1
+            END FOR
+        END FOR
+        FOR j = 0; j < width * height; ++j LOOP
+            x = j % width
+            y = j // width
+            plot(x, y, bits[j])
+        END FOR
+        sleep(1000 / fps)
+        clear()
+    END FOR
+END IF

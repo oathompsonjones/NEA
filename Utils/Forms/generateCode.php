@@ -28,8 +28,8 @@ switch ($_POST["matrix"]) {
     case "AdaFruit 16x9":
         $animation = new AdaFruit16x9Animation($_POST["animationID"]);
         break;
-    case "Custom":
-        $animation = new CustomAnimation($_POST["animationID"]);
+    default:
+        $animation = new Animation($_POST["animationID"]);
         break;
 }
 switch ($_POST["board"]) {

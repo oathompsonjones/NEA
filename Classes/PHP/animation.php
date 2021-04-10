@@ -170,7 +170,7 @@ class Animation
         }
         if ($this->type == 2) $frames = array_map("frameToBinaryArrayRGB", $this->frames);
         else $frames = array_map("frameToBinaryArray", $this->frames);
-        return str_replace('"', "", json_encode($frames, JSON_PRETTY_PRINT));
+        return str_replace("    ", "\t", str_replace('"', "", json_encode($frames, JSON_PRETTY_PRINT)));
     }
 
     public function generateFrameIcons()
@@ -236,34 +236,526 @@ class Animation
     // BBC Micro:Bit
     public function generateMicroBitMicroPythonCode($fps = 1)
     {
-        return "Error: Only valid for the BBC Micro:Bit.";
+        $frames = $this->getFramesAs32BitIntegersJSON();
+        $code = "from microbit import *"
+            . "\n"
+            . "\nanimation = $frames"
+            . "\n"
+            . "\ndef clear():"
+            . "\n\t# Insert your code here"
+            . "\n";
+        switch ($this->type) {
+            case 0:
+                $code .= "\ndef plot(x, y, value):"
+                    . "\n\t# Insert your code here"
+                    . "\n"
+                    . "\nwhile True:"
+                    . "\n\tif button_a.is_pressed():"
+                    . "\n\t\tfor i in range(len(animation)):"
+                    . "\n\t\t\tbits = []";
+                if ($this->width * $this->height % 32 == 0) {
+                    $code .= "\n\t\t\tfor j in range(" . strval($this->width * $this->height / 32) . "):"
+                        . "\n\t\t\t\tfor k in range(32):"
+                        . "\n\t\t\t\t\tbits.append(animation[i][j] >> 31 - k & 1)";
+                } else {
+                    $code .= "\n\t\t\tfor j in range(" . strval($this->width * $this->height % 32) . "):"
+                        . "\n\t\t\t\tbits.append(animation[i][0] >> " . strval($this->width * $this->height % 32 - 1) . " - j & 1)"
+                        . "\n\t\t\tfor j in range(" . strval(($this->width * $this->height - $this->width * $this->height % 32) / 32) . "):"
+                        . "\n\t\t\t\tfor k in range(32):"
+                        . "\n\t\t\t\t\tbits.append(animation[i][j + 1] >> 31 - k & 1)";
+                }
+                $code .= "\n\t\t\tfor j in range(" . strval($this->width * $this->height) . "):"
+                    . "\n\t\t\t\tx = j % $this->width"
+                    . "\n\t\t\t\ty = j // $this->width"
+                    . "\n\t\t\t\tplot(x, y, bits[j])"
+                    . "\n\t\t\tsleep(1000 / $fps)"
+                    . "\n\t\t\tclear()";
+                break;
+            case 1:
+                $code .= "\ndef plot(x, y, value):"
+                    . "\n\t# Insert your code here"
+                    . "\n"
+                    . "\nwhile True:"
+                    . "\n\tif button_a.is_pressed():"
+                    . "\n\t\tfor i in range(len(animation)):"
+                    . "\n\t\t\tbits = []";
+                if ($this->width * $this->height % 4 == 0) {
+                    $code .= "\n\t\t\tfor j in range(" . strval($this->width * $this->height / 4) . "):"
+                        . "\n\t\t\t\tfor k in range(4):"
+                        . "\n\t\t\t\t\tbits.append(animation[i][j] >> (3 - k) * 8 & 255)";
+                } else {
+                    $code .= "\n\t\t\tfor j in range(" . strval($this->width * $this->height % 4) . "):"
+                        . "\n\t\t\t\tbits.append(animation[i][0] >> " . strval($this->width * $this->height % 4 - 1) . " - j & 1)"
+                        . "\n\t\t\tfor j in range(" . strval(($this->width * $this->height - $this->width * $this->height % 4) / 4) . "):"
+                        . "\n\t\t\t\tfor k in range(4):"
+                        . "\n\t\t\t\t\tbits.append(animation[i][j + 1] >> (3 - k) * 8 & 255)";
+                }
+                $code .= "\n\t\t\tfor j in range(" . strval($this->width * $this->height) . "):"
+                    . "\n\t\t\t\tx = j % $this->width"
+                    . "\n\t\t\t\ty = j // $this->width"
+                    . "\n\t\t\t\tplot(x, y, bits[j])"
+                    . "\n\t\t\tsleep(1000 / $fps)"
+                    . "\n\t\t\tclear()";
+                break;
+            case 2:
+                $code .= "\ndef plot(x, y, r, g, b):"
+                    . "\n\t# Insert your code here"
+                    . "\n"
+                    . "\nwhile True:"
+                    . "\n\tif button_a.is_pressed():"
+                    . "\n\t\tfor i in range(len(animation)):"
+                    . "\n\t\t\tbits = []"
+                    . "\n\t\t\tfor j in range(" . strval($this->width * $this->height) . "):"
+                    . "\n\t\t\t\tbits.append([])"
+                    . "\n\t\t\t\tbits[j].append(animation[i][j] >> 16 & 255)"
+                    . "\n\t\t\t\tbits[j].append(animation[i][j] >> 8 & 255)"
+                    . "\n\t\t\t\tbits[j].append(animation[i][j] & 255)"
+                    . "\n\t\t\tfor j in range(" . strval($this->width * $this->height) . "):"
+                    . "\n\t\t\t\tx = j % $this->width"
+                    . "\n\t\t\t\ty = j // $this->width"
+                    . "\n\t\t\t\tplot(x, y, bits[j][0], bits[j][1], bits[j][2])"
+                    . "\n\t\t\tsleep(1000 / $fps)"
+                    . "\n\t\t\tclear()";
+                break;
+        }
+        return $code;
     }
 
     public function generateMicroBitTypeScriptCode($fps = 1)
     {
-        return "Error: Only valid for the BBC MicroBit.";
+        $frames = $this->getFramesAs32BitIntegersJSON();
+        $code = "const animation: number[][] = $frames;"
+            . "\n"
+            . "\nconst clear = () => {"
+            . "\n\t// Insert your code here"
+            . "\n};"
+            . "\n";
+        switch ($this->type) {
+            case 0:
+                $code .= "\nconst plot = (x: number, y: number, value: 0 | 1) => {"
+                    . "\n\t// Insert your code here"
+                    . "\n};"
+                    . "\n"
+                    . "\ninput.onButtonPressed(Button.A, () => {"
+                    . "\n\tfor (let i = 0; i < animation.length; ++i) {"
+                    . "\n\t\tlet bits: number[] = [];";
+                if ($this->width * $this->height % 32 == 0) {
+                    $code .= "\n\t\tfor (let j = 0; j < " . strval($this->width * $this->height / 32) . "; ++j)"
+                        . "\n\t\t\tfor (let k = 0; k < 32; ++k)"
+                        . "\n\t\t\t\tbits.push(animation[i][j] >> 31 - k & 1;)";
+                } else {
+                    $code .= "\n\t\tfor (let j = 0; j < " . strval($this->width * $this->height % 32) . "; ++j)"
+                        . "\n\t\t\tbits.push(animation[i][0] >> " . strval($this->width * $this->height % 32 - 1) . " - j & 1;)"
+                        . "\n\t\tfor (j = 0; j < " . strval(($this->width * $this->height - $this->width * $this->height % 32) / 32) . "; ++j)"
+                        . "\n\t\t\tfor (k = 0; k < 32; ++k)"
+                        . "\n\t\t\t\tbits.push(animation[i][j + 1] >> 31 - k & 1;)";
+                }
+                $code .= "\n\t\t}"
+                    . "\n\t\tfor (let j = 0; j < " . strval($this->width * $this->height) . "; ++j) {"
+                    . "\n\t\t\tconst x: number = j % $this->width;"
+                    . "\n\t\t\tconst y: number = Math.floor(j / $this->width);"
+                    . "\n\t\t\tplot(x, y, bits[j]);"
+                    . "\n\t\t}"
+                    . "\n\t\tbasic.pause(1000 / $fps);"
+                    . "\n\t\tclear();"
+                    . "\n\t}"
+                    . "\n});";
+                break;
+            case 1:
+                $code .= "\nconst plot = (x: number, y: number, value: number) => {"
+                    . "\n\t// Insert your code here"
+                    . "\n};"
+                    . "\n"
+                    . "\ninput.onButtonPressed(Button.A, () => {"
+                    . "\n\tfor (let i = 0; i < animation.length; ++i) {"
+                    . "\n\t\tlet bits: number[] = [];";
+                if ($this->width * $this->height % 4 == 0) {
+                    $code .= "\n\t\tfor (let j = 0; j < " . strval($this->width * $this->height / 4) . "; ++j)"
+                        . "\n\t\t\tfor (let k = 0; k < 4; ++k)"
+                        . "\n\t\t\t\tbits.push(animation[i][j] >> (3 - k) * 8 & 255;)";
+                } else {
+                    $code .= "\n\t\tfor (let j = 0; j < " . strval($this->width * $this->height % 4) . "; ++j)"
+                        . "\n\t\t\tbits.push(animation[i][0] >> " . strval($this->width * $this->height % 4 - 1) . " - j & 1;)"
+                        . "\n\t\tfor (j = 0; j < " . strval(($this->width * $this->height - $this->width * $this->height % 4) / 4) . "; ++j)"
+                        . "\n\t\t\tfor (k = 0; k < 4; ++k)"
+                        . "\n\t\t\t\tbits.push(animation[i][j + 1] >> (3 - k) * 8 & 255;)";
+                }
+                $code .= "\n\t\t}"
+                    . "\n\t\tfor (let j = 0; j < " . strval($this->width * $this->height) . "; ++j) {"
+                    . "\n\t\t\tconst x: number = j % $this->width;"
+                    . "\n\t\t\tconst y: number = Math.floor(j / $this->width);"
+                    . "\n\t\t\tplot(x, y, bits[j]);"
+                    . "\n\t\t}"
+                    . "\n\t\tbasic.pause(1000 / $fps);"
+                    . "\n\t\tclear();"
+                    . "\n\t}"
+                    . "\n});";
+                break;
+            case 2:
+                $code .= "\nconst plot = (x: number, y: number, r: number, g: number, b: number) => {"
+                    . "\n\t// Insert your code here"
+                    . "\n};"
+                    . "\n"
+                    . "\ninput.onButtonPressed(Button.A, () => {"
+                    . "\n\tfor (let i = 0; i < animation.length; ++i) {"
+                    . "\n\t\tlet bits: number[][] = [];"
+                    . "\n\t\tfor (let j = 0; j < " . strval($this->width * $this->height) . "; ++j)"
+                    . "\n\t\t\tbits[j] = [];"
+                    . "\n\t\t\tbits[j][0] = animation[i][j] >> 16 & 255;"
+                    . "\n\t\t\tbits[j][1] = animation[i][j] >> 8 & 255;"
+                    . "\n\t\t\tbits[j][2] = animation[i][j] & 255;"
+                    . "\n\t\t}"
+                    . "\n\t\tfor (let j = 0; j < " . strval($this->width * $this->height) . "; ++j) {"
+                    . "\n\t\t\tconst x: number = j % $this->width;"
+                    . "\n\t\t\tconst y: number = Math.floor(j / $this->width);"
+                    . "\n\t\t\tplot(x, y, bits[j][0], bits[j][1], bits[j][2]);"
+                    . "\n\t\t}"
+                    . "\n\t\tbasic.pause(1000 / $fps);"
+                    . "\n\t\tclear();"
+                    . "\n\t}"
+                    . "\n});";
+                break;
+        }
+        return $code;
     }
 
     public function generateMicroBitHexFile($fps = 1)
     {
-        return "Error: Only valid for the BBC MicroBit.";
+        return "Hex files cannot be generated for custom animations.";
     }
 
     // Arduino
     public function generateArduinoCppCode($fps = 1)
     {
-        return "Error: Only valid for the Arduino.";
+        $frames = str_replace("]", "}", str_replace("[", "{", $this->getFramesAs32BitIntegersJSON()));
+        $frameCount = count($this->frames);
+        $frameLength = ceil($this->width * $this->height / ($this->type == 0 ? 32 : ($this->type == 1 ? 4 : 1)));
+        $code = "const long animation[$frameCount][$frameLength] = $frames;"
+            . "\n"
+            . "\nvoid clear()"
+            . "\n{"
+            . "\n\t// Insert your code here"
+            . "\n}"
+            . "\n"
+            . "\nvoid setup()"
+            . "\n{"
+            . "\n\t// Insert your code here"
+            . "\n}"
+            . "\n";
+        switch ($this->type) {
+            case 0:
+                $code .= "\nvoid plot(int x, int y, int value)"
+                    . "\n{"
+                    . "\n\t// Insert your code here"
+                    . "\n}"
+                    . "\n"
+                    . "\nvoid loop()"
+                    . "\n{"
+                    . "\n\tfor (int i = 0; i < $frameCount; ++i)"
+                    . "\n\t{";
+                if ($this->width * $this->height % 32 == 0) {
+                    $code .= "\n\t\tint bits[" . strval($this->width * $this->height) . "];"
+                        . "\n\t\tfor (int j = 0; j < " . strval($this->width * $this->height / 32) . "; ++j)"
+                        . "\n\t\t\tfor (int k = 0; k < 32; ++k)"
+                        . "\n\t\t\t\tbits[j * 32 + k] = animation[i][j] >> 31 - k & 1;";
+                } else {
+                    $code .= "\n\t\tint bits[" . strval($this->width * $this->height) . "];"
+                        . "\n\t\tfor (int j = 0; j < " . strval($this->width * $this->height % 32) . "; ++j)"
+                        . "\n\t\t\tbits[j] = animation[i][0] >> " . strval($this->width * $this->height % 32 - 1) . " - j & 1;"
+                        . "\n\t\tfor (int j = 0; j < " . strval(($this->width * $this->height - $this->width * $this->height % 32) / 32) . "; ++j)"
+                        . "\n\t\t\tfor (int k = 0; k < 32; ++k)"
+                        . "\n\t\t\t\tbits[" . strval($this->width * $this->height % 32) . " + j * 32 + k] = animation[i][j + 1] >> 31 - k & 1;";
+                }
+                $code .= "\n\t\tfor (int j = 0; j < " . strval($this->width * $this->height) . "; ++j)"
+                    . "\n\t\t{"
+                    . "\n\t\t\tint x = j % $this->width;"
+                    . "\n\t\t\tint y = j / $this->width;"
+                    . "\n\t\t\tplot(x, y, bits[j]);"
+                    . "\n\t\t}"
+                    . "\n\t\tdelay(1000 / $fps);"
+                    . "\n\t\tclear();"
+                    . "\n\t}"
+                    . "\n}";
+                break;
+            case 1:
+                $code .= "\nvoid plot(int x, int y, int value)"
+                    . "\n{"
+                    . "\n\t// Insert your code here"
+                    . "\n}"
+                    . "\n"
+                    . "\nvoid loop()"
+                    . "\n{"
+                    . "\n\tfor (int i = 0; i < $frameCount; ++i)"
+                    . "\n\t{";
+                if ($this->width * $this->height % 4 == 0) {
+                    $code .= "\n\t\tint bits[" . strval($this->width * $this->height) . "];"
+                        . "\n\t\tfor (int j = 0; j < " . strval($this->width * $this->height / 4) . "; ++j)"
+                        . "\n\t\t\tfor (int k = 0; k < 4; ++k)"
+                        . "\n\t\t\t\tbits[j * 4 + k] = animation[i][j] >> (3 - k) * 8 & 255;";
+                } else {
+                    $code .= "\n\t\tint bits[" . strval($this->width * $this->height) . "];"
+                        . "\n\t\tfor (int j = 0; j < " . strval($this->width * $this->height % 4) . "; ++j)"
+                        . "\n\t\t\tbits[j] = animation[i][0] >> " . strval($this->width * $this->height % 4 - 1) . " - j & 1;"
+                        . "\n\t\tfor (int j = 0; j < " . strval(($this->width * $this->height - $this->width * $this->height % 4) / 4) . "; ++j)"
+                        . "\n\t\t\tfor (int k = 0; k < 4; ++k)"
+                        . "\n\t\t\t\tbits[" . strval($this->width * $this->height % 4) . " + j * 4 + k] = animation[i][j + 1] >> (3 - k) * 8 & 255;";
+                }
+                $code .= "\n\t\tfor (int j = 0; j < " . strval($this->width * $this->height) . "; ++j)"
+                    . "\n\t\t{"
+                    . "\n\t\t\tint x = j % $this->width;"
+                    . "\n\t\t\tint y = j / $this->width;"
+                    . "\n\t\t\tplot(x, y, bits[j]);"
+                    . "\n\t\t}"
+                    . "\n\t\tdelay(1000 / $fps);"
+                    . "\n\t\tclear();"
+                    . "\n\t}"
+                    . "\n}";
+                break;
+            case 2:
+                $code .= "\nvoid plot(int x, int y, int r, int g, int b)"
+                    . "\n{"
+                    . "\n\t// Insert your code here"
+                    . "\n}"
+                    . "\n"
+                    . "\nvoid loop()"
+                    . "\n{"
+                    . "\n\tfor (int i = 0; i < $frameCount; ++i)"
+                    . "\n\t{"
+                    . "\n\t\tint bits[" . strval($this->width * $this->height) . "][3];"
+                    . "\n\t\tfor (int j = 0; j < " . strval($this->width * $this->height) . "; ++j)"
+                    . "\n\t\t{"
+                    . "\n\t\t\tbits[j][0] = animation[i][j] >> 16 & 255;"
+                    . "\n\t\t\tbits[j][1] = animation[i][j] >> 8 & 255;"
+                    . "\n\t\t\tbits[j][2] = animation[i][j] & 255;"
+                    . "\n\t\t}"
+                    . "\n\t\tfor (int j = 0; j < " . strval($this->width * $this->height) . "; ++j)"
+                    . "\n\t\t{"
+                    . "\n\t\t\tint x = j % $this->width;"
+                    . "\n\t\t\tint y = j / $this->width;"
+                    . "\n\t\t\tplot(x, y, bits[j][0], bits[j][1], bits[j][2]);"
+                    . "\n\t\t}"
+                    . "\n\t\tdelay(1000 / $fps);"
+                    . "\n\t\tclear();"
+                    . "\n\t}"
+                    . "\n}";
+                break;
+        }
+        return $code;
     }
 
     // Raspberry Pi Pico
     public function generatePicoCppCode($fps = 1)
     {
-        return "Error: Only valid for the Raspberry Pi Pico.";
+        $frames = str_replace("]", "}", str_replace("[", "{", $this->getFramesAs32BitIntegersJSON()));
+        $frameCount = count($this->frames);
+        $frameLength = ceil($this->width * $this->height / ($this->type == 0 ? 32 : ($this->type == 1 ? 4 : 1)));
+        $code = "const long animation[$frameCount][$frameLength] = $frames;"
+            . "\n"
+            . "\nvoid clear()"
+            . "\n{"
+            . "\n\t// Insert your code here"
+            . "\n}"
+            . "\n"
+            . "\nvoid setup()"
+            . "\n{"
+            . "\n\t// Insert your code here"
+            . "\n}"
+            . "\n";
+        switch ($this->type) {
+            case 0:
+                $code .= "\nvoid plot(int x, int y, int value)"
+                    . "\n{"
+                    . "\n\t// Insert your code here"
+                    . "\n}"
+                    . "\n"
+                    . "\nint main()"
+                    . "\n{"
+                    . "\n\twhile (true)"
+                    . "\n\t{"
+                    . "\n\t\tfor (int i = 0; i < $frameCount; ++i)"
+                    . "\n\t\t{";
+                if ($this->width * $this->height % 32 == 0) {
+                    $code .= "\n\t\t\tint bits[" . strval($this->width * $this->height) . "];"
+                        . "\n\t\t\tfor (int j = 0; j < " . strval($this->width * $this->height / 32) . "; ++j)"
+                        . "\n\t\t\t\tfor (int k = 0; k < 32; ++k)"
+                        . "\n\t\t\t\t\tbits[j * 32 + k] = animation[i][j] >> 31 - k & 1;";
+                } else {
+                    $code .= "\n\t\t\tint bits[" . strval($this->width * $this->height) . "];"
+                        . "\n\t\t\tfor (int j = 0; j < " . strval($this->width * $this->height % 32) . "; ++j)"
+                        . "\n\t\t\t\tbits[j] = animation[i][0] >> " . strval($this->width * $this->height % 32 - 1) . " - j & 1;"
+                        . "\n\t\t\tfor (int j = 0; j < " . strval(($this->width * $this->height - $this->width * $this->height % 32) / 32) . "; ++j)"
+                        . "\n\t\t\t\tfor (int k = 0; k < 32; ++k)"
+                        . "\n\t\t\t\t\tbits[" . strval($this->width * $this->height % 32) . " + j * 32 + k] = animation[i][j + 1] >> 31 - k & 1;";
+                }
+                $code .= "\n\t\t\tfor (int j = 0; j < " . strval($this->width * $this->height) . "; ++j)"
+                    . "\n\t\t\t{"
+                    . "\n\t\t\t\tint x = j % $this->width;"
+                    . "\n\t\t\t\tint y = j / $this->width;"
+                    . "\n\t\t\t\tplot(x, y, bits[j]);"
+                    . "\n\t\t\t}"
+                    . "\n\t\t\tdelay(1000 / $fps);"
+                    . "\n\t\t\tclear();"
+                    . "\n\t\t}"
+                    . "\n\t\treturn 0;"
+                    . "\n\t}"
+                    . "\n}";
+                break;
+            case 1:
+                $code .= "\nvoid plot(int x, int y, int value)"
+                    . "\n{"
+                    . "\n\t// Insert your code here"
+                    . "\n}"
+                    . "\n"
+                    . "\nint main()"
+                    . "\n{"
+                    . "\n\twhile (true)"
+                    . "\n\t{"
+                    . "\n\t\tfor (int i = 0; i < $frameCount; ++i)"
+                    . "\n\t\t{";
+                if ($this->width * $this->height % 4 == 0) {
+                    $code .= "\n\t\t\tint bits[" . strval($this->width * $this->height) . "];"
+                        . "\n\t\t\tfor (int j = 0; j < " . strval($this->width * $this->height / 4) . "; ++j)"
+                        . "\n\t\t\t\tfor (int k = 0; k < 4; ++k)"
+                        . "\n\t\t\t\t\tbits[j * 4 + k] = animation[i][j] >> (3 - k) * 8 & 255;";
+                } else {
+                    $code .= "\n\t\t\tint bits[" . strval($this->width * $this->height) . "];"
+                        . "\n\t\t\tfor (int j = 0; j < " . strval($this->width * $this->height % 4) . "; ++j)"
+                        . "\n\t\t\t\tbits[j] = animation[i][0] >> " . strval($this->width * $this->height % 4 - 1) . " - j & 1;"
+                        . "\n\t\t\tfor (int j = 0; j < " . strval(($this->width * $this->height - $this->width * $this->height % 4) / 4) . "; ++j)"
+                        . "\n\t\t\t\tfor (int k = 0; k < 4; ++k)"
+                        . "\n\t\t\t\t\tbits[" . strval($this->width * $this->height % 4) . " + j * 4 + k] = animation[i][j + 1] >> (3 - k) * 8 & 255;";
+                }
+                $code .= "\n\t\t\tfor (int j = 0; j < " . strval($this->width * $this->height) . "; ++j)"
+                    . "\n\t\t\t{"
+                    . "\n\t\t\t\tint x = j % $this->width;"
+                    . "\n\t\t\t\tint y = j / $this->width;"
+                    . "\n\t\t\t\tplot(x, y, bits[j]);"
+                    . "\n\t\t\t}"
+                    . "\n\t\t\tdelay(1000 / $fps);"
+                    . "\n\t\t\tclear();"
+                    . "\n\t\t}"
+                    . "\n\t\treturn 0;"
+                    . "\n\t}"
+                    . "\n}";
+                break;
+            case 2:
+                $code .= "\nvoid plot(int x, int y, int r, int g, int b)"
+                    . "\n{"
+                    . "\n\t// Insert your code here"
+                    . "\n}"
+                    . "\n"
+                    . "\nint main()"
+                    . "\n{"
+                    . "\n\twhile (true)"
+                    . "\n\t{"
+                    . "\n\t\tfor (int i = 0; i < $frameCount; ++i)"
+                    . "\n\t\t{"
+                    . "\n\t\t\tint bits[" . strval($this->width * $this->height) . "][3];"
+                    . "\n\t\t\tfor (int j = 0; j < " . strval($this->width * $this->height) . "; ++j)"
+                    . "\n\t\t\t{"
+                    . "\n\t\t\t\tbits[j][0] = animation[i][j] >> 16 & 255;"
+                    . "\n\t\t\t\tbits[j][1] = animation[i][j] >> 8 & 255;"
+                    . "\n\t\t\t\tbits[j][2] = animation[i][j] & 255;"
+                    . "\n\t\t\t}"
+                    . "\n\t\t\tfor (int j = 0; j < " . strval($this->width * $this->height) . "; ++j)"
+                    . "\n\t\t\t{"
+                    . "\n\t\t\t\tint x = j % $this->width;"
+                    . "\n\t\t\t\tint y = j / $this->width;"
+                    . "\n\t\t\t\tplot(x, y, bits[j][0], bits[j][1], bits[j][2]);"
+                    . "\n\t\t\t}"
+                    . "\n\t\t\tdelay(1000 / $fps);"
+                    . "\n\t\t\tclear();"
+                    . "\n\t\t}"
+                    . "\n\t}"
+                    . "\n\treturn 0;"
+                    . "\n}";
+                break;
+        }
+        return $code;
     }
 
     public function generatePicoMicroPythonCode($fps = 1)
     {
-        return "Error: Only valid for the Raspberry Pi Pico.";
+        $frames = $this->getFramesAs32BitIntegersJSON();
+        $code = "import time"
+            . "\n"
+            . "\nanimation = $frames"
+            . "\n"
+            . "\ndef clear():"
+            . "\n\t# Insert your code here"
+            . "\n";
+        switch ($this->type) {
+            case 0:
+                $code .= "\ndef plot(x, y, value):"
+                    . "\n\t# Insert your code here"
+                    . "\n"
+                    . "\nwhile True:"
+                    . "\n\tfor i in range(len(animation)):"
+                    . "\n\t\tbits = []";
+                if ($this->width * $this->height % 32 == 0) {
+                    $code .= "\n\t\tfor j in range(" . strval($this->width * $this->height / 32) . "):"
+                        . "\n\t\t\tfor k in range(32):"
+                        . "\n\t\t\t\tbits.append(animation[i][j] >> 31 - k & 1)";
+                } else {
+                    $code .= "\n\t\tfor j in range(" . strval($this->width * $this->height % 32) . "):"
+                        . "\n\t\t\tbits.append(animation[i][0] >> " . strval($this->width * $this->height % 32 - 1) . " - j & 1)"
+                        . "\n\t\tfor j in range(" . strval(($this->width * $this->height - $this->width * $this->height % 32) / 32) . "):"
+                        . "\n\t\t\tfor k in range(32):"
+                        . "\n\t\t\t\tbits.append(animation[i][j + 1] >> 31 - k & 1)";
+                }
+                $code .= "\n\t\tfor j in range(" . strval($this->width * $this->height) . "):"
+                    . "\n\t\t\tx = j % $this->width"
+                    . "\n\t\t\ty = j // $this->width"
+                    . "\n\t\t\tplot(x, y, bits[j])"
+                    . "\n\t\ttime.sleep(1000 / $fps)"
+                    . "\n\t\tclear()";
+                break;
+            case 1:
+                $code .= "\ndef plot(x, y, value):"
+                    . "\n\t# Insert your code here"
+                    . "\n"
+                    . "\nwhile True:"
+                    . "\n\tfor i in range(len(animation)):"
+                    . "\n\t\tbits = []";
+                if ($this->width * $this->height % 4 == 0) {
+                    $code .= "\n\t\tfor j in range(" . strval($this->width * $this->height / 4) . "):"
+                        . "\n\t\t\tfor k in range(4):"
+                        . "\n\t\t\t\tbits.append(animation[i][j] >> (3 - k) * 8 & 255)";
+                } else {
+                    $code .= "\n\t\tfor j in range(" . strval($this->width * $this->height % 4) . "):"
+                        . "\n\t\t\tbits.append(animation[i][0] >> " . strval($this->width * $this->height % 4 - 1) . " - j & 1)"
+                        . "\n\t\tfor j in range(" . strval(($this->width * $this->height - $this->width * $this->height % 4) / 4) . "):"
+                        . "\n\t\t\tfor k in range(4):"
+                        . "\n\t\t\t\tbits.append(animation[i][j + 1] >> (3 - k) * 8 & 255)";
+                }
+                $code .= "\n\t\tfor j in range(" . strval($this->width * $this->height) . "):"
+                    . "\n\t\t\tx = j % $this->width"
+                    . "\n\t\t\ty = j // $this->width"
+                    . "\n\t\t\tplot(x, y, bits[j])"
+                    . "\n\t\ttime.sleep(1000 / $fps)"
+                    . "\n\t\tclear()";
+                break;
+            case 2:
+                $code .= "\ndef plot(x, y, r, g, b):"
+                    . "\n\t# Insert your code here"
+                    . "\n"
+                    . "\nwhile True:"
+                    . "\n\tfor i in range(len(animation)):"
+                    . "\n\t\tbits = []"
+                    . "\n\t\tfor j in range(" . strval($this->width * $this->height) . "):"
+                    . "\n\t\t\tbits.append([])"
+                    . "\n\t\t\tbits[j].append(animation[i][j] >> 16 & 255)"
+                    . "\n\t\t\tbits[j].append(animation[i][j] >> 8 & 255)"
+                    . "\n\t\t\tbits[j].append(animation[i][j] & 255)"
+                    . "\n\t\tfor j in range(" . strval($this->width * $this->height) . "):"
+                    . "\n\t\t\tx = j % $this->width"
+                    . "\n\t\t\ty = j // $this->width"
+                    . "\n\t\t\tplot(x, y, bits[j][0], bits[j][1], bits[j][2])"
+                    . "\n\t\tsleep(1000 / $fps)"
+                    . "\n\t\tclear()";
+                break;
+        }
+        return $code;
     }
 }
 
@@ -276,7 +768,7 @@ class MicroBitInternalAnimation extends Animation
 
     public function generateMicroBitMicroPythonCode($fps = 1)
     {
-        $frames = implode("\n", array_map("mapTabToStart", array_map("mapTabToStart", array_map("mapTabToStart", explode("\n", str_replace("    ", "\t", $this->getFramesAs32BitIntegersJSON()))))));
+        $frames = implode("\n", array_map("mapTabToStart", array_map("mapTabToStart", array_map("mapTabToStart", explode("\n", $this->getFramesAs32BitIntegersJSON())))));
         return "# https://python.microbit.org/v/2"
             . "\nfrom microbit import *"
             . "\n"
@@ -302,7 +794,7 @@ class MicroBitInternalAnimation extends Animation
 
     public function generateMicroBitTypeScriptCode($fps = 1)
     {
-        $frames = implode("\n", array_map("mapTabToStart", array_map("mapTabToStart", explode("\n", str_replace("    ", "\t", $this->getFramesAs32BitIntegersJSON())))));
+        $frames = implode("\n", array_map("mapTabToStart", array_map("mapTabToStart", explode("\n", $this->getFramesAs32BitIntegersJSON()))));
         return "/**"
             . "\n* https://makecode.microbit.org/#editor"
             . "\n*/"
@@ -327,11 +819,6 @@ class MicroBitInternalAnimation extends Animation
             . "\n$frames"
             . "\n\t);"
             . "\n});";
-    }
-
-    public function generateMicroBitHexFile($fps = 1)
-    {
-        return "Error: I haven't done this yet.";
     }
 }
 
@@ -399,7 +886,7 @@ class ScrollBitAnimation extends Animation
 
     public function generateMicroBitMicroPythonCode($fps = 1)
     {
-        $frames = implode("\n", array_map("mapTabToStart", array_map("mapTabToStart", array_map("mapTabToStart", explode("\n", str_replace("    ", "\t", $this->getFramesAs32BitIntegersJSON()))))));
+        $frames = implode("\n", array_map("mapTabToStart", array_map("mapTabToStart", array_map("mapTabToStart", explode("\n", $this->getFramesAs32BitIntegersJSON())))));
         return "# https://python.microbit.org/v/2"
             . "\n# Download the scrollbit library from https://github.com/pimoroni/micropython-scrollbit/blob/master/library/scrollbit.py"
             . "\n# Load/Save > Project Files > Add File"
@@ -434,7 +921,7 @@ class ScrollBitAnimation extends Animation
 
     public function generateMicroBitTypeScriptCode($fps = 1)
     {
-        $frames = implode("\n", array_map("mapTabToStart", array_map("mapTabToStart", explode("\n", str_replace("    ", "\t", $this->getFramesAs32BitIntegersJSON())))));
+        $frames = implode("\n", array_map("mapTabToStart", array_map("mapTabToStart", explode("\n", $this->getFramesAs32BitIntegersJSON()))));
         return "/**"
             . "\n* https://makecode.microbit.org/#editor"
             . "\n* You need to add the Scroll:Bit package."
@@ -467,11 +954,6 @@ class ScrollBitAnimation extends Animation
             . "\n$frames"
             . "\n\t);"
             . "\n});";
-    }
-
-    public function generateMicroBitHexFile($fps = 1)
-    {
-        return "Error: I haven't done this yet.";
     }
 }
 
@@ -524,7 +1006,7 @@ class PicoRGBKeypadAnimation extends Animation
 
     public function generatePicoMicroPythonCode($fps = 1)
     {
-        $frames = implode("\n", explode("\n", str_replace("    ", "\t", $this->getFramesAs32BitIntegersJSON())));
+        $frames = $this->getFramesAs32BitIntegersJSON();
         return "# Install the MicroPython uf2 file from https://github.com/pimoroni/pimoroni-pico/releases"
             . "\nimport time"
             . "\nimport picokeypad as keypad"
@@ -666,14 +1148,6 @@ class AdaFruit16x9Animation extends Animation
 }
 
 class HLM1388AR8x8Animation extends Animation
-{
-    public function __construct($id)
-    {
-        parent::__construct($id);
-    }
-}
-
-class CustomAnimation extends Animation
 {
     public function __construct($id)
     {

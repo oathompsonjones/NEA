@@ -79,7 +79,7 @@ echo <<<HTML
         const boardLanguages = {
             "Arduino": ["C++"],
             "Raspberry Pi Pico": ["C++", "MicroPython"],
-            "BBC Micro:Bit": ["MicroPython", "TypeScript", "Hex File"]
+            "BBC Micro:Bit": ["MicroPython", "TypeScript"/* , "Hex File" */]
         };
         const createMatrixAndLanguageOptions = () => {
             const microControllerOptions = document.getElementById("microControllerOptions");

@@ -28,9 +28,9 @@
             - Micro:Bit MicroPython
             - Micro:Bit TypeScript
     - Custom
-        - Arduino
-        - Micro:Bit MicroPython
-        - Micro:Bit TypeScript
+        - Monochromatic                                                             √
+        - Variable Brightness                                                       √
+        - RGB                                                                       √
     - Hex Files
     - UF2 Files
     - COMPRESSION (Some stuff too big for Arduino UNO)
