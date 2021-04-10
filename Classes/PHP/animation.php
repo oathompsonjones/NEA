@@ -555,6 +555,58 @@ class AdaFruitNeoPixelRGB8x8Animation extends Animation
     {
         parent::__construct($id);
     }
+
+    public function generateArduinoCppCode($fps = 1)
+    {
+        $frames = str_replace("]", "}", str_replace("[", "{", $this->getFramesAs32BitIntegersJSON()));
+        $frameCount = count($this->frames);
+        return "#include <Adafruit_GFX.h>"
+            . "\n#include <Adafruit_NeoMatrix.h>"
+            . "\n#include <Adafruit_NeoPixel.h>"
+            . "\n"
+            . "\n// Use digital pin 8 as your data pin."
+            . "\nAdafruit_NeoMatrix matrix = Adafruit_NeoMatrix(8, 8, 8, NEO_MATRIX_TOP + NEO_MATRIX_LEFT + NEO_MATRIX_ROWS + NEO_MATRIX_PROGRESSIVE);"
+            . "\n"
+            . "\nconst long animation[$frameCount][64] = $frames;"
+            . "\n"
+            . "\nvoid plot(int x, int y, int r, int g, int b)"
+            . "\n{"
+            . "\n\tmatrix.drawPixel(x, y, matrix.Color(r, g, b));"
+            . "\n}"
+            . "\n"
+            . "\nvoid clearScreen()"
+            . "\n{"
+            . "\n\tmatrix.fillScreen(0);"
+            . "\n}"
+            . "\n"
+            . "\nvoid setup()"
+            . "\n{"
+            . "\n\tmatrix.begin();"
+            . "\n\tmatrix.setBrightness(10);"
+            . "\n}"
+            . "\n"
+            . "\nvoid loop()"
+            . "\n{"
+            . "\n\tfor (int i = 0; i < $frameCount; ++i)"
+            . "\n\t{"
+            . "\n\t\tint bits[64][3];"
+            . "\n\t\tfor (int j = 0; j < 64; ++j)"
+            . "\n\t\t{"
+            . "\n\t\t\tbits[j][0] = animation[i][j] >> 16 & 255;"
+            . "\n\t\t\tbits[j][1] = animation[i][j] >> 8 & 255;"
+            . "\n\t\t\tbits[j][2] = animation[i][j] & 255;"
+            . "\n\t\t}"
+            . "\n\t\tfor (int j = 0; j < 64; ++j)"
+            . "\n\t\t{"
+            . "\n\t\t\tint x = j % 8;"
+            . "\n\t\t\tint y = j / 8;"
+            . "\n\t\t\tplot(x, y, bits[j][0], bits[j][1], bits[j][2]);"
+            . "\n\t\t}"
+            . "\n\t\tmatrix.show();"
+            . "\n\t\tdelay(1000 / $fps);"
+            . "\n\t\tclearScreen();"
+            . "\n\t}";
+    }
 }
 
 class HLM1388AR8x8Animation extends Animation

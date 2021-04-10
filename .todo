@@ -11,7 +11,7 @@
         - MicroPython                                                               √
         - C++                                                                       √
     - NeoPixel
-        - Arduino
+        - Arduino                                                                   √
         - Micro:Bit MicroPython
         - Micro:Bit TypeScript
     - 16x9
@@ -33,6 +33,7 @@
         - Micro:Bit TypeScript
     - Hex Files
     - UF2 Files
+    - COMPRESSION (Some stuff too big for Arduino UNO)
 - Backend
     - Admin controls
         - Delete/Add users                                                          √
