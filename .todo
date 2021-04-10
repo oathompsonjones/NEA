@@ -12,28 +12,28 @@
         - C++                                                                       √
     - NeoPixel
         - Arduino                                                                   √
-        - Micro:Bit MicroPython
-        - Micro:Bit TypeScript
+        - Micro:Bit MicroPython                                                     ~
+        - Micro:Bit TypeScript                                                      ~
     - 16x9
         - Arduino                                                                   √
-        - Micro:Bit MicroPython
-        - Micro:Bit TypeScript
+        - Micro:Bit MicroPython                                                     ~
+        - Micro:Bit TypeScript                                                      ~
     - 8x8
         - With Control Board
-            - Arduino
-            - Micro:Bit MicroPython
-            - Micro:Bit TypeScript
+            - Arduino                                                               
+            - Micro:Bit MicroPython                                                 ~
+            - Micro:Bit TypeScript                                                  ~
         - Without Control Board
-            - Arduino
-            - Micro:Bit MicroPython
-            - Micro:Bit TypeScript
+            - Arduino                                                               
+            - Micro:Bit MicroPython                                                 ~
+            - Micro:Bit TypeScript                                                  ~
     - Custom
         - Monochromatic                                                             √
         - Variable Brightness                                                       √
         - RGB                                                                       √
-    - Hex Files
-    - UF2 Files
-    - COMPRESSION (Some stuff too big for Arduino UNO)
+    - Hex Files                                                                     ~
+    - UF2 Files                                                                     ~
+    - COMPRESSION (Some stuff too big for Arduino UNO)                              ~
 - Backend
     - Admin controls
         - Delete/Add users                                                          √
