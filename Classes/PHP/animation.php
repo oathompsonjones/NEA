@@ -155,7 +155,7 @@ class Animation
     {
         function frameToBinaryArray($value)
         {
-            $num = strlen($value->binary) + 32 - strlen($value->binary) % 32;
+            $num = ceil(strlen($value->binary) / 32) * 32;
             $binary = str_pad($value->binary, $num, "0", STR_PAD_LEFT);
             $smallerBinaries = [];
             preg_match_all("/.{1,32}/", $binary, $smallerBinaries);
@@ -609,15 +609,63 @@ class AdaFruitNeoPixelRGB8x8Animation extends Animation
     }
 }
 
-class HLM1388AR8x8Animation extends Animation
+class AdaFruit16x9Animation extends Animation
 {
     public function __construct($id)
     {
         parent::__construct($id);
     }
+
+    public function generateArduinoCppCode($fps = 1)
+    {
+        $frames = str_replace("]", "}", str_replace("[", "{", $this->getFramesAs32BitIntegersJSON()));
+        $frameCount = count($this->frames);
+        return "#include <Adafruit_GFX.h>"
+            . "\n#include <Adafruit_IS31FL3731.h>"
+            . "\n"
+            . "\nAdafruit_IS31FL3731 ledmatrix = Adafruit_IS31FL3731();"
+            . "\n"
+            . "\nconst long animation[$frameCount][36] = $frames;"
+            . "\n"
+            . "\nvoid plot(int x, int y, int v)"
+            . "\n{"
+            . "\n\tledmatrix.drawPixel(x, y, v);"
+            . "\n}"
+            . "\n"
+            . "\nvoid clearScreen()"
+            . "\n{"
+            . "\n\tfor (int i = 0; i < 16; ++i)"
+            . "\n\t\tfor (int j = 0; j < 9; ++j)"
+            . "\n\t\t\tplot(i, j, 0);"
+            . "\n}"
+            . "\n"
+            . "\nvoid setup()"
+            . "\n{"
+            . "\n\tledmatrix.begin();"
+            . "\n}"
+            . "\n"
+            . "\nvoid loop()"
+            . "\n{"
+            . "\n\tfor (int i = 0; i < $frameCount; ++i)"
+            . "\n\t{"
+            . "\n\t\tint bits[16 * 9];"
+            . "\n\t\tfor (int j = 0; j < 36; ++j)"
+            . "\n\t\t\tfor (int k = 0; k < 4; ++k)"
+            . "\n\t\t\t\tbits[j * 4 + k] = animation[i][j] >> (3 - k) * 8 & 255;"
+            . "\n\t\tfor (int j = 0; j < 16 * 9; ++j)"
+            . "\n\t\t{"
+            . "\n\t\t\tint x = j % 16;"
+            . "\n\t\t\tint y = j / 16;"
+            . "\n\t\t\tplot(x, y, bits[j]);"
+            . "\n\t\t}"
+            . "\n\t\tdelay(1000 / $fps);"
+            . "\n\t\tclearScreen();"
+            . "\n\t}"
+            . "\n}";
+    }
 }
 
-class AdaFruit9x16Animation extends Animation
+class HLM1388AR8x8Animation extends Animation
 {
     public function __construct($id)
     {

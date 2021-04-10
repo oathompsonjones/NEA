@@ -69,10 +69,10 @@ echo <<<HTML
                 type: 0,
                 requiredBoards: []
             }, {
-                name: "AdaFruit 9x16",
-                width: 9,
-                height: 16,
-                type: 0,
+                name: "AdaFruit 16x9",
+                width: 16,
+                height: 9,
+                type: 1,
                 requiredBoards: []
             }
         ];

@@ -25,8 +25,8 @@ switch ($_POST["matrix"]) {
     case "HL-M1388AR 8x8":
         $animation = new HLM1388AR8x8Animation($_POST["animationID"]);
         break;
-    case "AdaFruit 9x16":
-        $animation = new AdaFruit9x16Animation($_POST["animationID"]);
+    case "AdaFruit 16x9":
+        $animation = new AdaFruit16x9Animation($_POST["animationID"]);
         break;
     case "Custom":
         $animation = new CustomAnimation($_POST["animationID"]);
