@@ -90,7 +90,7 @@ class Animation
                             clearInterval(interval);
                             img.src = frames[0];
                             div.className = "icon firstIcon";
-                        }, 1000 * (frames.length + 3) / fps);
+                        }, 1000 * (frames.length + 1) / fps);
                     };
                 </script>
                 <div id="$id-card" class="card text-white bg-dark animation">
