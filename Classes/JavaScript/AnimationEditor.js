@@ -224,6 +224,9 @@ class AnimationEditor {
         this.binaryString = this.convertMatrixToString(this.matrix.translate(direction));
     }
     new() {
+        unsetCookie("data");
+        unsetCookie("fps");
+        unsetCookie("colour");
         const form = document.createElement("form");
         form.style.display = "none";
         form.setAttribute("method", "post");

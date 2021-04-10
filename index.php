@@ -39,6 +39,8 @@ echo <<<HTML
     <script>
         const setCookie = (name, value) => document.cookie = name + "=" + value + ";";
         const getCookie = (name) => document.cookie.match(/(firstName=)([^;]*)(;\s)/g)?.[0].split("=")[1].replace("; ", "");
+        const unsetCookie = (name) => document.cookie = name + "=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+
     </script>
 HTML;
 

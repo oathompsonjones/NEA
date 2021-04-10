@@ -2,6 +2,9 @@
 if (isset($_POST["createNew"]) && $_POST["createNew"] === "true") {
     unset($_SESSION["matrix"]);
     unset($_SESSION["editor"]);
+    unset($_COOKIE["data"]);
+    unset($_COOKIE["fps"]);
+    unset($_COOKIE["colour"]);
 }
 
 if (isset($_POST["preMade"]) && $_POST["preMade"] !== "New") {
@@ -138,7 +141,7 @@ if (!$widthSet || !$heightSet || !$typeSet || !$nameSet || !$idSet) {
 
                 setup.style.display = preMade.value === "New" ? "block" : "none";
                 inputName.required = preMade.value === "New";
-                customSetup.style.display = setupOptions.value === "Custom" ? "block" : "none";
+                customSetup.style.display = setupOptions.value == 0 ? "block" : "none";
             });
         </script>
     HTML;

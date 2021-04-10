@@ -234,6 +234,12 @@ abstract class AnimationEditor {
     }
 
     public new(): void {
+        // @ts-ignore
+        unsetCookie("data");
+        // @ts-ignore
+        unsetCookie("fps");
+        // @ts-ignore
+        unsetCookie("colour");
         const form: HTMLFormElement = document.createElement("form");
         form.style.display = "none";
         form.setAttribute("method", "post");

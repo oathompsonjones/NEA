@@ -36,30 +36,30 @@ switch ($_POST["board"]) {
     case "BBC Micro:Bit":
         switch ($_POST["language"]) {
             case "MicroPython":
-                echo $animation->generateMicroBitMicroPythonCode($_POST["fps"]);
+                echo htmlspecialchars($animation->generateMicroBitMicroPythonCode($_POST["fps"]));
                 break;
             case "TypeScript":
-                echo $animation->generateMicroBitTypeScriptCode($_POST["fps"]);
+                echo htmlspecialchars($animation->generateMicroBitTypeScriptCode($_POST["fps"]));
                 break;
             case "Hex File":
-                echo $animation->generateMicroBitHexFile($_POST["fps"]);
+                echo htmlspecialchars($animation->generateMicroBitHexFile($_POST["fps"]));
                 break;
         }
         break;
     case "Arduino":
         switch ($_POST["language"]) {
             case "C++":
-                echo $animation->generateArduinoCppCode($_POST["fps"]);
+                echo htmlspecialchars($animation->generateArduinoCppCode($_POST["fps"]));
                 break;
         }
         break;
     case "Raspberry Pi Pico":
         switch ($_POST["language"]) {
             case "C++":
-                echo $animation->generatePicoCppCode($_POST["fps"]);
+                echo htmlspecialchars($animation->generatePicoCppCode($_POST["fps"]));
                 break;
             case "MicroPython":
-                echo $animation->generatePicoMicroPythonCode($_POST["fps"]);
+                echo htmlspecialchars($animation->generatePicoMicroPythonCode($_POST["fps"]));
                 break;
         }
         break;
