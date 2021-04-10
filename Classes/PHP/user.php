@@ -56,8 +56,10 @@ class User
     {
         $db = $_SESSION["database"];
         $db->delete("User", "Username = '$this->username'");
-        for ($i = 0; $i < count($this->animations); ++$i) $this->animations[$i]->delete();
-        for ($i = 0; $i < count($this->posts); ++$i) $this->posts[$i]->delete();
+        $animationCount = count($this->animations);
+        for ($i = 0; $i < $animationCount; ++$i) $this->animations[$i]->delete();
+        $postCount = count($this->posts);
+        for ($i = 0; $i < $postCount; ++$i) $this->posts[$i]->delete();
         $db->delete("PostLike", "Username = '$this->username'");
         $db->delete("Comment", "Username = '$this->username'");
         $db->delete("UserFollowing", "Username = '$this->username' OR FollowingUsername = '$this->username'");

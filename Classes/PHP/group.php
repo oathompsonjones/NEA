@@ -50,7 +50,8 @@ class Group
         $db->delete("ClassMember", "ClassID = '$this->id'");
         $db->delete("MutedUser", "ClassID = '$this->id'");
         $db->delete("ChatMessage", "ClassID = '$this->id'");
-        for ($i = 0; $i < count($this->assignments); ++$i) $this->assignments[$i]->delete();
+        $assignmentCount = count($this->assignments);
+        for ($i = 0; $i < $assignmentCount; ++$i) $this->assignments[$i]->delete();
     }
 
     public function addUser($username)

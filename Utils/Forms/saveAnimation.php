@@ -22,4 +22,5 @@ if ($animationExists) $db->delete("Frame", "AnimationID = '$id'");
 // If it doesn't add it.
 else $db->insert("Animation", "AnimationID, Name, Username, Width, Height, Type", "'$id', '$name', '$username', $width, $height, $type");
 // Get all of the current frames.
-for ($i = 0; $i < count($frames); ++$i) $db->insert("Frame", "FrameID, AnimationID, FramePosition, BinaryString", "'$id$i', '$id', $i, '$frames[$i]'");
+$frameCount = count($frames);
+for ($i = 0; $i < $frameCount; ++$i) $db->insert("Frame", "FrameID, AnimationID, FramePosition, BinaryString", "'$id$i', '$id', $i, '$frames[$i]'");

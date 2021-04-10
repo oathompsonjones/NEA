@@ -135,9 +135,11 @@ class Animation
     {
         $db = $_SESSION["database"];
         $db->delete("Animation", "AnimationID = '$this->id'");
-        for ($i = 0; $i < count($this->frames); ++$i) $this->frames[$i]->delete();
+        $frameCount = count($this->frames);
+        for ($i = 0; $i < $frameCount; ++$i) $this->frames[$i]->delete();
         $posts = $db->select("PostID", "Post", "AnimationID = '$this->id'");
-        for ($i = 0; $i < count($posts); ++$i) (new Post($posts[$i]))->delete();
+        $postCount = count($posts);
+        for ($i = 0; $i < $postCount; ++$i) (new Post($posts[$i]))->delete();
         $db->delete("AssignmentWork", "AnimationID = '$this->id'");
     }
 
@@ -178,7 +180,8 @@ class Animation
         $ledHeight = 1024 / $this->height;
         $binary = array_map("mapToBinary", $frames);
         $images = [];
-        for ($i = 0; $i < count($binary); ++$i) {
+        $frameCount = count($binary);
+        for ($i = 0; $i < $frameCount; ++$i) {
             $image = imagecreatetruecolor(1024, 1024);
             $bgColour = imagecolorallocatealpha($image, 255, 255, 255, 10);
             imagefill($image, 0, 0, $bgColour);
@@ -187,7 +190,8 @@ class Animation
                 case 0:
                     preg_match_all("/.{1,1}/", $binary[$i], $leds);
                     $leds = array_map("mapBinaryToIntegers", $leds[0]);
-                    for ($j = 0; $j < count($leds); ++$j) {
+                    $ledCount = count($leds);
+                    for ($j = 0; $j < $ledCount; ++$j) {
                         $x = $j % $this->width;
                         $y = floor($j / $this->width);
                         $ledColour = imagecolorallocate($image, $leds[$j] * 255, 0, 0);
@@ -197,7 +201,8 @@ class Animation
                 case 1:
                     preg_match_all("/.{1,8}/", $binary[$i], $leds);
                     $leds = array_map("mapBinaryToIntegers", $leds[0]);
-                    for ($j = 0; $j < count($leds); ++$j) {
+                    $ledCount = count($leds);
+                    for ($j = 0; $j < $ledCount; ++$j) {
                         $x = $j % $this->width;
                         $y = floor($j / $this->width);
                         $ledColour = imagecolorallocate($image, $leds[$j], 0, 0);
@@ -207,7 +212,8 @@ class Animation
                 case 2:
                     preg_match_all("/.{1,24}/", $binary[$i], $leds);
                     $leds = $leds[0];
-                    for ($j = 0; $j < count($leds); ++$j) {
+                    $ledCount = count($leds);
+                    for ($j = 0; $j < $ledCount; ++$j) {
                         $rgb = [];
                         preg_match_all("/.{1,8}/", $leds[$j], $rgb);
                         $rgb = array_map("mapBinaryToIntegers", $rgb[0]);

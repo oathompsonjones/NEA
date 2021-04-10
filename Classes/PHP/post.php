@@ -154,7 +154,8 @@ class Post
             </div>
         HTML;
         $comments = "";
-        for ($i = 0; $i < count($postComments); ++$i) $comments = $comments . $postComments[$i]->render();
+        $commentCount = count($postComments);
+        for ($i = 0; $i < $commentCount; ++$i) $comments = $comments . $postComments[$i]->render();
         return <<<HTML
             <div class="card text-white bg-dark post">
                 <script>

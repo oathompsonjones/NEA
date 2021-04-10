@@ -73,7 +73,8 @@ if (!$widthSet || !$heightSet || !$typeSet || !$nameSet || !$idSet) {
                     <option value="New">Create new</option>
     HTML;
     $animations = unserialize($_SESSION["user"])->animations;
-    for ($i = 0; $i < count($animations); ++$i) {
+    $animationCount = count($animations);
+    for ($i = 0; $i < $animationCount; ++$i) {
         $id = $animations[$i]->id;
         $name = $animations[$i]->name;
         echo <<<HTML

@@ -36,7 +36,8 @@ class Assignment
         switch ($user->type) {
             case "teacher":
                 $work = "";
-                for ($i = 0; $i < count($this->work); ++$i) $work = $work . $this->work[$i]->render();
+                $workCount = count($this->work);
+                for ($i = 0; $i < $workCount; ++$i) $work = $work . $this->work[$i]->render();
                 return <<<HTML
                     <div id="$this->id">
                         <div class="card bg-dark">
@@ -73,7 +74,8 @@ class Assignment
                 $handedIn = in_array($user->username, array_map("mapToUsernames", $this->work));
                 $handedInAnimation = "";
                 if ($handedIn) {
-                    for ($i = 0; $i < count($this->work); ++$i) {
+                    $workCount = count($this->work);
+                    for ($i = 0; $i < $workCount; ++$i) {
                         $thisWork = $this->work[$i];
                         if ($thisWork->username === $user->username) {
                             $handedInAnimation = $thisWork->animation->name;
@@ -85,7 +87,8 @@ class Assignment
                     $animationList = <<<HTML
                         <select class="form-control bg-dark text-light" id="animationList" name="setup">
                     HTML;
-                    for ($i = 0; $i < count($user->animations); ++$i) {
+                    $animationCount = count($user->animations);
+                    for ($i = 0; $i < $animationCount; ++$i) {
                         $animation = $user->animations[$i];
                         $animationList = $animationList . <<<HTML
                             <option value="$i">$animation->name</option>

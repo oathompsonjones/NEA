@@ -7,7 +7,8 @@ echo <<<HTML
         <style>.animation { display: none; }</style>
 HTML;
 $animations = $user->animations;
-for ($i = 0; $i < count($animations); ++$i) {
+$animationCount = count($animations);
+for ($i = 0; $i < $animationCount; ++$i) {
     $html = $animations[$i]->render();
     echo <<<HTML
         <div class="col">$html</div>

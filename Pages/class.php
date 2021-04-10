@@ -65,7 +65,8 @@ if (!isset($_GET["classID"]) || is_null($_GET["classID"])) {
         </div>
     HTML;
     $html = "";
-    for ($i = 0; $i < count($classes); ++$i) {
+    $classCount = count($classes);
+    for ($i = 0; $i < $classCount; ++$i) {
         $classHTML = $classes[$i]->render();
         $html = $html . <<<HTML
             <div class="col">$classHTML</div>
@@ -269,7 +270,8 @@ if (!isset($_GET["classID"]) || is_null($_GET["classID"])) {
     HTML;
     $assignments = $class->assignments;
     $lastAssignmentWasPast = false;
-    for ($i = 0; $i < count($assignments); ++$i) {
+    $assignmentCount = count($assignments);
+    for ($i = 0; $i < $assignmentCount; ++$i) {
         $assignment = $assignments[$i];
         if ($i === 0) echo <<<HTML
             <h4>Upcoming Assignments</h4>
@@ -289,7 +291,8 @@ if (!isset($_GET["classID"]) || is_null($_GET["classID"])) {
     // Teacher List
     $teachers = $class->teachers;
     $teachersHTML = "";
-    for ($i = 0; $i < count($teachers); ++$i) {
+    $teacherCount = count($teachers);
+    for ($i = 0; $i < $teacherCount; ++$i) {
         $username = $teachers[$i]->username;
         $teachersHTML = $teachersHTML . <<<HTML
             <div id="$username" style="display: flex;">
@@ -347,7 +350,8 @@ if (!isset($_GET["classID"]) || is_null($_GET["classID"])) {
     // Student List
     $students = $class->students;
     $studentsHTML = "";
-    for ($i = 0; $i < count($students); ++$i) {
+    $studentCount = count($students);
+    for ($i = 0; $i < $studentCount; ++$i) {
         $username = $students[$i]->username;
         $studentsHTML = $studentsHTML . <<<HTML
             <div id="$username" style="display: flex;">

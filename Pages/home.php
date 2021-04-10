@@ -23,7 +23,8 @@ function renderUsers()
                 <th></th>
             </tr>
     HTML;
-    for ($i = 0; $i < count($users); ++$i) {
+    $userCount = count($users);
+    for ($i = 0; $i < $userCount; ++$i) {
         $username = $users[$i]->username;
         $passwordHash = $users[$i]->passwordHash;
         $resetPasswordHash = md5($username);
@@ -131,7 +132,8 @@ function renderAnimations()
                 <th></th>
             </tr>
     HTML;
-    for ($i = 0; $i < count($animations); ++$i) {
+    $animationCount = count($animations);
+    for ($i = 0; $i < $animationCount; ++$i) {
         $id = $animations[$i]->id;
         $name = $animations[$i]->name;
         $width = $animations[$i]->width;
@@ -188,7 +190,8 @@ function renderPosts()
                 <th></th>
             </tr>
     HTML;
-    for ($i = 0; $i < count($posts); ++$i) {
+    $postCount = count($posts);
+    for ($i = 0; $i < $postCount; ++$i) {
         $id = $posts[$i]->id;
         $animation = $posts[$i]->animationID;
         $fps = $posts[$i]->fps;
@@ -243,7 +246,8 @@ function renderComments()
                 <th></th>
             </tr>
     HTML;
-    for ($i = 0; $i < count($comments); ++$i) {
+    $commentCount = count($comments);
+    for ($i = 0; $i < $commentCount; ++$i) {
         $id = $comments[$i]->id;
         $content = $comments[$i]->content;
         $post = $comments[$i]->post->id;
@@ -297,7 +301,8 @@ function renderClasses()
                 <th></th>
             </tr>
     HTML;
-    for ($i = 0; $i < count($classes); ++$i) {
+    $classCount = count($classes);
+    for ($i = 0; $i < $classCount; ++$i) {
         $id = $classes[$i]->id;
         $name = $classes[$i]->name;
         $chatEnabled = $classes[$i]->chatEnabled;
@@ -354,10 +359,12 @@ switch ($user->type) {
         $feedPosts = [];
         $feedUsers = $user->following;
         array_push($feedUsers, $user);
-        for ($i = 0; $i < count($feedUsers); ++$i) {
+        $feedUserCount = count($feedUsers);
+        for ($i = 0; $i < $feedUserCount; ++$i) {
             $thisUser = $feedUsers[$i];
             $thisPosts = $thisUser->posts;
-            for ($j = 0; $j < count($thisPosts); ++$j) array_push($feedPosts, $thisPosts[$j]);
+            $thisPostCount = count($thisPosts);
+            for ($j = 0; $j < $thisPostCount; ++$j) array_push($feedPosts, $thisPosts[$j]);
         }
         usort($feedPosts, "sortByCreatedAt");
         echo <<<HTML

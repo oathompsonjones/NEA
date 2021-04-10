@@ -34,8 +34,9 @@ class Database
     {
         if (count($columns) !== count($values)) return NULL;
         $query = "UPDATE $table SET";
-        for ($i = 0; $i < count($columns); ++$i)
-            $query = $query . " $columns[$i] = '$values[$i]'" . ($i !== count($columns) - 1 ? "," : "");
+        $columnCount = count($columns);
+        for ($i = 0; $i < $columnCount; ++$i)
+            $query = $query . " $columns[$i] = '$values[$i]'" . ($i !== $columnCount - 1 ? "," : "");
         $query = $query . " WHERE $condition;";
         return $this->mysqli->query($query);
     }

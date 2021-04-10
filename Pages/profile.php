@@ -9,13 +9,14 @@ if (isset($_GET["searchUser"]) && !is_null($_GET["searchUser"]) && strlen($_GET[
         return strpos(strtolower($value), strtolower($_GET["searchUser"])) !== false;
     }
     $searchedUsernames = array_values(array_filter($allUsernames, "searchForUsernames"));
-    if (count($searchedUsernames) > 0) echo <<<HTML
+    $searchedUsernameCount = count($searchedUsernames);
+    if ($searchedUsernameCount > 0) echo <<<HTML
         <h2>Results for $getUser...</h2>
     HTML;
     else echo <<<HTML
         <h2>No results were found for $getUser.</h2>
     HTML;
-    for ($i = 0; $i < count($searchedUsernames); ++$i) {
+    for ($i = 0; $i < $searchedUsernameCount; ++$i) {
         $thisUser = new User($searchedUsernames[$i]);
         $thisUsername = $thisUser->username;
         $thisBio = $thisUser->bio;
@@ -152,13 +153,14 @@ if (isset($_POST["editProfile"]) && $_POST["editProfile"] === "true" && $isLogge
     }
 } else if (isset($_POST["displayFollowers"]) && $_POST["displayFollowers"] === "true") {
     $followers = is_null($user->followers) ? [] : $user->followers;
-    if (count($followers) > 0) echo <<<HTML
+    $followerCount = count($followers);
+    if ($followerCount > 0) echo <<<HTML
         <h2><a href="$profile?user=r->username">$user->username</a>'s followers...</h2>
     HTML;
     else echo <<<HTML
         <h2><a href="profile?user=$user->username">$user->username</a> has no followers.</h2>
     HTML;
-    for ($i = 0; $i < count($followers); ++$i) {
+    for ($i = 0; $i < $followerCount; ++$i) {
         $thisUser = $followers[$i];
         $thisUsername = $thisUser->username;
         $thisBio = $thisUser->bio;
@@ -176,13 +178,14 @@ if (isset($_POST["editProfile"]) && $_POST["editProfile"] === "true" && $isLogge
     }
 } else if (isset($_POST["displayFollowing"]) && $_POST["displayFollowing"] === "true") {
     $following = is_null($user->following) ? [] : $user->following;
-    if (count($following) > 0) echo <<<HTML
+    $followingCount = count($following);
+    if ($followingCount > 0) echo <<<HTML
         <h2><a href="profile?user=$user->username">$user->username</a> follows...</h2>
     HTML;
     else echo <<<HTML
         <h2><a href="profile?user=$user->username">$user->username</a> does not follow anyone.</h2>
     HTML;
-    for ($i = 0; $i < count($following); ++$i) {
+    for ($i = 0; $i < $followingCount; ++$i) {
         $thisUser = $following[$i];
         $thisUsername = $thisUser->username;
         $thisBio = $thisUser->bio;
@@ -271,7 +274,8 @@ if (isset($_POST["editProfile"]) && $_POST["editProfile"] === "true" && $isLogge
         <div class="row row-cols-1 row-cols-md-3 g-4">
             <style>.post { display: none; }</style>
     HTML;
-    for ($i = 0; $i < count($posts); ++$i) {
+    $postCount = count($posts);
+    for ($i = 0; $i < $postCount; ++$i) {
         $html = $posts[$i]->render();
         echo <<<HTML
             <div class="col">$html</div>
