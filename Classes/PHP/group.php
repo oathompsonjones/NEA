@@ -1,12 +1,26 @@
 <?php
+
+/**
+ * Class to represent a class.
+ */
 class Group
 {
+    /**
+     * @var string
+     */
     private $id;
+    /**
+     * @param string $id
+     */
     public function __construct($id)
     {
         $this->id = $id;
     }
 
+    /**
+     * @param string $name
+     * @return mixed
+     */
     public function __get($name)
     {
         $id = $this->id;
@@ -43,6 +57,10 @@ class Group
         }
     }
 
+    /**
+     * Deletes the group from the database.
+     * @return void
+     */
     public function delete()
     {
         $db = $_SESSION["database"];
@@ -54,6 +72,11 @@ class Group
         for ($i = 0; $i < $assignmentCount; ++$i) $this->assignments[$i]->delete();
     }
 
+    /**
+     * Adds a user to the class.
+     * @param string $username
+     * @return void
+     */
     public function addUser($username)
     {
         $db = $_SESSION["database"];
@@ -63,24 +86,43 @@ class Group
         $db->insert("ClassMember", "Username, ClassID", "'$username', '$this->id'");
     }
 
+    /**
+     * Mutes a user on the class chat.
+     * @param string $username
+     * @return void
+     */
     public function muteUser($username)
     {
         $db = $_SESSION["database"];
         $db->insert("MutedUser", "ClassID, Username", "'$this->id', '$username'");
     }
 
+    /**
+     * Un mutes a user on the class chat.
+     * @param string $username
+     * @return void
+     */
     public function unMuteUser($username)
     {
         $db = $_SESSION["database"];
         $db->delete("MutedUser", "ClassID = '$this->id' AND Username = '$username'");
     }
 
+    /**
+     * Kicks a user from the class.
+     * @param string $username
+     * @return void
+     */
     public function kickUser($username)
     {
         $db = $_SESSION["database"];
         $db->delete("ClassMember", "ClassID = '$this->id' AND Username = '$username'");
     }
 
+    /**
+     * Creates the HTML required to render the class.
+     * @return string
+     */
     public function render()
     {
         $id = $this->id;

@@ -1,12 +1,26 @@
 <?php
+
+/**
+ * Class to represent a comment made on a post.
+ */
 class Comment
 {
+    /**
+     * @var string
+     */
     private $id;
+    /**
+     * @param string $id
+     */
     public function __construct($id)
     {
         $this->id = $id;
     }
 
+    /**
+     * @param string $name
+     * @return mixed
+     */
     public function __get($name)
     {
         $id = $this->id;
@@ -27,12 +41,20 @@ class Comment
         }
     }
 
+    /**
+     * Deletes the comment from the database.
+     * @return void
+     */
     public function delete()
     {
         $db = $_SESSION["database"];
         $db->delete("Comment", "CommentID = '$this->id'");
     }
 
+    /**
+     * Creates the HTML required to render the comment.
+     * @return string
+     */
     public function render()
     {
         $username = $this->user->username;

@@ -15,6 +15,6 @@ $messageCount = count($messages);
 if ($_POST["messageCount"] === $messageCount) echo $_POST["currentHTML"];
 else {
     $html = "";
-    for ($i = 0; $i < $messageCount; ++$i) $html = $html . $messages[$i]->render($user);
+    for ($i = 0; $i < $messageCount; ++$i) $html .= $messages[$i]->render($user);
     echo $html;
 }

@@ -1,12 +1,16 @@
 <?php
+// Get the animation.
 $id = $_GET["animationID"];
 if (!isset($id) || is_null($id)) require_once "Include/redirect.inc";
 $animation = new Animation($id);
 if (is_null($animation->name)) require_once "Include/redirect.inc";
 
 echo <<<HTML
+    <!-- Tell user which animation it is. -->
     <h1>$animation->name</h1>
+    <!-- Tell them the dimensions and colour depth. -->
     <h4>$animation->width x $animation->height - $animation->typeString</h4>
+    <!-- Allow user to select their board. -->
     <div class="form-floating">
         <select class="form-control bg-dark text-light border-dark" id="microControllerOptions" name="microController">
             <option value="BBC Micro:Bit">BBC Micro:Bit</option>
@@ -16,21 +20,25 @@ echo <<<HTML
         <label for="microControllerOptions">Micro Controller</label>
     </div>
     <br>
+    <!-- Allow user to select their matrix. -->
     <div class="form-floating">
         <select class="form-control bg-dark text-light border-dark" id="ledMatrixOptions" name="ledMatrix"></select>
         <label for="ledMatrixOptions">LED Matrix</label>
     </div>
     <br>
+    <!-- Allow user to select their language. -->
     <div class="form-floating">
         <select class="form-control bg-dark text-light border-dark" id="languageOptions" name="language"></select>
         <label for="languageOptions">Language</label>
     </div>
     <br>
+    <!-- Allow user to select their FPS. -->
     <div class="form-floating bg-dark text-white border-dark">
         <input type="number" class="form-control bg-dark text-white border-dark" id="fps" name="fps" placeholder="FPS" min=1 max=60 value=1>
         <label for="fps">FPS</label>
     </div>
     <script>
+        // Supported matrices and their properties.
         const LEDMatrices = [
             {
                 name: "Micro:Bit Internal",
@@ -76,11 +84,13 @@ echo <<<HTML
                 requiredBoards: []
             }
         ];
+        // Which boards support which languages.
         const boardLanguages = {
             "Arduino": ["C++"],
             "Raspberry Pi Pico": ["C++", "MicroPython"],
             "BBC Micro:Bit": ["MicroPython", "TypeScript"/* , "Hex File" */]
         };
+        // Work out which languages and matrices ar valid based on the board selection and the animation properties.
         const createMatrixAndLanguageOptions = () => {
             const microControllerOptions = document.getElementById("microControllerOptions");
             const ledMatrixOptions = document.getElementById("ledMatrixOptions");
@@ -112,6 +122,7 @@ echo <<<HTML
         };
         $("#microControllerOptions").change(createMatrixAndLanguageOptions);
         createMatrixAndLanguageOptions();
+        // Gets the code via AJAX.
         const generateCode = () => {
             const animationID = "$id";
             const board = document.getElementById("microControllerOptions").value;
@@ -124,14 +135,17 @@ echo <<<HTML
                 document.getElementById("copyBtn").style.display = "";
             });
         };
+        // Copies the code to the clipboard.
         const copyToClipboard = () => navigator.clipboard.writeText(document.getElementById("code").innerHTML.replace(/&amp;/g, "&").replace(/&gt;/g, ">").replace(/&lt;/g, "<"));
     </script>
     <br>
+    <!-- Buttons to generate and to copy code to clipboard. -->
     <div class="btn-group">
         <button class="btn btn-dark" type="button" onclick="generateCode();">Generate Code</button>
         <button class="btn btn-dark" type="button" onclick="copyToClipboard();" style="display: none;" id="copyBtn">Copy</button>
     </div>
     <br>
     <br>
+    <!-- The code output goes here. -->
     <pre><code id="code"></code></pre>
 HTML;

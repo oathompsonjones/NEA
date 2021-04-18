@@ -1,12 +1,26 @@
 <?php
+
+/**
+ * Class to represent a single frame in an animation.
+ */
 class Frame
 {
+    /**
+     * @var string
+     */
     private $id;
+    /**
+     * @param string $id
+     */
     public function __construct($id)
     {
         $this->id = $id;
     }
 
+    /**
+     * @param string $name
+     * @return mixed
+     */
     public function __get($name)
     {
         $id = $this->id;
@@ -33,6 +47,10 @@ class Frame
         }
     }
 
+    /**
+     * Deletes the frame from the database.
+     * @return void
+     */
     public function delete()
     {
         $db = $_SESSION["database"];

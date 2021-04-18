@@ -91,9 +91,9 @@ class Matrix {
         CM[0].forEach((x, i) => det += x * this.data[0][i]);
         return det;
     }
-    get adjoint() {
+    get adjugate() {
         if (!this.square)
-            throw new Error("Non-square matrices do not have adjoints.");
+            throw new Error("Non-square matrices do not have adjugates.");
         const T = this.transposition;
         const A = T.value;
         for (let i = 0; i < this.width; ++i)
@@ -107,7 +107,7 @@ class Matrix {
         if (this.determinant === 0)
             throw new Error("This matrix has a determinant of 0, so does not have an inverse.");
         const D = this.determinant;
-        const I = this.adjoint.value;
+        const I = this.adjugate.value;
         for (let i = 0; i < this.width; ++i)
             for (let j = 0; j < this.height; ++j)
                 I[i][j] *= 1 / D;

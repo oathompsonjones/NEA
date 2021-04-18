@@ -226,7 +226,7 @@ if (isset($_POST["editProfile"]) && $_POST["editProfile"] === "true" && $isLogge
             </script>
         HTML;
         if ($isFollowing) {
-            $followButton = $followButton . ($isFollowing ? <<<HTML
+            $followButton .= ($isFollowing ? <<<HTML
                 <div id="followUserButton">
                     <button onclick="unFollowUser();" class="btn btn-dark btn-sm" type="button" style="padding-left: 10px;">Unfollow</button>
                 </div>

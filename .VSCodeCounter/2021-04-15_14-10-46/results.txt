@@ -1,0 +1,138 @@
+Date : 2021-04-15 14:10:46
+Directory : /Users/oathompsonjones/Sites
+Total : 86 files,  7935 codes, 1094 comments, 398 blanks, all 9427 lines
+
+Languages
++------------+------------+------------+------------+------------+------------+
+| language   | files      | code       | comment    | blank      | total      |
++------------+------------+------------+------------+------------+------------+
+| PHP        |         56 |      4,088 |        534 |        203 |      4,825 |
+| TypeScript |          7 |      1,166 |        524 |         80 |      1,770 |
+| C++        |         10 |      1,152 |         17 |         49 |      1,218 |
+| Python     |          9 |        715 |         12 |         61 |        788 |
+| JavaScript |          2 |        706 |          0 |          2 |        708 |
+| CSS        |          1 |         79 |          2 |          3 |         84 |
+| JSON       |          1 |         29 |          5 |          0 |         34 |
++------------+------------+------------+------------+------------+------------+
+
+Directories
++----------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| path                                                                                   | files      | code       | comment    | blank      | total      |
++----------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| .                                                                                      |         86 |      7,935 |      1,094 |        398 |      9,427 |
+| CSS                                                                                    |          1 |         79 |          2 |          3 |         84 |
+| Classes                                                                                |         13 |      3,254 |        891 |        149 |      4,294 |
+| Classes/JavaScript                                                                     |          2 |        706 |          0 |          2 |        708 |
+| Classes/PHP                                                                            |          9 |      1,877 |        377 |         79 |      2,333 |
+| Classes/TypeScript                                                                     |          2 |        671 |        514 |         68 |      1,253 |
+| Database                                                                               |          1 |         42 |          0 |          7 |         49 |
+| Include                                                                                |          5 |        148 |          6 |          8 |        162 |
+| Output Algorithms                                                                      |         24 |      2,362 |         39 |        122 |      2,523 |
+| Output Algorithms/16x9                                                                 |          1 |        144 |          0 |          6 |        150 |
+| Output Algorithms/Custom                                                               |         14 |        503 |         32 |         51 |        586 |
+| Output Algorithms/Custom/Monochromatic                                                 |          4 |        173 |          9 |         14 |        196 |
+| Output Algorithms/Custom/RGB                                                           |          5 |        126 |         12 |         19 |        157 |
+| Output Algorithms/Custom/Variable Brightness                                           |          5 |        204 |         11 |         18 |        233 |
+| Output Algorithms/Lol Shield                                                           |          1 |         54 |          0 |          6 |         60 |
+| Output Algorithms/Micro:Bit                                                            |          2 |        163 |          0 |          6 |        169 |
+| Output Algorithms/NeoPixel                                                             |          1 |        616 |          1 |          6 |        623 |
+| Output Algorithms/Pico RGB Keypad                                                      |          2 |        120 |          0 |         13 |        133 |
+| Output Algorithms/ScrollBit                                                            |          3 |        762 |          6 |         34 |        802 |
+| Pages                                                                                  |         10 |      1,603 |         30 |         38 |      1,671 |
+| Utils                                                                                  |         30 |        375 |        107 |         61 |        543 |
+| Utils/Forms                                                                            |         28 |        293 |          6 |         57 |        356 |
+| Utils/Functions                                                                        |          2 |         82 |        101 |          4 |        187 |
++----------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+
+Files
++----------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| filename                                                                               | language   | code       | comment    | blank      | total      |
++----------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| /Users/oathompsonjones/Sites/CSS/main.css                                              | CSS        |         79 |          2 |          3 |         84 |
+| /Users/oathompsonjones/Sites/Classes/JavaScript/AnimationEditor.js                     | JavaScript |        531 |          0 |          1 |        532 |
+| /Users/oathompsonjones/Sites/Classes/JavaScript/Matrix.js                              | JavaScript |        175 |          0 |          1 |        176 |
+| /Users/oathompsonjones/Sites/Classes/PHP/animation.php                                 | PHP        |      1,121 |        156 |         30 |      1,307 |
+| /Users/oathompsonjones/Sites/Classes/PHP/assignment.php                                | PHP        |        162 |         22 |          5 |        189 |
+| /Users/oathompsonjones/Sites/Classes/PHP/assignmentWork.php                            | PHP        |         45 |         21 |          5 |         71 |
+| /Users/oathompsonjones/Sites/Classes/PHP/comment.php                                   | PHP        |         64 |         21 |          5 |         90 |
+| /Users/oathompsonjones/Sites/Classes/PHP/frame.php                                     | PHP        |         39 |         17 |          4 |         60 |
+| /Users/oathompsonjones/Sites/Classes/PHP/group.php                                     | PHP        |         93 |         41 |          9 |        143 |
+| /Users/oathompsonjones/Sites/Classes/PHP/message.php                                   | PHP        |         59 |         22 |          5 |         86 |
+| /Users/oathompsonjones/Sites/Classes/PHP/post.php                                      | PHP        |        204 |         42 |          8 |        254 |
+| /Users/oathompsonjones/Sites/Classes/PHP/user.php                                      | PHP        |         90 |         35 |          8 |        133 |
+| /Users/oathompsonjones/Sites/Classes/TypeScript/AnimationEditor.ts                     | TypeScript |        516 |        379 |         48 |        943 |
+| /Users/oathompsonjones/Sites/Classes/TypeScript/Matrix.ts                              | TypeScript |        155 |        135 |         20 |        310 |
+| /Users/oathompsonjones/Sites/Database/database.php                                     | PHP        |         42 |          0 |          7 |         49 |
+| /Users/oathompsonjones/Sites/Include/footer.inc                                        | PHP        |          4 |          0 |          0 |          4 |
+| /Users/oathompsonjones/Sites/Include/header.inc                                        | PHP        |         89 |          6 |          7 |        102 |
+| /Users/oathompsonjones/Sites/Include/loginForm.inc                                     | PHP        |         15 |          0 |          0 |         15 |
+| /Users/oathompsonjones/Sites/Include/redirect.inc                                      | PHP        |          6 |          0 |          1 |          7 |
+| /Users/oathompsonjones/Sites/Include/signupForm.inc                                    | PHP        |         34 |          0 |          0 |         34 |
+| /Users/oathompsonjones/Sites/Output Algorithms/16x9/Arduino.ino                        | C++        |        144 |          0 |          6 |        150 |
+| /Users/oathompsonjones/Sites/Output Algorithms/Custom/Monochromatic/Arduino.ino        | C++        |         51 |          3 |          4 |         58 |
+| /Users/oathompsonjones/Sites/Output Algorithms/Custom/Monochromatic/Micro:Bit.py       | Python     |         32 |          2 |          4 |         38 |
+| /Users/oathompsonjones/Sites/Output Algorithms/Custom/Monochromatic/Micro:Bit.ts       | TypeScript |         38 |          2 |          3 |         43 |
+| /Users/oathompsonjones/Sites/Output Algorithms/Custom/Monochromatic/Pico.cpp           | C++        |         52 |          2 |          3 |         57 |
+| /Users/oathompsonjones/Sites/Output Algorithms/Custom/RGB/Arduino.ino                  | C++        |         31 |          3 |          4 |         38 |
+| /Users/oathompsonjones/Sites/Output Algorithms/Custom/RGB/Micro:Bit.py                 | Python     |         19 |          2 |          4 |         25 |
+| /Users/oathompsonjones/Sites/Output Algorithms/Custom/RGB/Micro:Bit.ts                 | TypeScript |         23 |          2 |          3 |         28 |
+| /Users/oathompsonjones/Sites/Output Algorithms/Custom/RGB/Pico.cpp                     | C++        |         35 |          3 |          4 |         42 |
+| /Users/oathompsonjones/Sites/Output Algorithms/Custom/RGB/Pico.py                      | Python     |         18 |          2 |          4 |         24 |
+| /Users/oathompsonjones/Sites/Output Algorithms/Custom/Variable Brightness/Arduino.ino  | C++        |         51 |          3 |          4 |         58 |
+| /Users/oathompsonjones/Sites/Output Algorithms/Custom/Variable Brightness/Micro:Bit.py | Python     |         32 |          2 |          4 |         38 |
+| /Users/oathompsonjones/Sites/Output Algorithms/Custom/Variable Brightness/Micro:Bit.ts | TypeScript |         38 |          2 |          3 |         43 |
+| /Users/oathompsonjones/Sites/Output Algorithms/Custom/Variable Brightness/Pico.cpp     | C++        |         52 |          2 |          3 |         57 |
+| /Users/oathompsonjones/Sites/Output Algorithms/Custom/Variable Brightness/Pico.py      | Python     |         31 |          2 |          4 |         37 |
+| /Users/oathompsonjones/Sites/Output Algorithms/Lol Shield/C++.ino                      | C++        |         54 |          0 |          6 |         60 |
+| /Users/oathompsonjones/Sites/Output Algorithms/Micro:Bit/MicroPython.py                | Python     |         81 |          0 |          5 |         86 |
+| /Users/oathompsonjones/Sites/Output Algorithms/Micro:Bit/TypeScript.ts                 | TypeScript |         82 |          0 |          1 |         83 |
+| /Users/oathompsonjones/Sites/Output Algorithms/NeoPixel/Arduino (Mega).ino             | C++        |        616 |          1 |          6 |        623 |
+| /Users/oathompsonjones/Sites/Output Algorithms/Pico RGB Keypad/C++.cpp                 | C++        |         66 |          0 |          9 |         75 |
+| /Users/oathompsonjones/Sites/Output Algorithms/Pico RGB Keypad/MicroPython.py          | Python     |         54 |          0 |          4 |         58 |
+| /Users/oathompsonjones/Sites/Output Algorithms/ScrollBit/MicroPython.py                | Python     |        313 |          2 |          3 |        318 |
+| /Users/oathompsonjones/Sites/Output Algorithms/ScrollBit/TypeScript.ts                 | TypeScript |        314 |          4 |          2 |        320 |
+| /Users/oathompsonjones/Sites/Output Algorithms/ScrollBit/scrollbit.py                  | Python     |        135 |          0 |         29 |        164 |
+| /Users/oathompsonjones/Sites/Pages/404.php                                             | PHP        |          4 |          0 |          0 |          4 |
+| /Users/oathompsonjones/Sites/Pages/animations.php                                      | PHP        |         20 |          0 |          1 |         21 |
+| /Users/oathompsonjones/Sites/Pages/class.php                                           | PHP        |        415 |         10 |          3 |        428 |
+| /Users/oathompsonjones/Sites/Pages/editor.php                                          | PHP        |        250 |          5 |         12 |        267 |
+| /Users/oathompsonjones/Sites/Pages/generateCode.php                                    | PHP        |        136 |          0 |          2 |        138 |
+| /Users/oathompsonjones/Sites/Pages/home.php                                            | PHP        |        436 |          0 |         10 |        446 |
+| /Users/oathompsonjones/Sites/Pages/login.php                                           | PHP        |         23 |          7 |          2 |         32 |
+| /Users/oathompsonjones/Sites/Pages/logout.php                                          | PHP        |          3 |          0 |          1 |          4 |
+| /Users/oathompsonjones/Sites/Pages/profile.php                                         | PHP        |        284 |          0 |          5 |        289 |
+| /Users/oathompsonjones/Sites/Pages/signup.php                                          | PHP        |         32 |          8 |          2 |         42 |
+| /Users/oathompsonjones/Sites/Utils/Forms/createAssignment.php                          | PHP        |         11 |          0 |          2 |         13 |
+| /Users/oathompsonjones/Sites/Utils/Forms/createClass.php                               | PHP        |         11 |          0 |          3 |         14 |
+| /Users/oathompsonjones/Sites/Utils/Forms/deleteAnimation.php                           | PHP        |          6 |          0 |          2 |          8 |
+| /Users/oathompsonjones/Sites/Utils/Forms/deleteAssignment.php                          | PHP        |          7 |          0 |          2 |          9 |
+| /Users/oathompsonjones/Sites/Utils/Forms/deleteChatMessage.php                         | PHP        |          7 |          0 |          2 |          9 |
+| /Users/oathompsonjones/Sites/Utils/Forms/deleteClass.php                               | PHP        |          8 |          0 |          2 |         10 |
+| /Users/oathompsonjones/Sites/Utils/Forms/deleteComment.php                             | PHP        |          7 |          0 |          2 |          9 |
+| /Users/oathompsonjones/Sites/Utils/Forms/deleteUser.php                                | PHP        |          5 |          0 |          2 |          7 |
+| /Users/oathompsonjones/Sites/Utils/Forms/followUser.php                                | PHP        |          6 |          0 |          2 |          8 |
+| /Users/oathompsonjones/Sites/Utils/Forms/generateCode.php                              | PHP        |         65 |          0 |          2 |         67 |
+| /Users/oathompsonjones/Sites/Utils/Forms/handInAssignment.php                          | PHP        |         11 |          0 |          2 |         13 |
+| /Users/oathompsonjones/Sites/Utils/Forms/joinClass.php                                 | PHP        |          6 |          0 |          2 |          8 |
+| /Users/oathompsonjones/Sites/Utils/Forms/kickUserFromClass.php                         | PHP        |          5 |          0 |          2 |          7 |
+| /Users/oathompsonjones/Sites/Utils/Forms/likePost.php                                  | PHP        |          8 |          0 |          2 |         10 |
+| /Users/oathompsonjones/Sites/Utils/Forms/makeAdmin.php                                 | PHP        |          5 |          0 |          2 |          7 |
+| /Users/oathompsonjones/Sites/Utils/Forms/muteUserInClass.php                           | PHP        |          5 |          0 |          2 |          7 |
+| /Users/oathompsonjones/Sites/Utils/Forms/postComment.php                               | PHP        |          9 |          0 |          2 |         11 |
+| /Users/oathompsonjones/Sites/Utils/Forms/resetPassword.php                             | PHP        |          5 |          0 |          2 |          7 |
+| /Users/oathompsonjones/Sites/Utils/Forms/saveAnimation.php                             | PHP        |         19 |          6 |          2 |         27 |
+| /Users/oathompsonjones/Sites/Utils/Forms/saveClass.php                                 | PHP        |          9 |          0 |          2 |         11 |
+| /Users/oathompsonjones/Sites/Utils/Forms/sendChatMessage.php                           | PHP        |         11 |          0 |          2 |         13 |
+| /Users/oathompsonjones/Sites/Utils/Forms/shareAnimation.php                            | PHP        |          9 |          0 |          2 |         11 |
+| /Users/oathompsonjones/Sites/Utils/Forms/unFollowUser.php                              | PHP        |          6 |          0 |          2 |          8 |
+| /Users/oathompsonjones/Sites/Utils/Forms/unLikePost.php                                | PHP        |          8 |          0 |          2 |         10 |
+| /Users/oathompsonjones/Sites/Utils/Forms/unMuteUserInClass.php                         | PHP        |          5 |          0 |          2 |          7 |
+| /Users/oathompsonjones/Sites/Utils/Forms/unShareAnimation.php                          | PHP        |          8 |          0 |          2 |         10 |
+| /Users/oathompsonjones/Sites/Utils/Forms/updateClassChatInput.php                      | PHP        |         12 |          0 |          2 |         14 |
+| /Users/oathompsonjones/Sites/Utils/Forms/updateMessages.php                            | PHP        |         19 |          0 |          2 |         21 |
+| /Users/oathompsonjones/Sites/Utils/Functions/arrayMappers.php                          | PHP        |         77 |         95 |          2 |        174 |
+| /Users/oathompsonjones/Sites/Utils/Functions/arraySorters.php                          | PHP        |          5 |          6 |          2 |         13 |
+| /Users/oathompsonjones/Sites/index.php                                                 | PHP        |         43 |         14 |         10 |         67 |
+| /Users/oathompsonjones/Sites/tsconfig.json                                             | JSON       |         29 |          5 |          0 |         34 |
+| Total                                                                                  |            |      7,935 |      1,094 |        398 |      9,427 |
++----------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+

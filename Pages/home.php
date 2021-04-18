@@ -33,7 +33,7 @@ function renderUsers()
         $posts = count($users[$i]->posts);
         $followers = count($users[$i]->followers);
         $following = count($users[$i]->following);
-        $html = $html . <<<HTML
+        $html .= <<<HTML
             <tr id="$username-row">
                 <td><a href="profile?user=$username">$username</a></td>
                 <td id="$username-password">$passwordHash</td>
@@ -44,13 +44,13 @@ function renderUsers()
                 <td>$following</td>
         HTML;
         if ($username === $user->username) {
-            $html = $html . <<<HTML
+            $html .= <<<HTML
                 <td>
                     <button class="btn btn-sm btn-danger disabled">Delete</button>
                 </td>
             HTML;
         } else {
-            $html = $html . <<<HTML
+            $html .= <<<HTML
                 <script>
                     const delete_$username = () => document.getElementById("$username-delete").innerHTML = `<button onclick="deleteConfirm_$username();" class="btn btn-sm btn-danger">Confirm</button>`;
                     const deleteConfirm_$username = () => {
@@ -66,7 +66,7 @@ function renderUsers()
                 </td>
             HTML;
         }
-        $html = $html . <<<HTML
+        $html .= <<<HTML
             <script>
                 const resetPassword_$username = () => document.getElementById("$username-resetPassword").innerHTML = `<button onclick="resetPasswordConfirm_$username();" class="btn btn-sm btn-warning">Confirm</button>`;
                 const resetPasswordConfirm_$username = () => {
@@ -82,13 +82,13 @@ function renderUsers()
             </td>
         HTML;
         if ($type === "admin") {
-            $html = $html . <<<HTML
+            $html .= <<<HTML
                 <td>
                     <button class="btn btn-sm btn-dark disabled">Make Admin</button>
                 </td>
             HTML;
         } else {
-            $html = $html . <<<HTML
+            $html .= <<<HTML
                 <script>
                     const makeAdmin_$username = () => document.getElementById("$username-makeAdmin").innerHTML = `<button onclick="makeAdminConfirm_$username();" class="btn btn-sm btn-dark">Confirm</button>`;
                     const makeAdminConfirm_$username = () => {
@@ -104,11 +104,11 @@ function renderUsers()
                 </td>
             HTML;
         }
-        $html = $html . <<<HTML
+        $html .= <<<HTML
             </tr>
         HTML;
     }
-    $html = $html . <<<HTML
+    $html .= <<<HTML
         </table>
     HTML;
     return $html;
@@ -141,7 +141,7 @@ function renderAnimations()
         $type = $animations[$i]->typeString;
         $frames = count($animations[$i]->frames);
         $user = $animations[$i]->user;
-        $html = $html . <<<HTML
+        $html .= <<<HTML
             <tr id="$id-row">
                 <td>$id</td>
                 <td>$name</td>
@@ -166,7 +166,7 @@ function renderAnimations()
             </tr>
         HTML;
     }
-    $html = $html . <<<HTML
+    $html .= <<<HTML
         </table>
     HTML;
     return $html;
@@ -199,7 +199,7 @@ function renderPosts()
         $likes = count($posts[$i]->likedBy);
         $createdAt = $posts[$i]->createdAt;
         $user = $posts[$i]->user;
-        $html = $html . <<<HTML
+        $html .= <<<HTML
             <tr id="$id-row">
                 <td>$id</td>
                 <td>$animation</td>
@@ -224,7 +224,7 @@ function renderPosts()
             </tr>
         HTML;
     }
-    $html = $html . <<<HTML
+    $html .= <<<HTML
         </table>
     HTML;
     return $html;
@@ -253,7 +253,7 @@ function renderComments()
         $post = $comments[$i]->post->id;
         $createdAt = $comments[$i]->createdAt;
         $user = $comments[$i]->user;
-        $html = $html . <<<HTML
+        $html .= <<<HTML
             <tr id="$id-row">
                 <td>$id</td>
                 <td style="max-width: 500px; word-wrap: break-word;">$content</td>
@@ -276,7 +276,7 @@ function renderComments()
             </tr>
         HTML;
     }
-    $html = $html . <<<HTML
+    $html .= <<<HTML
         </table>
     HTML;
     return $html;
@@ -311,7 +311,7 @@ function renderClasses()
         $chatMessages = count($classes[$i]->chatMessages);
         $mutedUsers = count($classes[$i]->mutedUsers);
         $assignments = count($classes[$i]->assignments);
-        $html = $html . <<<HTML
+        $html .= <<<HTML
             <tr id="$id-row">
                 <td>$id</td>
                 <td style="max-width: 500px; word-wrap: break-word;">$name</td>
@@ -337,7 +337,7 @@ function renderClasses()
             </tr>
         HTML;
     }
-    $html = $html . <<<HTML
+    $html .= <<<HTML
         </table>
     HTML;
     return $html;
@@ -385,11 +385,11 @@ switch ($user->type) {
         $animations = "";
         for ($i = 0; $i < min(3, count($allAnimations)); ++$i) {
             $html = $allAnimations[$i]->render(false);
-            $animations = $animations . <<<HTML
+            $animations .= <<<HTML
                 <div class="col">$html</div>
             HTML;
         }
-        if (count($allAnimations) < 3) $animations = $animations . <<<HTML
+        if (count($allAnimations) < 3) $animations .= <<<HTML
             <div class="col">
                 <div class="card bg-dark text-light" style="height: 100%; min-height: 150px">
                     <div class="card-body" style="display: flex; height: 100%">
@@ -405,11 +405,11 @@ switch ($user->type) {
         $classes = "";
         for ($i = 0; $i < min(3, count($allClasses)); ++$i) {
             $html = $allClasses[$i]->render();
-            $classes = $classes . <<<HTML
+            $classes .= <<<HTML
                 <div class="col">$html</div>
             HTML;
         }
-        if (count($allClasses) < 3) $classes = $classes . <<<HTML
+        if (count($allClasses) < 3) $classes .= <<<HTML
             <div class="col">
                 <div class="card bg-dark text-light" style="height: 100%; min-height: 100px">
                     <div class="card-body" style="display: flex; height: 100%">

@@ -1,12 +1,26 @@
 <?php
+
+/**
+ * Class to represent a user's post.
+ */
 class Post
 {
+    /**
+     * @var string
+     */
     private $id;
+    /**
+     * @param string $id
+     */
     public function __construct($id)
     {
         $this->id = $id;
     }
 
+    /**
+     * @param string $name
+     * @return mixed
+     */
     public function __get($name)
     {
         $id = $this->id;
@@ -37,6 +51,10 @@ class Post
         }
     }
 
+    /**
+     * Deletes the post from the database.
+     * @return void
+     */
     public function delete()
     {
         $db = $_SESSION["database"];
@@ -45,18 +63,34 @@ class Post
         $db->delete("Comment", "PostID = '$this->id'");
     }
 
+    /**
+     * Adds the given user to the list of users who liked the post.
+     * @param string $username
+     * @return void
+     */
     public function like($username)
     {
         $db = $_SESSION["database"];
         $db->insert("PostLike", "PostID, Username", "'$this->id', '$username'");
     }
 
+    /**
+     * Adds the given user from the list of users who liked the post.
+     * @param string $username
+     * @return void
+     */
     public function unlike($username)
     {
         $db = $_SESSION["database"];
         $db->delete("PostLike", "PostID = '$this->id' AND Username = '$username'");
     }
 
+    /**
+     * Adds a comment to the post from the given user containing the given content.
+     * @param string $username
+     * @param string $content
+     * @return void
+     */
     public function comment($username, $content)
     {
         $db = $_SESSION["database"];
@@ -65,6 +99,10 @@ class Post
         $db->insert("Comment", "CommentID, PostID, Username, Content, CreatedAt", "'$id', '$this->id', '$username', '$content', $timestamp");
     }
 
+    /**
+     * Creates the HTML required to render the post.
+     * @return string
+     */
     public function render()
     {
         // Get the current user.
@@ -113,7 +151,7 @@ class Post
                 };
             </script>
         HTML;
-        $likeButton = $likeButton . ($postLikedByUser
+        $likeButton .= ($postLikedByUser
             ? <<<HTML
                 <button type="button" onclick="unLike_$postID()" class="btn btn-danger">❤</button>
             HTML
@@ -155,7 +193,7 @@ class Post
         HTML;
         $comments = "";
         $commentCount = count($postComments);
-        for ($i = 0; $i < $commentCount; ++$i) $comments = $comments . $postComments[$i]->render();
+        for ($i = 0; $i < $commentCount; ++$i) $comments .= $postComments[$i]->render();
         return <<<HTML
             <div class="card text-white bg-dark post">
                 <script>

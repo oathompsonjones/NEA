@@ -1,12 +1,26 @@
 <?php
+
+/**
+ * Class to represent a piece of work submitted for an assignment.
+ */
 class AssignmentWork
 {
+    /**
+     * @var string
+     */
     private $id;
+    /**
+     * @param string $id
+     */
     public function __construct($id)
     {
         $this->id = $id;
     }
 
+    /**
+     * @param string $name
+     * @return mixed
+     */
     public function __get($name)
     {
         $id = $this->id;
@@ -29,6 +43,10 @@ class AssignmentWork
         }
     }
 
+    /**
+     * Creates the HTML required to render the work.
+     * @return string
+     */
     public function render()
     {
         $animationHTML = $this->animation->render(true, false);
@@ -40,6 +58,10 @@ class AssignmentWork
         HTML;
     }
 
+    /**
+     * Deletes the work from the database.
+     * @return void
+     */
     public function delete()
     {
         $db = $_SESSION["database"];

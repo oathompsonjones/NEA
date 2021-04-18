@@ -1,12 +1,26 @@
 <?php
+
+/**
+ * Class to represent a message in a class chat.
+ */
 class Message
 {
+    /**
+     * @var string
+     */
     private $id;
+    /**
+     * @param string $id
+     */
     public function __construct($id)
     {
         $this->id = $id;
     }
 
+    /**
+     * @param string $name
+     * @return mixed
+     */
     public function __get($name)
     {
         $id = $this->id;
@@ -27,12 +41,21 @@ class Message
         }
     }
 
+    /**
+     * Deletes the message from the database.
+     * @return void
+     */
     public function delete()
     {
         $db = $_SESSION["database"];
         $db->delete("ChatMessage", "MessageID = '$this->id'");
     }
 
+    /**
+     * Creates the HTML required to render the message.
+     * @param User $loggedInUser
+     * @return string
+     */
     public function render($loggedInUser)
     {
         $id = $this->id;
@@ -47,12 +70,12 @@ class Message
                 <div class="card-body" style="display: flex; word-break: break-all;">
                     <p style="flex: 100%;">$this->content</p>
         HTML;
-        if ($loggedInUser->username === $user->username || $loggedInUser->type === "teacher") $html = $html . <<<HTML
+        if ($loggedInUser->username === $user->username || $loggedInUser->type === "teacher") $html .= <<<HTML
             <div style="flex: 10%; text-align: right;">
                 <a class="btn btn-sm btn-danger" onclick="deleteMessage('$id');">Delete</a>
             </div>
         HTML;
-        $html = $html . <<<HTML
+        $html .= <<<HTML
                 </div>
             </div>
             <br>

@@ -1,12 +1,26 @@
 <?php
+
+/**
+ * Class to represent a group assignment.
+ */
 class Assignment
 {
+    /**
+     * @var string
+     */
     private $id;
+    /**
+     * @param string $id
+     */
     public function __construct($id)
     {
         $this->id = $id;
     }
 
+    /**
+     * @param string $name
+     * @return mixed
+     */
     public function __get($name)
     {
         $id = $this->id;
@@ -31,13 +45,18 @@ class Assignment
         }
     }
 
+    /**
+     * Creates the HTML required to render an assignment.
+     * @param User $user
+     * @return string
+     */
     public function render($user)
     {
         switch ($user->type) {
             case "teacher":
                 $work = "";
                 $workCount = count($this->work);
-                for ($i = 0; $i < $workCount; ++$i) $work = $work . $this->work[$i]->render();
+                for ($i = 0; $i < $workCount; ++$i) $work .= $this->work[$i]->render();
                 return <<<HTML
                     <div id="$this->id">
                         <div class="card bg-dark">
@@ -90,7 +109,7 @@ class Assignment
                     $animationCount = count($user->animations);
                     for ($i = 0; $i < $animationCount; ++$i) {
                         $animation = $user->animations[$i];
-                        $animationList = $animationList . <<<HTML
+                        $animationList .= <<<HTML
                             <option value="$i">$animation->name</option>
                         HTML;
                     }
@@ -99,11 +118,10 @@ class Assignment
                     $jsonAnimationIDs = json_encode($animationIDs);
                     $animationNames = array_map("mapToNames", $animations);
                     $jsonAnimationNames = json_encode($animationNames);
-                    $animationList = $animationList . <<<HTML
+                    $animationList .= <<<HTML
                         </select>
                     HTML;
-                    $animationList = $animationList
-                        . "<button class='btn btn-outline-light' onclick='handInAssignment(`$this->id`,"
+                    $animationList .= "<button class='btn btn-outline-light' onclick='handInAssignment(`$this->id`,"
                         . $jsonAnimationIDs
                         . '[$("#animationList").val()],'
                         . $jsonAnimationNames
@@ -156,6 +174,10 @@ class Assignment
         }
     }
 
+    /**
+     * Deletes the assignment from the database.
+     * @return void
+     */
     public function delete()
     {
         $db = $_SESSION["database"];

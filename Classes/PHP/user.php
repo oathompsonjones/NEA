@@ -1,12 +1,26 @@
 <?php
+
+/**
+ * Class to represent a user.
+ */
 class User
 {
+    /**
+     * @var string
+     */
     private $username;
+    /**
+     * @param string $username
+     */
     public function __construct($username)
     {
         $this->username = $username;
     }
 
+    /**
+     * @param string $name
+     * @return mixed
+     */
     public function __get($name)
     {
         $username = $this->username;
@@ -52,6 +66,10 @@ class User
         }
     }
 
+    /**
+     * Deletes the user from the database.
+     * @return void
+     */
     public function delete()
     {
         $db = $_SESSION["database"];
@@ -68,18 +86,31 @@ class User
         $db->delete("AssignmentWork", "Username = '$this->username'");
     }
 
+    /**
+     * Sets the user's password to be the same as their username.
+     * @return void
+     */
     public function resetPassword()
     {
         $db = $_SESSION["database"];
         $db->update("User", ["PasswordHash"], [md5($this->username)], "Username = '$this->username'");
     }
 
+    /**
+     * Turns the user into an admin.
+     * @return void
+     */
     public function makeAdmin()
     {
         $db = $_SESSION["database"];
         $db->update("User", ["type"], [0], "Username = '$this->username'");
     }
 
+    /**
+     * Adds the given user to list of users who follow this user.
+     * @param string $username
+     * @return void
+     */
     public function followUser($username)
     {
         $db = $_SESSION["database"];
@@ -87,6 +118,11 @@ class User
         $db->insert("UserFollowing", "Username, FollowingUsername", "'$this->username', '$user->username'");
     }
 
+    /**
+     * Removes the given user from list of users who follow this user.
+     * @param string $username
+     * @return void
+     */
     public function unfollowUser($username)
     {
         $db = $_SESSION["database"];

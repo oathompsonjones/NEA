@@ -1,23 +1,30 @@
+/* These settings affect the entire site. */
 html, body {
     height: 100%;
     width: 100%;
     margin: 0em;
 }
 body {
+    /* This adds a small gap to the edges of the site. */
     padding: 30px;
+    /* This increases the gap at the top to account for the navbar. */
     padding-top: 60px;
     background: #121212;
     color: #efefef;
+    /* This prevents the horizontal scroll bar from appearing. */
     overflow-x: hidden;
 }
 p {
     margin: 0;
 }
+/* This makes links look like normal text until they are hovered over. */
 a {
     text-decoration: none;
     color: #efefef;
 }
 
+/* These affect the icons used to display and edit animations. */
+/* This wraps the entire icon. */
 .icon {
     height: 100%;
     vertical-align: top;
@@ -25,13 +32,16 @@ a {
     display: inline-block;
     position: relative;
 }
+/* This controls the actual image. */
 .icon img {
     height: 100%;
     display: block;
 }
+/* This allows me to hide the icon binary in the icon div without it being displayed. */
 .icon p {
     display: none;
 }
+/* This position the div which contains the buttons which will appear when the icon is hovered over. */
 .icon .buttons {
     position: absolute;
     top: 50%;
@@ -41,22 +51,27 @@ a {
     display: none;
     text-align: center;
 }
+/* This adds some spacing around the actual buttons. */
 .icon .buttons button {
     padding: 2px;
 }
+/* This dims the background when the mouse hovers. */
 .firstIcon:hover img {
     background-color: rgba(0, 0, 0, 0.5);
     filter: brightness(50%);
 }
+/* This displays the buttons when the mouse hovers. */
 .firstIcon:hover .buttons {
     display: block;
 }
 
 /* Scrollbar Settings */
+/* This makes the scrollbar much thinner. */
 ::-webkit-scrollbar {
     width: 3px;
     height: 3px;
 }
+/* These match the scrollbar colours to the rest of the site. */
 ::-webkit-scrollbar-track {
     background: #232323; 
 }
@@ -69,6 +84,7 @@ a {
 
 /* Mobile settings */
 @media only screen and (max-width: 600px) {
+    /* These ensure that only the feed appears on the home page when on mobile. */
     .homeNotFeed {
         display: none;
     }

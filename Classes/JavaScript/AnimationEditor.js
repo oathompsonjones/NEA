@@ -528,10 +528,4 @@ class MonochromaticAnimationEditor extends AnimationEditor {
         });
     }
 }
-function createAnimationEditor(type, width, height, data = []) {
-    return new [
-        MonochromaticAnimationEditor,
-        VariableBrightnessAnimationEditor,
-        RGBAnimationEditor
-    ][type](width, height, data);
-}
+const createAnimationEditor = (type, width, height, data = []) => new [MonochromaticAnimationEditor, VariableBrightnessAnimationEditor, RGBAnimationEditor][type](width, height, data);

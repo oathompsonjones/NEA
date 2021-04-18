@@ -1,12 +1,26 @@
 <?php
+
+/**
+ * Class to represent a generic animation.
+ */
 class Animation
 {
+    /**
+     * @var string
+     */
     private $id;
+    /**
+     * @param string $id
+     */
     public function __construct($id)
     {
         $this->id = $id;
     }
 
+    /**
+     * @param string $name
+     * @return mixed
+     */
     public function __get($name)
     {
         $id = $this->id;
@@ -35,6 +49,12 @@ class Animation
         }
     }
 
+    /**
+     * Returns the HTML to render an animation.
+     * @param bool $showImages
+     * @param bool $showButtons
+     * @return string
+     */
     public function render($showImages = true, $showButtons = true)
     {
         $db = $_SESSION["database"];
@@ -68,7 +88,7 @@ class Animation
                 };
             </script>
         HTML;
-        $shareButton = $shareButton . ($postExists
+        $shareButton .= ($postExists
             ? <<<HTML
                 <button class="btn btn-dark btn-sm" type="button" onclick="unShare_$id();" style="width: 100%;">Unshare</button>
             HTML
@@ -131,6 +151,10 @@ class Animation
             HTML;
     }
 
+    /**
+     * Deletes the animation from the database.
+     * @return void
+     */
     public function delete()
     {
         $db = $_SESSION["database"];
@@ -143,6 +167,12 @@ class Animation
         $db->delete("AssignmentWork", "AnimationID = '$this->id'");
     }
 
+    /**
+     * Saves the animation to the database.
+     * @param string $username
+     * @param number $fps
+     * @return void
+     */
     public function share($username, $fps)
     {
         $db = $_SESSION["database"];
@@ -151,6 +181,10 @@ class Animation
         $db->insert("Post", "PostID, Username, AnimationID, CreatedAt, FPS", "'$id', '$username', '$this->id', '$timestamp', $fps");
     }
 
+    /**
+     * Generates a 32-bit number 2D array of bits in JSON.
+     * @return string
+     */
     public function getFramesAs32BitIntegersJSON()
     {
         function frameToBinaryArray($value)
@@ -173,6 +207,10 @@ class Animation
         return str_replace("    ", "\t", str_replace('"', "", json_encode($frames, JSON_PRETTY_PRINT)));
     }
 
+    /**
+     * Creates an array of base-64 encoded images.
+     * @return string[]
+     */
     public function generateFrameIcons()
     {
         $frames = $this->frames;
@@ -234,6 +272,11 @@ class Animation
     }
 
     // BBC Micro:Bit
+    /**
+     * Creates the code needed to run an animation on a BBC:MicroBit in MicroPython.
+     * @param int $fps
+     * @return string
+     */
     public function generateMicroBitMicroPythonCode($fps = 1)
     {
         $frames = $this->getFramesAs32BitIntegersJSON();
@@ -321,6 +364,11 @@ class Animation
         return $code;
     }
 
+    /**
+     * Creates the code needed to run an animation on a BBC:MicroBit in TypeScript.
+     * @param int $fps
+     * @return string
+     */
     public function generateMicroBitTypeScriptCode($fps = 1)
     {
         $frames = $this->getFramesAs32BitIntegersJSON();
@@ -425,6 +473,11 @@ class Animation
     }
 
     // Arduino
+    /**
+     * Creates the code needed to run an animation on an Arduino in C++.
+     * @param int $fps
+     * @return string
+     */
     public function generateArduinoCppCode($fps = 1)
     {
         $frames = str_replace("]", "}", str_replace("[", "{", $this->getFramesAs32BitIntegersJSON()));
@@ -544,6 +597,11 @@ class Animation
     }
 
     // Raspberry Pi Pico
+    /**
+     * Creates the code needed to run an animation on a Raspberry Pi Pico in C++.
+     * @param int $fps
+     * @return string
+     */
     public function generatePicoCppCode($fps = 1)
     {
         $frames = str_replace("]", "}", str_replace("[", "{", $this->getFramesAs32BitIntegersJSON()));
@@ -674,6 +732,11 @@ class Animation
         return $code;
     }
 
+    /**
+     * Creates the code needed to run an animation on a Raspberry Pi Pico in MicroPython.
+     * @param int $fps
+     * @return string
+     */
     public function generatePicoMicroPythonCode($fps = 1)
     {
         $frames = $this->getFramesAs32BitIntegersJSON();
@@ -759,13 +822,24 @@ class Animation
     }
 }
 
+/**
+ * Class to represent an animation for the MicroBitInternal LED Matrix.
+ */
 class MicroBitInternalAnimation extends Animation
 {
+    /**
+     * @param mixed $id
+     */
     public function __construct($id)
     {
         parent::__construct($id);
     }
 
+    /**
+     * Creates the code needed to run an animation on a BBC:MicroBit in MicroPython.
+     * @param int $fps
+     * @return string
+     */
     public function generateMicroBitMicroPythonCode($fps = 1)
     {
         $frames = implode("\n", array_map("mapTabToStart", array_map("mapTabToStart", array_map("mapTabToStart", explode("\n", $this->getFramesAs32BitIntegersJSON())))));
@@ -792,6 +866,11 @@ class MicroBitInternalAnimation extends Animation
             . "\n\t\t)";
     }
 
+    /**
+     * Creates the code needed to run an animation on a BBC:MicroBit in TypeScript.
+     * @param int $fps
+     * @return string
+     */
     public function generateMicroBitTypeScriptCode($fps = 1)
     {
         $frames = implode("\n", array_map("mapTabToStart", array_map("mapTabToStart", explode("\n", $this->getFramesAs32BitIntegersJSON()))));
@@ -822,13 +901,24 @@ class MicroBitInternalAnimation extends Animation
     }
 }
 
+/**
+ * Class to represent an animation for the LoLShield LED Matrix.
+ */
 class LoLShieldAnimation extends Animation
 {
+    /**
+     * @param mixed $id
+     */
     public function __construct($id)
     {
         parent::__construct($id);
     }
 
+    /**
+     * Creates the code needed to run an animation on an Arduino in C++.
+     * @param int $fps
+     * @return string
+     */
     public function generateArduinoCppCode($fps = 1)
     {
         $frames = str_replace("]", "}", str_replace("[", "{", $this->getFramesAs32BitIntegersJSON()));
@@ -877,13 +967,24 @@ class LoLShieldAnimation extends Animation
     }
 }
 
+/**
+ * Class to represent an animation for the ScrollBit LED Matrix.
+ */
 class ScrollBitAnimation extends Animation
 {
+    /**
+     * @param mixed $id
+     */
     public function __construct($id)
     {
         parent::__construct($id);
     }
 
+    /**
+     * Creates the code needed to run an animation on a BBC:MicroBit in MicroPython.
+     * @param int $fps
+     * @return string
+     */
     public function generateMicroBitMicroPythonCode($fps = 1)
     {
         $frames = implode("\n", array_map("mapTabToStart", array_map("mapTabToStart", array_map("mapTabToStart", explode("\n", $this->getFramesAs32BitIntegersJSON())))));
@@ -919,6 +1020,11 @@ class ScrollBitAnimation extends Animation
             . "\n\t\t)";
     }
 
+    /**
+     * Creates the code needed to run an animation on a BBC:MicroBit in TypeScript.
+     * @param int $fps
+     * @return string
+     */
     public function generateMicroBitTypeScriptCode($fps = 1)
     {
         $frames = implode("\n", array_map("mapTabToStart", array_map("mapTabToStart", explode("\n", $this->getFramesAs32BitIntegersJSON()))));
@@ -957,13 +1063,24 @@ class ScrollBitAnimation extends Animation
     }
 }
 
+/**
+ * Class to represent an animation for the PicoRGBKeypad LED Matrix.
+ */
 class PicoRGBKeypadAnimation extends Animation
 {
+    /**
+     * @param mixed $id
+     */
     public function __construct($id)
     {
         parent::__construct($id);
     }
 
+    /**
+     * Creates the code needed to run an animation on a Raspberry Pi Pico in C++.
+     * @param int $fps
+     * @return string
+     */
     public function generatePicoCppCode($fps = 1)
     {
         $frames = str_replace("]", "}", str_replace("[", "{", $this->getFramesAs32BitIntegersJSON()));
@@ -1004,6 +1121,11 @@ class PicoRGBKeypadAnimation extends Animation
             . "\n}";
     }
 
+    /**
+     * Creates the code needed to run an animation on a Raspberry Pi Pico in MicroPython.
+     * @param int $fps
+     * @return string
+     */
     public function generatePicoMicroPythonCode($fps = 1)
     {
         $frames = $this->getFramesAs32BitIntegersJSON();
@@ -1031,13 +1153,24 @@ class PicoRGBKeypadAnimation extends Animation
     }
 }
 
+/**
+ * Class to represent an animation for the AdaFruitNeoPixelRGB8x8 LED Matrix.
+ */
 class AdaFruitNeoPixelRGB8x8Animation extends Animation
 {
+    /**
+     * @param mixed $id
+     */
     public function __construct($id)
     {
         parent::__construct($id);
     }
 
+    /**
+     * Creates the code needed to run an animation on an Arduino in C++.
+     * @param int $fps
+     * @return string
+     */
     public function generateArduinoCppCode($fps = 1)
     {
         $frames = str_replace("]", "}", str_replace("[", "{", $this->getFramesAs32BitIntegersJSON()));
@@ -1091,13 +1224,24 @@ class AdaFruitNeoPixelRGB8x8Animation extends Animation
     }
 }
 
+/**
+ * Class to represent an animation for the AdaFruit16x9 LED Matrix.
+ */
 class AdaFruit16x9Animation extends Animation
 {
+    /**
+     * @param mixed $id
+     */
     public function __construct($id)
     {
         parent::__construct($id);
     }
 
+    /**
+     * Creates the code needed to run an animation on an Arduino in C++.
+     * @param int $fps
+     * @return string
+     */
     public function generateArduinoCppCode($fps = 1)
     {
         $frames = str_replace("]", "}", str_replace("[", "{", $this->getFramesAs32BitIntegersJSON()));
@@ -1147,8 +1291,14 @@ class AdaFruit16x9Animation extends Animation
     }
 }
 
+/**
+ * Class to represent an animation for the HLM1388AR8x8 LED Matrix.
+ */
 class HLM1388AR8x8Animation extends Animation
 {
+    /**
+     * @param mixed $id
+     */
     public function __construct($id)
     {
         parent::__construct($id);
