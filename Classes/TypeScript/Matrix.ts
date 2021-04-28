@@ -295,14 +295,12 @@ class Matrix {
             for (let i = 0; i < this.width; ++i)
                 for (let j = 0; j < this.height; ++j)
                     if (i === j - 1) shiftMatrix[j][i] = 1;
-            
             if (direction === "left") return this.multiply(new Matrix(shiftMatrix));
             else return new Matrix(shiftMatrix).multiply(this);
         } else {
             for (let i = 0; i < this.width; ++i)
                 for (let j = 0; j < this.height; ++j)
                     if (i === j + 1) shiftMatrix[j][i] = 1;
-            
             if (direction === "right") return this.multiply(new Matrix(shiftMatrix));
             else return new Matrix(shiftMatrix).multiply(this);
         }
