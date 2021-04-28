@@ -403,12 +403,15 @@ else {
                     <button class="btn btn-sm btn-danger" onclick="kick_$username();">Kick</button>
                     <div class="btn-group" id="muteButton-$username">
             HTML;
+            // Adds the mute/unmute button to students.
             if (in_array($username, array_map("mapToUsernames", $class->mutedUsers))) {
                 $studentsHTML .= <<<HTML
+                    <!-- Unmute button -->
                     <button class="btn btn-sm btn-secondary" onclick="unMute_$username();">Unmute</button>
                 HTML;
             } else {
                 $studentsHTML .= <<<HTML
+                    <!-- Mute button -->
                     <button class="btn btn-sm btn-secondary" onclick="mute_$username();">Mute</button>
                 HTML;
             }
@@ -432,9 +435,11 @@ else {
                 padding: 30px;
                 padding-top: 60px;
             ">
+                <!-- Teachers -->
                 <h5>Teachers</h5>
                 $teachersHTML
                 <br>
+                <!-- Students -->
                 <h5>Students</h5>
                 $studentsHTML
             </div>
