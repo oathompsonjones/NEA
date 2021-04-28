@@ -66,7 +66,7 @@ class Database
      * @param string $table
      * @param string $columns
      * @param string $values
-     * @return void;
+     * @return void
      */
     public function insert($table, $columns, $values)
     {
