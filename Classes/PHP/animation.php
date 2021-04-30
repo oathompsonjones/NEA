@@ -75,9 +75,8 @@ class Animation
                 };
                 const share_$id = () => {
                     const animationID = "$id";
-                    const username = "$user->username";
                     const fps = document.getElementById("$id-inputFPS").value;
-                    $.post("Utils/Forms/shareAnimation.php", { animationID, username, fps }, () => document.getElementById("$id-shareButton").innerHTML = `<button class="btn btn-dark btn-sm" type="button" onclick="unShare_$id();" style="width: 100%;">Unshare</button>`);
+                    $.post("Utils/Forms/shareAnimation.php", { animationID, fps }, () => document.getElementById("$id-shareButton").innerHTML = `<button class="btn btn-dark btn-sm" type="button" onclick="unShare_$id();" style="width: 100%;">Unshare</button>`);
                 };
                 const delete_$id = () => {
                     document.getElementById("$id-deleteButton").innerHTML = `<button class="btn btn-danger btn-sm" type="button" onclick="deleteConfirm_$id();" style="width: 100%;">Confirm</button>`;
@@ -168,15 +167,15 @@ class Animation
     }
 
     /**
-     * Saves the animation to the database.
-     * @param string $username
+     * Creates and saves a new post in the database.
      * @param number $fps
      * @return void
      */
-    public function share($username, $fps)
+    public function share($fps)
     {
         $db = $_SESSION["database"];
         $timestamp = time();
+        $username = $this->user->username;
         $id = md5($username . $timestamp);
         $db->insert("Post", "PostID, Username, AnimationID, CreatedAt, FPS", "'$id', '$username', '$this->id', '$timestamp', $fps");
     }
