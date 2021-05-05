@@ -25,6 +25,7 @@ if (!isset($_GET["classID"]) || is_null($_GET["classID"])) {
                     // Function runs an AJAX request to update the db in the background, then redirects to the correct class.
                     const joinClass = () => {
                         const classID = document.getElementById("inputClassCode").value;
+                        if (!classID) return false;
                         const validIDs = $validClassIDsJSON;
                         if (!validIDs.includes(classID)) return document.getElementById("invalidCodeWarning").innerHTML = `
                             <div class="alert alert-danger alert-dismissible fade show" role="alert">
@@ -57,6 +58,7 @@ if (!isset($_GET["classID"]) || is_null($_GET["classID"])) {
                 const createClass = () => {
                     const className = document.getElementById("inputClassName").value;
                     const username = "$user->username";
+                    if (!className) return false;
                     $.post("Utils/Forms/createClass.php", { className, username }, (classID) => {
                         document.getElementById("inputClassName").value = "";
                         window.location.replace("class?classID=" + classID);
