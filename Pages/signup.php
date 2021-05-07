@@ -12,8 +12,32 @@ if (isset($_SESSION["auth"]) && $_SESSION["auth"]) {
     $password = $_POST["password"];
     $confirmPassword = $_POST["passwordConfirmation"];
     $type = intval($_POST["type"]);
+    // Tell user to enter a username.
+    if (is_null($username) || strlen($username) === 0) {
+        echo <<<HTML
+            <div class="alert alert-danger" role="alert">
+                No username was entered.
+            </div>
+        HTML;
+    }
+    // Tell user to enter a password.
+    else if (is_null($password) || strlen($password) === 0) {
+        echo <<<HTML
+            <div class="alert alert-danger" role="alert">
+                No password was entered.
+            </div>
+        HTML;
+    }
+    // Tell user to enter a password confirmation.
+    else if (is_null($confirmPassword) || strlen($confirmPassword) === 0) {
+        echo <<<HTML
+            <div class="alert alert-danger" role="alert">
+                No password confirmation was entered.
+            </div>
+        HTML;
+    }
     // Tell user if username is taken.
-    if (!is_null($_SESSION["database"]->select("Username", "User", "Username = '$username'")[0])) {
+    else if (!is_null($_SESSION["database"]->select("Username", "User", "Username = '$username'")[0])) {
         echo <<<HTML
             <div class="alert alert-danger" role="alert">
                 Username is already taken.

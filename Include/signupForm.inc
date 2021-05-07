@@ -6,17 +6,24 @@
         <input type="text" class="form-control bg-dark text-light border-dark" id="inputUsername" aria-describedby="usernameHelp" name="username" placeholder="Username" required>
         <label for="inputUsername">Username (max. 32 characters)</label>
     </div>
+    <script>
+        // Ensures that the username only contains letters and numbers and is no more than 32 characters.
+        $("#inputUsername").on("keypress", (e) => {
+            const isValid = (n) => (/[0-9A-Za-z]/).test(String.fromCharCode(n)) && $("#inputUsername").val().length <= 32;
+            if (!isValid(e.which)) return false;
+        });
+    </script>
     <br>
     <!-- Password field. -->
     <div class="form-floating">
         <input type="password" class="form-control bg-dark text-light border-dark" id="inputPassword" name="password" placeholder="Password" required>
-        <label for="inputPassword">Password (max. 32 characters)</label>
+        <label for="inputPassword">Password</label>
     </div>
     <br>
     <!-- Password confirmation field. -->
     <div class="form-floating">
         <input type="password" class="form-control bg-dark text-light border-dark" id="inputPasswordConfirmation" name="passwordConfirmation" placeholder="Confirm Password" required>
-        <label for="inputPasswordConfirmation">Confirm Password (max. 32 characters)</label>
+        <label for="inputPasswordConfirmation">Confirm Password</label>
     </div>
     <br>
     <!-- User type field. -->
@@ -30,20 +37,4 @@
     <br>
     <!-- Sign up button. -->
     <button type="submit" class="btn btn-dark">Sign Up</button>
-    <script>
-        // Ensures that the username only contains letters and numbers and is no more than 32 characters.
-        $("#inputUsername").on("keypress", (e) => {
-            const isValid = (n) => (/[0-9A-Za-z]/).test(String.fromCharCode(n)) && $("#inputUsername").val().length <= 32;
-            if (!isValid(e.which)) return false;
-        });
-        // Ensures password is no more than 32 characters.
-        $("#inputPassword").on("keypress", (e) => {
-            const isValid = (n) => $("#inputPassword").val().length <= 32;
-            if (!isValid(e.which)) return false;
-        });
-        $("#inputPasswordConfirmation").on("keypress", (e) => {
-            const isValid = (n) => $("#inputPasswordConfirmation").val().length <= 32;
-            if (!isValid(e.which)) return false;
-        });
-    </script>
 </form>
