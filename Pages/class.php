@@ -173,6 +173,14 @@ else {
                 <!-- Allows the user to send messages. -->
                 <div id="input" style="height: 5%; width: 100%;">
                     <script>
+                        // Checks that the user is still a member of the class.
+                        const checkStillInClass = () => {
+                            const classID = "$class->id";
+                            $.post("Utils/Forms/getClassMembers.php", { classID }, (members) => {
+                                if (members.split("<br>").includes("$user->username")) return;
+                                window.location.replace("/class");
+                            });
+                        };
                         // Gets the message content, exits if it has no content, sends AJAX request to update DB, then clears the user's input.
                         const sendMessage = () => {
                             const message = document.getElementById("messageInput").value?.trim();
@@ -207,6 +215,7 @@ else {
                         };
                         // Updates the messages and input section twice per second.
                         setInterval(() => {
+                            checkStillInClass();
                             updateMessages();
                             updateInput();
                         }, 500);
