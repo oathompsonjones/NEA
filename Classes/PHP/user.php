@@ -33,7 +33,9 @@ class User
             case "passwordHash":
                 return $db->select("PasswordHash", "User", "Username = '$username'")[0][0];
             case "type":
-                switch ($db->select("Type", "User", "Username = '$username'")[0][0]) {
+                $type = $db->select("Type", "User", "Username = '$username'")[0][0];
+                if (is_null($type)) return -1;
+                switch ($type) {
                     case 0:
                         return "admin";
                     case 1:

@@ -269,19 +269,17 @@ else {
             </script>
         HTML;
         // Check if the follow or unfollow button should be rendered.
-        if ($isFollowing) {
-            $followButton .= ($isFollowing ? <<<HTML
-                <!-- Unfollow Button -->
-                <div id="followUserButton">
-                    <button onclick="unFollowUser();" class="btn btn-dark btn-sm" type="button" style="padding-left: 10px;">Unfollow</button>
-                </div>
-            HTML : <<<HTML
-                <!-- Follow Button -->
-                <div id="followUserButton">
-                    <button onclick="followUser();" class="btn btn-dark btn-sm" type="button" style="padding-left: 10px;">Follow</button>
-                </div>
-            HTML);
-        }
+        $followButton .= ($isFollowing ? <<<HTML
+            <!-- Unfollow Button -->
+            <div id="followUserButton">
+                <button onclick="unFollowUser();" class="btn btn-dark btn-sm" type="button" style="padding-left: 10px;">Unfollow</button>
+            </div>
+        HTML : <<<HTML
+            <!-- Follow Button -->
+            <div id="followUserButton">
+                <button onclick="followUser();" class="btn btn-dark btn-sm" type="button" style="padding-left: 10px;">Follow</button>
+            </div>
+        HTML);
     }
     echo <<<HTML
         <div class="row row-cols-2">

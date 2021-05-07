@@ -31,9 +31,11 @@ class Animation
             case "name":
                 return $db->select("Name", "Animation", "AnimationID = '$id'")[0][0];
             case "width":
-                return $db->select("Width", "Animation", "AnimationID = '$id'")[0][0];
+                $res = $db->select("Width", "Animation", "AnimationID = '$id'")[0][0];
+                return is_null($res) ? 1 : $res;
             case "height":
-                return $db->select("Height", "Animation", "AnimationID = '$id'")[0][0];
+                $res = $db->select("Height", "Animation", "AnimationID = '$id'")[0][0];
+                return is_null($res) ? 1 : $res;
             case "type":
                 return $db->select("Type", "Animation", "AnimationID = '$id'")[0][0];
             case "typeString":
@@ -213,8 +215,8 @@ class Animation
     public function generateFrameIcons()
     {
         $frames = $this->frames;
-        $ledWidth = 1024 / $this->width;
-        $ledHeight = 1024 / $this->height;
+        $ledWidth = 1024 / max($this->width, 1);
+        $ledHeight = 1024 / max($this->height, 1);
         $binary = array_map("mapToBinary", $frames);
         $images = [];
         $frameCount = count($binary);
@@ -229,8 +231,8 @@ class Animation
                     $leds = array_map("mapBinaryToIntegers", $leds[0]);
                     $ledCount = count($leds);
                     for ($j = 0; $j < $ledCount; ++$j) {
-                        $x = $j % $this->width;
-                        $y = floor($j / $this->width);
+                        $x = $j % max($this->width, 1);
+                        $y = floor($j / max($this->width, 1));
                         $ledColour = imagecolorallocate($image, $leds[$j] * 255, 0, 0);
                         imagefilledrectangle($image, $x * $ledWidth, $y * $ledHeight, ($x + 1) * $ledWidth, ($y + 1) * $ledHeight, $ledColour);
                     }

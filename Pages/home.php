@@ -535,4 +535,6 @@ switch ($user->type) {
             </div>
         HTML;
         break;
+    default:
+        require_once "Page/logout.php";
 }

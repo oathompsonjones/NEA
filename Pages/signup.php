@@ -8,7 +8,7 @@ if (isset($_SESSION["auth"]) && $_SESSION["auth"]) {
     require_once "Include/redirect.inc";
 } else if (isset($_GET["submit"])) {
     // Get form data.
-    $username = preg_replace("/[^0-9A-Za-z]/", "", $_POST["username"]);
+    $username = substr(preg_replace("/[^0-9A-Za-z]/", "", $_POST["username"]), 0, 32);
     $password = $_POST["password"];
     $confirmPassword = $_POST["passwordConfirmation"];
     $type = intval($_POST["type"]);
