@@ -93,6 +93,8 @@ class Database
         for ($i = 0; $i < $columnCount; ++$i) $query .= " $columns[$i] = '$values[$i]'" . ($i !== $columnCount - 1 ? "," : "");
         // Adds the where condition.
         $query .= " WHERE $condition;";
+        // Query the database.
+        $this->mysqli->query($query);
     }
 
     /**
