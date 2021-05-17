@@ -23,6 +23,13 @@ a {
     color: #efefef;
 }
 
+footer {
+    background: rgba(255, 255, 255, 0.1);
+    clear: both;
+    width: 100%;
+    left: 0;
+}
+
 /* These affect the icons used to display and edit animations. */
 /* This wraps the entire icon. */
 .icon {
