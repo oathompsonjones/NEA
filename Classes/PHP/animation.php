@@ -1221,7 +1221,8 @@ class AdaFruitNeoPixelRGB8x8Animation extends Animation
             . "\n\t\tmatrix.show();"
             . "\n\t\tdelay(1000 / $fps);"
             . "\n\t\tclearScreen();"
-            . "\n\t}";
+            . "\n\t}"
+            . "\n}";
     }
 }
 
