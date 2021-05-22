@@ -9,7 +9,7 @@
     <script>
         // Ensures that the username only contains letters and numbers and is no more than 32 characters.
         $("#inputUsername").on("keypress", (e) => {
-            const isValid = (n) => (/[0-9A-Za-z]/).test(String.fromCharCode(n)) && $("#inputUsername").val().length <= 32;
+            const isValid = (n) => (/[0-9A-Za-z]/).test(String.fromCharCode(n)) && $("#inputUsername").val().length < 32;
             if (!isValid(e.which)) return false;
         });
     </script>
