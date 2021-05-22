@@ -159,6 +159,11 @@ if (!$widthSet || !$heightSet || !$typeSet || !$nameSet || !$idSet) {
                 inputName.required = preMade.value === "New";
                 customSetup.style.display = setupOptions.value == 0 ? "block" : "none";
             });
+            // Limits name input.
+            $("#inputName").on("keypress", (e) => {
+                const isValid = (n) => (/[0-9A-Za-z]/).test(String.fromCharCode(n)) && $("#inputName").val().length < 32;
+                if (!isValid(e.which)) return false;
+            });
         </script>
     HTML;
 }
