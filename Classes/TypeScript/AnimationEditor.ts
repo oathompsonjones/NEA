@@ -472,6 +472,7 @@ abstract class AnimationEditor {
      * @memberof AnimationEditor
      */
     public playback(): void {
+        (document.getElementById("saveAlert") as HTMLDivElement).innerHTML = "";
         clearTimeout(this.playbackTimeout);
         const playbackDiv = document.getElementById("playback") as HTMLDivElement;
         const frames = this.makeFrameIcons();
@@ -558,12 +559,16 @@ abstract class AnimationEditor {
         const username = SESSION.username;
         
         // @ts-ignore
-        $.post("Utils/Forms/saveAnimation", { width, height, type, id, name, data, username }, () => document.getElementById("saveAlert").innerHTML = `
-            <div class="alert alert-success alert-dismissible fade show" role="alert">
-                Animation Saved!
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>
-        `);
+        $.post("Utils/Forms/saveAnimation", { width, height, type, id, name, data, username }, () => {
+            clearTimeout(this.playbackTimeout);
+            (document.getElementById("playback") as HTMLDivElement).innerHTML = "";
+            (document.getElementById("saveAlert") as HTMLDivElement).innerHTML = `
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    Animation Saved!
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            `;
+        });
     }
 
     /**
@@ -667,6 +672,7 @@ abstract class AnimationEditor {
      * @memberof AnimationEditor
      */
     public updateIcons(): void {
+        (document.getElementById("saveAlert") as HTMLDivElement).innerHTML = "";
         this.displayIcons();
         // @ts-ignore
         setCookie("data", JSON.stringify(this.frames));

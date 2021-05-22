@@ -239,6 +239,7 @@ class AnimationEditor {
         form.submit();
     }
     playback() {
+        document.getElementById("saveAlert").innerHTML = "";
         clearTimeout(this.playbackTimeout);
         const playbackDiv = document.getElementById("playback");
         const frames = this.makeFrameIcons();
@@ -289,12 +290,16 @@ class AnimationEditor {
         const id = SESSION.matrix.id;
         const name = SESSION.matrix.name;
         const username = SESSION.username;
-        $.post("Utils/Forms/saveAnimation", { width, height, type, id, name, data, username }, () => document.getElementById("saveAlert").innerHTML = `
-            <div class="alert alert-success alert-dismissible fade show" role="alert">
-                Animation Saved!
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>
-        `);
+        $.post("Utils/Forms/saveAnimation", { width, height, type, id, name, data, username }, () => {
+            clearTimeout(this.playbackTimeout);
+            document.getElementById("playback").innerHTML = "";
+            document.getElementById("saveAlert").innerHTML = `
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    Animation Saved!
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            `;
+        });
     }
     setControls(fps, colour) {
         const controlsDiv = document.getElementById("controls");
@@ -383,6 +388,7 @@ class AnimationEditor {
         this.shiftIsDown = !this.shiftIsDown;
     }
     updateIcons() {
+        document.getElementById("saveAlert").innerHTML = "";
         this.displayIcons();
         setCookie("data", JSON.stringify(this.frames));
         setCookie("fps", this.playbackFPS.toString());
