@@ -7,16 +7,27 @@
     },
     "git.ignoreLimitWarning": true,
     "cSpell.words": [
+        "adafruitneopixel",
+        "andor",
+        "animationeditor",
+        "assignmentwork",
         "charliplexing",
         "elif",
         "ledmatrix",
+        "lolshieldanimation",
         "microbit",
+        "monochromaticanimationeditor",
         "neopixel",
         "picokeypad",
+        "picorgbkaypadanimation",
+        "premade",
+        "rgbanimationeditor",
         "scrollbit",
+        "scrollbitanimation",
         "stdlib",
         "toggler",
-        "tscrollbit"
+        "tscrollbit",
+        "variablebrightnessanimaitoneditor"
     ],
     "python.pythonPath": "/usr/bin/python",
 }
