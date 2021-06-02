@@ -1,11 +1,17 @@
 # Microcontroller Animations
 This was my A-Level coursework project. It achieved an overall score of 73/75.
 The scores for each section are as follows:
+
 **Analysis:** 8/9
+
 **Design:** 12/12
+
 **Technical Solution - Completeness of Solution:** 15/15
+
 **Technical Solution - Techniques Used:** 27/27
+
 **Testing:** 7/8
+
 **Evaluation:** 4/4
 
 ## Table of Contents
